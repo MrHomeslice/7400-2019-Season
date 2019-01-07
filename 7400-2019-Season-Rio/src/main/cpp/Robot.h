@@ -7,19 +7,20 @@
 #include "SwerveDrive/SwerveDrive.h"
 #include "Pneumatics/Pneumatics.h"
 
-class Robot : public frc::IterativeRobot
+class Robot : public frc::TimedRobot
 {
+	public    : Robot();
 	protected :
-				void RobotInit();
-				void AutonomousInit();
-				void AutonomousPeriodic();
-				void TeleopInit();
-				void TeleopPeriodic();
+							void RobotInit();
+							void AutonomousInit();
+							void AutonomousPeriodic();
+							void TeleopInit();
+							void TeleopPeriodic();
 
-				NavXGyro     m_gyro;
-				RobotControl m_control;
-				SwerveDrive  m_swerve;
-				Pneumatics	 m_pneumatics;
+							NavXGyro     m_gyro;
+							RobotControl m_control;
+							SwerveDrive  m_swerve;
+							Pneumatics	 m_pneumatics;
 };
 
 #endif

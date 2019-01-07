@@ -5,6 +5,10 @@
 TableController    g_tc;
 MeeseeksProperties g_mp;
 
+Robot::Robot()
+{
+}
+
 void Robot::RobotInit()
 {
 	g_mp.Initialize();
@@ -47,7 +51,7 @@ void Robot::TeleopPeriodic()
 	else if (m_control.DisableSwerve()) {
 		m_swerve.Disable();
 		m_swerve.ShowOffsets();
-		ShowState(state, "Calibrating...\n");
+		ShowState(state, "Calibrating Swerve...\n");
 	}
 	else if (m_control.WriteServeZeros()) {
 		m_swerve.SetSteerOffsets();
@@ -92,4 +96,8 @@ void Robot::AutonomousPeriodic()
 	m_swerve.Periodic();
 }
 
-START_ROBOT_CLASS(Robot)
+int main() 
+{ 
+	return frc::StartRobot<Robot>();
+}
+
