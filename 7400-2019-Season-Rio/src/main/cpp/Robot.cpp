@@ -25,6 +25,8 @@ void Robot::TeleopInit()
 	m_gyro.ZeroYaw();
 	printf("Gyro Zeroed\n");
 
+	
+
 	m_swerve.SetPIDValues();
 
 	//m_swerve.Disable();
@@ -44,26 +46,12 @@ void Robot::TeleopPeriodic()
 
 	bool bControlChanged = m_control.Periodic();
 
-	if (m_control.ZeroSwerve()) {
-		m_swerve.ToZero();
-		ShowState(state, "Zero Swerve...\n");
-	}
-	else if (m_control.DisableSwerve()) {
-		m_swerve.Disable();
-		m_swerve.ShowOffsets();
-		ShowState(state, "Calibrating Swerve...\n");
-	}
-	else if (m_control.WriteServeZeros()) {
-		m_swerve.SetSteerOffsets();
-		ShowState(state, "Setting Zeros...\n");
-	}
-	else if (bControlChanged)
-	{
-		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), m_control.RotationPoint());
-		ShowState(state, "Driving...\n");
-	}
+	m_control.TestButtons();
 
-	m_pneumatics.Grab(m_control.Grab());
+	if(bControlChanged)
+	{
+		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+	}
 
 	m_swerve.Periodic();
 }
@@ -90,8 +78,6 @@ void Robot::AutonomousPeriodic()
 	if (rotation < -.5) rotation = -.5;
 
 	printf("%.6f, %.6f %.6f\n", x, y, rotation);
-
-	m_swerve.Drive(0, 0, rotation, m_gyro.Yaw(), m_control.RotationPoint());
 
 	m_swerve.Periodic();
 }

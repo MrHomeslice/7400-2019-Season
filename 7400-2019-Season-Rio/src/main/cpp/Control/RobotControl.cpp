@@ -17,10 +17,6 @@ RobotControl::RobotControl()
 	m_lastZ  = 0.0;
 
 	m_bXYZChanged = false;
-	m_rotationPoint = eRotateCenter;
-	m_disableSwerve = false;
-	m_writeZeros = false;
-	m_zeroSwerve = false;
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -48,63 +44,21 @@ bool RobotControl::Periodic()
 	m_z 	 =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
 
-	if (m_driveJoyStick.OnlyX()->Pressed()) {
-		m_y = 0.0;
-		m_z = 0.0;
-	}
-	else if (m_driveJoyStick.OnlyY()->Pressed()) {
-		m_x = 0.0;
-		m_z = 0.0;
-	}
-	else if (m_driveJoyStick.OnlyZ()->Pressed()) {
-		m_x = 0.0;
-		m_y = 0.0;
-	}
+	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
 
-	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) {
+	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
+	{
 		m_bXYZChanged = true;
 		m_lastX = m_x;
 		m_lastY = m_y;
 		m_lastZ = m_z;
 	}
 	else
+	{
 		m_bXYZChanged = false;
-
-	if (m_driveJoyStick.CenterCenter()->Pressed())
-		m_rotationPoint = eRotateCenter;
-
-	else if (m_driveJoyStick.FrontLeftCenter()->Pressed())
-		m_rotationPoint = eRotateFrontLeft;
-
-	else if (m_driveJoyStick.FrontRightCenter()->Pressed())
-		m_rotationPoint = eRotateFrontRight;
-
-	else if (m_driveJoyStick.BackLeftCenter()->Pressed())
-		m_rotationPoint = eRotateBackLeft;
-
-	else if (m_driveJoyStick.BackRightCenter()->Pressed())
-		m_rotationPoint = eRotateBackRight;
-
-	m_zeroSwerve = m_driveJoyStick.ZeroSwerve()->Pressed() ? true : false;
-
-	m_disableSwerve = (m_driveJoyStick.DisableSwerve()->Value() == 0 ? false : true);
-
-	if (m_driveJoyStick.WriteSwerveOffsets()->Changed()) {
-		if (m_driveJoyStick.WriteSwerveOffsets()->Pressed()) {
-			if (m_disableSwerve) {
-				m_driveJoyStick.DisableSwerve()->Value(0);
-				m_disableSwerve = false;
-				m_writeZeros = true;
-			}
-		}
 	}
 
 	return m_bXYZChanged;
-}
-
-bool RobotControl::Grab()
-{
-	return m_driveJoyStick.Grab()->Value() != 0 ? true : false;
 }
 
 bool RobotControl::XYZChanged()
@@ -127,32 +81,46 @@ double RobotControl::Z()
 	return m_z * m_slider;
 }
 
-double RobotControl::Slider()
+bool RobotControl::Cargo()
 {
-	return m_slider;
+	return m_bCargo;
 }
 
-bool RobotControl::DisableSwerve()
+void RobotControl::TestButtons()
 {
-	return m_disableSwerve;
-}
+	if(m_driveJoyStick.Allign()->Changed() && m_driveJoyStick.Allign()->Pressed())
+		printf("Allignment Changed...\n");
 
-bool RobotControl::ZeroSwerve()
-{
-	return m_zeroSwerve;
-}
-
-bool RobotControl::WriteServeZeros()
-{
-	if (m_writeZeros)
+	if(m_driveJoyStick.Eject()->Changed() && m_driveJoyStick.Eject()->Pressed())
+		printf("Eject Changed...\n");
+		
+	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
+		printf("Flip Changed...\n");
+	
+	if(m_driveJoyStick.Intake()->Changed() && m_driveJoyStick.Intake()->Pressed())
+		printf("Intake Changed...\n");
+	
+	if(m_bCargo)
 	{
-		m_writeZeros = false;
-		return true;
+		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+			printf("Cargo Top Height Changed...\n");
+	
+		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+			printf("Cargo Mid Height Changed...\n");
+	
+		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+			printf("Cargo Bottom Height Changed...\n");
 	}
-	return false;
-}
 
-eRotationPoint RobotControl::RotationPoint()
-{
-	return m_rotationPoint;
+	else
+	{
+		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+			printf("Hatch Top Height Changed...\n");
+	
+		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+			printf("Hatch Mid Height Changed...\n");
+	
+		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+			printf("Hatch Bottom Height Changed...\n");
+	}
 }
