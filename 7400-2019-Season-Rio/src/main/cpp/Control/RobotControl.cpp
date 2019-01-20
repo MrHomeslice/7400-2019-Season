@@ -68,14 +68,20 @@ bool RobotControl::Periodic()
 		m_bXYZChanged = false;
 	}
 
+	if(m_driveJoyStick.GetPOVState() == -1) //Left
+	{
 
+	}
 
-	if(m_driveJoyStick.GetPOVState() == -1)
-		printf("POV: Left\n");
-	else if(m_driveJoyStick.GetPOVState() == 1)
-		printf("POV: Right\n");
-	else
-		printf("POV: Center\n");
+	else if(m_driveJoyStick.GetPOVState() == 1) //Right
+	{
+
+	}	
+
+	else //Center
+	{
+		
+	}	
 
 	return m_bXYZChanged;
 }
