@@ -25,6 +25,7 @@ class RobotControl
 				double Deadband(double x, double d);
 
 				DriveJoystick  m_driveJoyStick;
+				int 		   m_pov;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
 				bool           m_bCargo, m_bXYZChanged;
 };
