@@ -46,6 +46,8 @@ void Robot::TeleopPeriodic()
 
 	bool bControlChanged = m_control.Periodic();
 
+	bool bCargoState = m_control.Cargo();
+
 	m_control.TestButtons();
 
 	if(bControlChanged)
@@ -53,7 +55,9 @@ void Robot::TeleopPeriodic()
 		//m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
-	//m_swerve.Periodic();
+	m_pneumatics.Flip(m_control.FlipState());
+
+	m_swerve.Periodic();
 }
 
 void Robot::AutonomousInit()

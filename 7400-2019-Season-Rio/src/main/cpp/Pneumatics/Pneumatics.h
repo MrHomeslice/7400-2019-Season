@@ -7,9 +7,9 @@ class Pneumatics
 {
 	public    : Pneumatics();
 
-				void Grab(bool bGrab);
+				void Flip(bool bFlip);
 	protected :
-				frc::DoubleSolenoid m_doubleSolonoid;
+				frc::DoubleSolenoid m_flip;
 };
 
 #endif

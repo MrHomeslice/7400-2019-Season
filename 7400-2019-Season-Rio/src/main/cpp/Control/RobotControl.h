@@ -4,6 +4,7 @@
 #include <frc/wpilib.h>
 #include "..\Joystick\DriveJoystick.h"
 #include "Defines.h"
+#include "..\Pneumatics\Pneumatics.h"
 
 #define JOYSTICK_1	0
 
@@ -19,6 +20,7 @@ class RobotControl
 				double Z();
 				double Slider();
 				bool   Cargo();
+				bool   FlipState();
 
 				void TestButtons();
 	protected :
@@ -27,7 +29,7 @@ class RobotControl
 				DriveJoystick  m_driveJoyStick;
 				int 		   m_pov;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
-				bool           m_bCargo, m_bXYZChanged;
+				bool           m_bCargo, m_bXYZChanged, m_bFlipState;
 };
 
 #endif

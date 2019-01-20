@@ -17,6 +17,7 @@ RobotControl::RobotControl()
 	m_lastZ  = 0.0;
 
 	m_bXYZChanged = false;
+	m_bFlipState = true;
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -46,6 +47,14 @@ bool RobotControl::Periodic()
 	m_pov    = m_driveJoyStick.GetPOV();
 
 	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
+
+	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
+	{
+		if(!m_bFlipState) 
+			m_bFlipState = true;
+		else
+			m_bFlipState = false;
+	}
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
 	{
@@ -104,9 +113,9 @@ void RobotControl::TestButtons()
 	if(m_driveJoyStick.Eject()->Changed() && m_driveJoyStick.Eject()->Pressed())
 		printf("Eject Changed...\n");
 		
-	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
-		printf("Flip Changed...\n");
-	
+	//if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
+	//	printf("Flip Changed...\n");
+		
 	if(m_driveJoyStick.Intake()->Changed() && m_driveJoyStick.Intake()->Pressed())
 		printf("Intake Changed...\n");
 	
@@ -132,8 +141,9 @@ void RobotControl::TestButtons()
 	
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
 			printf("Hatch Bottom Height Changed...\n");
-	}	
-
-	
-	
+	}
+}
+bool RobotControl::FlipState()
+{
+		return m_bFlipState;
 }
