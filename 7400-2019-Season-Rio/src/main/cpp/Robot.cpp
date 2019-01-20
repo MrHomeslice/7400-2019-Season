@@ -17,7 +17,7 @@ void Robot::RobotInit()
 
 	m_gyro.Initialize();
 
-	m_swerve.Initialize();
+	//m_swerve.Initialize();
 }
 
 void Robot::TeleopInit()
@@ -27,7 +27,7 @@ void Robot::TeleopInit()
 
 	
 
-	m_swerve.SetPIDValues();
+	//m_swerve.SetPIDValues();
 
 	//m_swerve.Disable();
 }
@@ -50,10 +50,10 @@ void Robot::TeleopPeriodic()
 
 	if(bControlChanged)
 	{
-		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+		//m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
-	m_swerve.Periodic();
+	//m_swerve.Periodic();
 }
 
 void Robot::AutonomousInit()
@@ -63,8 +63,8 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-	m_swerve.Disable();
-	m_swerve.Periodic();
+	//m_swerve.Disable();
+	//m_swerve.Periodic();
 	return;
 
 	double x = g_tc.GetDouble("/Target/X", -1000.0);
@@ -79,7 +79,7 @@ void Robot::AutonomousPeriodic()
 
 	printf("%.6f, %.6f %.6f\n", x, y, rotation);
 
-	m_swerve.Periodic();
+	//m_swerve.Periodic();
 }
 
 int main() 

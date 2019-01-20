@@ -19,8 +19,8 @@ class Robot : public frc::TimedRobot
 
 							NavXGyro     m_gyro;
 							RobotControl m_control;
-							SwerveDrive  m_swerve;
-							Pneumatics	 m_pneumatics;
+							//SwerveDrive  m_swerve;
+							//Pneumatics	 m_pneumatics;
 };
 
 #endif

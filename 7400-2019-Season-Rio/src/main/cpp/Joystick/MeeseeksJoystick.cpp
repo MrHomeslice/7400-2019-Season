@@ -4,6 +4,10 @@
 MeeseeksJoystick::MeeseeksJoystick(int port)
 	            : Joystick(port)
 {
+	m_oldPOV = -1;
+	m_newPOV = -1;
+
+	m_bPOVChanged = false;
 }
 
 void MeeseeksJoystick::Periodic()
@@ -18,6 +22,28 @@ void MeeseeksJoystick::Periodic()
 
 		pButton->Update(buttonState);
 	}
+
+	m_bPOVChanged = false;
+
+	m_POVState = 0;
+
+	m_newPOV = GetPOV();
+
+	if(m_newPOV != m_oldPOV)
+	{
+		if((m_oldPOV <= 180 && m_oldPOV >= 0 && m_newPOV >= 180) || (m_oldPOV >= 180 && m_newPOV <= 180 && m_newPOV >= 0) || (m_oldPOV == -1 && m_newPOV > -1))
+			m_bPOVChanged = true;
+		
+		m_oldPOV = m_newPOV;
+	}
+
+	if(m_bPOVChanged)
+	{
+		if(m_newPOV > 180)
+			m_POVState = -1;
+		else if(m_newPOV > 0 && m_newPOV < 180)
+			m_POVState = 1;
+	}
 }
 
 void MeeseeksJoystick::Initialize()
@@ -28,4 +54,9 @@ void MeeseeksJoystick::Initialize()
 
 		pButton->Initialize();
 	}
+}
+
+int MeeseeksJoystick::GetPOVState()
+{
+	return m_POVState;
 }

@@ -43,6 +43,7 @@ bool RobotControl::Periodic()
 	m_y	     = -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
 	m_z 	 =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
+	m_pov    = m_driveJoyStick.GetPOV();
 
 	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
 
@@ -57,6 +58,15 @@ bool RobotControl::Periodic()
 	{
 		m_bXYZChanged = false;
 	}
+
+
+
+	if(m_driveJoyStick.GetPOVState() == -1)
+		printf("POV: Left\n");
+	else if(m_driveJoyStick.GetPOVState() == 1)
+		printf("POV: Right\n");
+	else
+		printf("POV: Center\n");
 
 	return m_bXYZChanged;
 }
@@ -122,5 +132,8 @@ void RobotControl::TestButtons()
 	
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
 			printf("Hatch Bottom Height Changed...\n");
-	}
+	}	
+
+	
+	
 }
