@@ -46,6 +46,8 @@ bool RobotControl::Periodic()
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
 	m_pov    = m_driveJoyStick.GetPOV();
 
+	m_bRobotCentric = m_driveJoyStick.CentricityToggle()->Value() == 1 ? true : false;
+
 	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
 
 	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
@@ -116,14 +118,11 @@ void RobotControl::TestButtons()
 	if(m_driveJoyStick.Allign()->Changed() && m_driveJoyStick.Allign()->Pressed())
 		printf("Allignment Changed...\n");
 
-	if(m_driveJoyStick.Eject()->Changed() && m_driveJoyStick.Eject()->Pressed())
+	if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
 		printf("Eject Changed...\n");
 		
 	//if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
 	//	printf("Flip Changed...\n");
-		
-	if(m_driveJoyStick.Intake()->Changed() && m_driveJoyStick.Intake()->Pressed())
-		printf("Intake Changed...\n");
 	
 	if(m_bCargo)
 	{
@@ -148,8 +147,18 @@ void RobotControl::TestButtons()
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
 			printf("Hatch Bottom Height Changed...\n");
 	}
+
+	if(m_driveJoyStick.CentricityToggle()->Changed())
+	{
+		printf("Centricity Value: %d\n", m_driveJoyStick.CentricityToggle()->Value());
+	}
 }
 bool RobotControl::FlipState()
 {
-		return m_bFlipState;
+	return m_bFlipState;
+}
+
+bool RobotControl::RobotCentric()
+{
+	return m_driveJoyStick.CentricityToggle()->Value();
 }

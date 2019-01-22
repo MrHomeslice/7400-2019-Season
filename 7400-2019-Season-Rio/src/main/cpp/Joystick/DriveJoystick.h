@@ -8,17 +8,19 @@ class DriveJoystick : public MeeseeksJoystick
 	public    : DriveJoystick(int joyStickPort);
 
 				JSButton *Allign()	   	 { return &m_allign; 	   }
-				JSButton *Eject()	   	 { return &m_eject;		   }
+				JSButton *Action()	   	 { return &m_action;	   }
 				JSButton *ElevatorFlip() { return &m_elevatorFlip; }
-				JSButton *Intake()	   	 { return &m_intake;	   }
 				JSButton *TopHeight()	 { return &m_topHeight;	   }
 				JSButton *MidHeight()	 { return &m_midHeight;	   }
 				JSButton *BottomHeight() { return &m_bottomHeight; }
+
+				JoystickValueButton *CentricityToggle() { return &m_centricityToggle; }
 				
 				void Periodic();
 	protected :
-				JSButton m_allign, m_eject, m_elevatorFlip, m_intake;
+				JSButton m_allign, m_action, m_elevatorFlip;
 				JSButton m_topHeight, m_midHeight, m_bottomHeight;
+				JoystickValueButton m_centricityToggle;
 				
 };
 

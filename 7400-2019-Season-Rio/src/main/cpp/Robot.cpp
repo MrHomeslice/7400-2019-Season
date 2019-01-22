@@ -6,6 +6,8 @@ TableController    g_tc;
 MeeseeksProperties g_mp;
 
 Robot::Robot()
+	 :  m_deliverySystem(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
+
 {
 }
 
@@ -23,9 +25,8 @@ void Robot::RobotInit()
 void Robot::TeleopInit()
 {
 	m_gyro.ZeroYaw();
-	printf("Gyro Zeroed\n");
-
 	
+	printf("Gyro Zeroed\n");	
 
 	m_swerve.SetPIDValues();
 
@@ -52,7 +53,7 @@ void Robot::TeleopPeriodic()
 
 	if(bControlChanged)
 	{
-		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_control.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
 	m_pneumatics.Flip(m_control.FlipState());

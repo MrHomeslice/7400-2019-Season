@@ -21,6 +21,7 @@ class RobotControl
 				double Slider();
 				bool   Cargo();
 				bool   FlipState();
+				bool   RobotCentric();
 
 				void TestButtons();
 	protected :
@@ -29,7 +30,7 @@ class RobotControl
 				DriveJoystick  m_driveJoyStick;
 				int 		   m_pov;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
-				bool           m_bCargo, m_bXYZChanged, m_bFlipState;
+				bool           m_bCargo, m_bXYZChanged, m_bFlipState, m_bRobotCentric;
 };
 
 #endif
