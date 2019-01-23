@@ -1,11 +1,13 @@
 #include "RobotControl.h"
 #include <frc/GenericHID.h>
 #include "..\MeeseeksProperties.h"
+#include <unistd.h>
 
 extern MeeseeksProperties g_mp;
 
 RobotControl::RobotControl()
-						: m_driveJoyStick(JOYSTICK_1)
+						: m_driveJoyStick(JOYSTICK_1),
+						  m_acquiredSwitch(0)
 {
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;
@@ -18,6 +20,16 @@ RobotControl::RobotControl()
 
 	m_bXYZChanged = false;
 	m_bFlipState = true;
+
+	m_ejectCounter = 0;
+
+	m_cargoState = eCargoStateNull;
+	m_lastCargoState = eCargoStateNull;
+}
+
+void RobotControl::Initialize()
+{
+	m_ladder.Initialize();
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -46,15 +58,13 @@ bool RobotControl::Periodic()
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
 	m_pov    = m_driveJoyStick.GetPOV();
 
+	m_bRobotCentric = m_driveJoyStick.CentricityToggle()->Value() == 1 ? true : false;
+
 	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
 
-	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
-	{
-		if(!m_bFlipState) 
-			m_bFlipState = true;
-		else
-			m_bFlipState = false;
-	}
+	ProcessCargoState();
+
+	m_ladder.Periodic();
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
 	{
@@ -82,6 +92,14 @@ bool RobotControl::Periodic()
 	{
 		
 	}	
+
+	if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
+	{
+		if(!m_bFlipState) 
+			m_bFlipState = true;
+		else
+			m_bFlipState = false;
+	}
 
 	return m_bXYZChanged;
 }
@@ -116,14 +134,11 @@ void RobotControl::TestButtons()
 	if(m_driveJoyStick.Allign()->Changed() && m_driveJoyStick.Allign()->Pressed())
 		printf("Allignment Changed...\n");
 
-	if(m_driveJoyStick.Eject()->Changed() && m_driveJoyStick.Eject()->Pressed())
+	if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
 		printf("Eject Changed...\n");
 		
 	//if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
 	//	printf("Flip Changed...\n");
-		
-	if(m_driveJoyStick.Intake()->Changed() && m_driveJoyStick.Intake()->Pressed())
-		printf("Intake Changed...\n");
 	
 	if(m_bCargo)
 	{
@@ -148,8 +163,101 @@ void RobotControl::TestButtons()
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
 			printf("Hatch Bottom Height Changed...\n");
 	}
+
+	if(m_driveJoyStick.CentricityToggle()->Changed())
+	{
+		printf("Centricity Value: %d\n", m_driveJoyStick.CentricityToggle()->Value());
+	}
 }
 bool RobotControl::FlipState()
 {
-		return m_bFlipState;
+	return m_bFlipState;
+}
+
+bool RobotControl::RobotCentric()
+{
+	return m_driveJoyStick.CentricityToggle()->Value();
+}
+
+void RobotControl::ProcessCargoState()
+{
+	NewStateCheck();
+
+
+	switch (m_cargoState)
+	{
+		case eCargoStateNull     :
+		{
+			if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
+			{
+				m_cargoState = eCargoStateAquiring;
+			}
+
+			break;
+		}
+		case eCargoStateAquiring :
+		{
+			if(m_acquiredSwitch.Get()) 
+			{
+				m_cargoState = eCargoStateAquired;
+			}
+
+			if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
+			{
+				m_cargoState = eCargoStateNull;
+			}
+
+			break;
+		}
+		case eCargoStateAquired  :
+		{
+			if(m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed())
+			{
+				m_cargoState = eCargoStateFlipped;
+			}
+
+			break;
+		}
+		case eCargoStateFlipped  :
+		{
+			if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
+			{
+				//m_pneumatics.Flip(FlipState());
+
+				m_cargoState = eCargoStateEjecting;
+			}
+
+			break;
+		}
+		case eCargoStateEjecting :
+		{
+			m_ejectCounter++;
+			if(m_ejectCounter % 50 == 0)
+			{
+				m_cargoState = eCargoStateEjected;
+			}
+			
+			break;
+		}
+
+		case eCargoStateEjected  :
+		{
+			//m_pneumatics.Flip(FlipState());
+
+
+			m_cargoState = eCargoStateNull;
+			
+
+			break;
+		}
+	}
+}
+
+void RobotControl::NewStateCheck()
+{
+	if(m_lastCargoState != m_cargoState)
+	{
+		printf("State: %d\n", m_cargoState);
+		m_lastCargoState = m_cargoState;
+	}
 }

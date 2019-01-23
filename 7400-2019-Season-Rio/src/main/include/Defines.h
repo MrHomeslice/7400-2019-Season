@@ -6,6 +6,13 @@
 #define BACK_RIGHT  2
 #define BACK_LEFT   3
 
+enum Constants 
+{
+	kSlotIdx = 0,
+	kPIDLoopIdx = 0,
+	kTimeoutMs = 30
+};
+
 typedef enum
 {
 	eRotateCenter = -1,
