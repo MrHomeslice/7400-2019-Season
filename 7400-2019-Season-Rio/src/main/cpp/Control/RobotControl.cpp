@@ -121,7 +121,7 @@ double RobotControl::Y()
 
 double RobotControl::Z()
 {
-	return m_z * m_slider;
+	return m_z / 2;
 }
 
 bool RobotControl::Cargo()
@@ -164,7 +164,7 @@ void RobotControl::TestButtons()
 			printf("Hatch Bottom Height Changed...\n");
 	}
 
-	if(m_driveJoyStick.CentricityToggle()->Changed())
+	if(m_driveJoyStick.CentricityToggle()->Changed() && m_driveJoyStick.CentricityToggle()->Pressed())
 	{
 		printf("Centricity Value: %d\n", m_driveJoyStick.CentricityToggle()->Value());
 	}
@@ -222,7 +222,7 @@ void RobotControl::ProcessCargoState()
 		{
 			if(m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed())
 			{
-				//m_pneumatics.Flip(FlipState());
+				m_pneumatics.Flip(FlipState());
 
 				m_cargoState = eCargoStateEjecting;
 			}
@@ -242,7 +242,7 @@ void RobotControl::ProcessCargoState()
 
 		case eCargoStateEjected  :
 		{
-			//m_pneumatics.Flip(FlipState());
+			m_pneumatics.Flip(FlipState());
 
 
 			m_cargoState = eCargoStateNull;

@@ -34,5 +34,5 @@ void Ladder::Initialize()
 
 void Ladder::Periodic()
 {
-    
+
 }

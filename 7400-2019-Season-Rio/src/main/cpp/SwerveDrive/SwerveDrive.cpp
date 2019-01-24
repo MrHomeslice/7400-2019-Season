@@ -39,7 +39,7 @@ void SwerveDrive::Disable()
 }
 
 void SwerveDrive::RectangularToBoundedCircle(double &x, double &y) //AKA Mikee is smarter that Mr Patrick
-{
+{	
 	if (x == 0 || y == 0)
 		return;
 
@@ -119,7 +119,10 @@ void SwerveDrive::CalculateDriveVectors(DoubleXY *pDestCorners)
 
 	  DoubleXY delta = g_mp.m_corners[index] - pDestCorners[index];
 
-      m_angle[index]     = 270.0 - 180.0 * atan2(delta.y, delta.x) / M_PI;
+	  if (delta.y != 0.0 || delta.y != 0) 
+
+      	m_angle[index] = 270.0 - 180.0 * atan2(delta.y, delta.x) / M_PI;
+
       m_magnitude[index] = 10.0 * sqrt(delta.x * delta.x + delta.y * delta.y);
 
       if (m_angle[index] < 0)   m_angle[index] += 360.0;
@@ -141,7 +144,7 @@ void SwerveDrive::SetSteerPosition(int module, int position)
 }
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
-{
+{ 	
 	z /= g_mp.m_zScale;
 
 	RectangularToBoundedCircle(x, y);

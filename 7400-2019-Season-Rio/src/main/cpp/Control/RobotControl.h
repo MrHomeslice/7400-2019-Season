@@ -58,7 +58,7 @@ class RobotControl
 
 				DriveJoystick  m_driveJoyStick;
 				frc::DigitalInput   m_acquiredSwitch;
-				//Pneumatics     m_pneumatics;
+				Pneumatics     m_pneumatics;
 
 				int 		   m_pov, m_ejectCounter;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
