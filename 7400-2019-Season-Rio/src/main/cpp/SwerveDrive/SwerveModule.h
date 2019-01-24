@@ -2,12 +2,7 @@
 #define SWERVE_MODULE_H_INCLUDED
 
 #include <ctre/Phoenix.h>
-
-enum Constants {
-	kSlotIdx = 0,
-	kPIDLoopIdx = 0,
-	kTimeoutMs = 30
-};
+#include "Defines.h"
 
 #define STEER_ENCODER_ZERO_OFFSET (0.0) //(1000.0)
 

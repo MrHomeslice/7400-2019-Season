@@ -6,7 +6,7 @@ TableController    g_tc;
 MeeseeksProperties g_mp;
 
 Robot::Robot()
-	 :  m_deliverySystem(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
+	: m_deliverySystem(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
 
 {
 }
@@ -19,14 +19,15 @@ void Robot::RobotInit()
 
 	m_gyro.Initialize();
 
+	m_control.Initialize();
+
 	m_swerve.Initialize();
 }
 
 void Robot::TeleopInit()
 {
 	m_gyro.ZeroYaw();
-	
-	printf("Gyro Zeroed\n");	
+	printf("Gyro Zeroed\n");
 
 	m_swerve.SetPIDValues();
 
@@ -41,7 +42,7 @@ void ShowState(std::string &oldState, const char *pNewState)
 	}
 }
 
-void Robot::TeleopPeriodic()
+void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
 	static std::string state = "Idle";
 
@@ -49,14 +50,12 @@ void Robot::TeleopPeriodic()
 
 	bool bCargoState = m_control.Cargo();
 
-	m_control.TestButtons();
-
-	if(bControlChanged)
+	if (bControlChanged)
 	{
 		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_control.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
-	m_pneumatics.Flip(m_control.FlipState());
+	m_control.TestButtons();
 
 	m_swerve.Periodic();
 }
@@ -79,7 +78,7 @@ void Robot::AutonomousPeriodic()
 
 	rotation /= 2.0;
 
-	if (rotation >  .5) rotation =  .5;
+	if (rotation > .5) rotation = .5;
 	if (rotation < -.5) rotation = -.5;
 
 	printf("%.6f, %.6f %.6f\n", x, y, rotation);
@@ -87,8 +86,8 @@ void Robot::AutonomousPeriodic()
 	m_swerve.Periodic();
 }
 
-int main() 
-{ 
+int main()
+{
 	return frc::StartRobot<Robot>();
 }
 
