@@ -5,6 +5,11 @@ Pneumatics::Pneumatics()
 {
 }
 
+void Pneumatics::Initialize()
+{
+	Flip(false);
+}
+
 void Pneumatics::Flip(bool bFlip)
 {
 	m_flip.Set(bFlip ? frc::DoubleSolenoid::kForward : frc::DoubleSolenoid::kReverse);

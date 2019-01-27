@@ -7,6 +7,7 @@ class Pneumatics
 {
 	public    : Pneumatics();
 
+				void Initialize();
 				void Flip(bool bFlip);
 	protected :
 				frc::DoubleSolenoid m_flip;

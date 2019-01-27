@@ -1,7 +1,9 @@
 #include "Ladder.h"
 #include "..\DataTable\TableController.h"
+#include "..\Control\RobotControl.h"
 
 extern TableController g_tc;
+extern RobotControl	   g_rc;
 
 Ladder::Ladder()
 {
@@ -34,5 +36,5 @@ void Ladder::Initialize()
 
 void Ladder::Periodic()
 {
-
+    
 }

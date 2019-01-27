@@ -6,7 +6,7 @@
 #include "Control/RobotControl.h"
 #include "SwerveDrive/SwerveDrive.h"
 #include "Pneumatics/Pneumatics.h"
-#include "SubSystems/DeliverySystem.h"
+#include "SubSystems/CargoControl.h"
 
 class Robot : public frc::TimedRobot
 {
@@ -17,12 +17,13 @@ class Robot : public frc::TimedRobot
 							void AutonomousPeriodic();
 							void TeleopInit();
 							void TeleopPeriodic();
+							void DisabledInit();
+							void DisabledPeriodic();
 
 							NavXGyro       m_gyro;
 							RobotControl   m_control;
 							SwerveDrive    m_swerve;
-							Pneumatics	   m_pneumatics;
-							DeliverySystem m_deliverySystem;
+							CargoControl   m_cargoControl;
 };
 
 #endif

@@ -1,12 +1,14 @@
 #include "Robot.h"
 #include "MeeseeksProperties.h"
 #include "DataTable\TableController.h"
+#include "Control\RobotControl.h"
 
 TableController    g_tc;
 MeeseeksProperties g_mp;
+RobotControl	   g_rc;
 
 Robot::Robot()
-	: m_deliverySystem(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
+	 :  m_cargoControl(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
 
 {
 }
@@ -16,6 +18,8 @@ void Robot::RobotInit()
 	g_mp.Initialize();
 
 	g_tc.Initialize();
+
+	g_rc.Initialize();
 
 	m_gyro.Initialize();
 
@@ -46,16 +50,16 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
 	static std::string state = "Idle";
 
-	bool bControlChanged = m_control.Periodic();
+	bool bControlChanged = m_control.Periodic(true);
 
 	bool bCargoState = m_control.Cargo();
 
-	if (bControlChanged)
+	if(bControlChanged)
 	{
 		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_control.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
-	m_control.TestButtons();
+	m_control.ReadButtons();
 
 	m_swerve.Periodic();
 }
@@ -78,7 +82,7 @@ void Robot::AutonomousPeriodic()
 
 	rotation /= 2.0;
 
-	if (rotation > .5) rotation = .5;
+	if (rotation >  .5) rotation =  .5;
 	if (rotation < -.5) rotation = -.5;
 
 	printf("%.6f, %.6f %.6f\n", x, y, rotation);
@@ -86,8 +90,17 @@ void Robot::AutonomousPeriodic()
 	m_swerve.Periodic();
 }
 
-int main()
+void Robot::DisabledInit()
 {
-	return frc::StartRobot<Robot>();
+
 }
 
+void Robot::DisabledPeriodic()
+{
+	m_control.Periodic(false);
+}
+
+int main() 
+{ 
+	return frc::StartRobot<Robot>();
+}

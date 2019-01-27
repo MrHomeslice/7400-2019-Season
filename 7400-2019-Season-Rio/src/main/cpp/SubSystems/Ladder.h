@@ -1,3 +1,6 @@
+#ifndef LADDER_H_INCLUDED
+#define LADDER_H_INCLUDED
+
 #include <ctre/Phoenix.h>
 #include "Defines.h"
 
@@ -18,3 +21,5 @@ class Ladder
 
              std::string   m_name;
 };
+
+#endif

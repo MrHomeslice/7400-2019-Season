@@ -4,20 +4,9 @@
 #include <frc/wpilib.h>
 #include "..\Joystick\DriveJoystick.h"
 #include "Defines.h"
-#include "..\Pneumatics\Pneumatics.h"
-#include "Ladder.h"
+#include "..\SubSystems\Ladder.h"
 
 #define JOYSTICK_1	0
-
-typedef enum
-{
-	eCargoStateNull = 0,
-	eCargoStateAquiring,
-	eCargoStateAquired,
-	eCargoStateFlipped,
-	eCargoStateEjecting,
-	eCargoStateEjected
-} CargoState;
 
 typedef enum
 {
@@ -33,40 +22,51 @@ typedef enum
 	eTemp9,
 }	DigitalInput;
 
+typedef enum
+{
+	eLadderHeightGround = 0,
+	eLadderHeightCargoBottom,
+	eLadderHeightCargoMid,
+	eLadderHeightCargoTop,
+	eLadderHeightHatchBottom,
+	eLadderHeightHatchMid,
+	eLadderHeightHatchTop,
+} LadderHeight;
+
 class RobotControl
 {
-public: RobotControl();
+	public    : RobotControl();
 
-		bool Periodic();
-		bool XYZChanged();
-		void Initialize();
+				bool Periodic(bool bTeleop);
+				bool XYZChanged();
+				void Initialize();
 
-		double X();
-		double Y();
-		double Z();
-		double Slider();
-		bool   Cargo();
-		bool   FlipState();
-		bool   RobotCentric();
+				double X();
+				double Y();
+				double Z();
+				double Slider();
+				bool   Cargo();
+				bool   RobotCentric();
+				
+				void NewStateCheck();
+				void ProcessLadderState();
+				void ReadButtons();
+				void CargoEjected();
 
-		void NewStateCheck();
-		void ProcessCargoState();
-		void ProcessLadderState();
-		void TestButtons();
-protected:
-	double Deadband(double x, double d);
+				DriveJoystick m_driveJoyStick;
 
-	DriveJoystick  m_driveJoyStick;
-	frc::DigitalInput   m_acquiredSwitch;
-	Pneumatics     m_pneumatics;
+				bool m_bCargo, m_bAction, m_bFlipped;
 
-	int 		   m_pov, m_ejectCounter;
-	double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
-	bool           m_bCargo, m_bXYZChanged, m_bFlipState, m_bRobotCentric;
+				LadderHeight m_ladderTargetHeight;
+	protected :
+				double Deadband(double x, double d);
 
-	Ladder         m_ladder;
-	CargoState     m_cargoState;
-	CargoState	   m_lastCargoState;
+				int 		   m_pov;
+				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
+				bool           m_bXYZChanged, m_bRobotCentric;
+
+				Ladder         m_ladder;
+				
 };
 
 #endif
