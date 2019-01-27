@@ -22,6 +22,9 @@ class HatchControl
 	public    : HatchControl(int movementID, int grabberID);
 
                 void Periodic();
+                void Aquire();
+                void Eject();
+                void GrabbersOff();
 
 	protected :
                 double HatchCurrent();

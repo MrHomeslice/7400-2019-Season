@@ -18,6 +18,7 @@ RobotControl::RobotControl()
 	m_lastZ  = 0.0;
 
 	m_bXYZChanged = false;
+	m_bChangedHeight = false;
 }
 
 void RobotControl::Initialize()
@@ -122,28 +123,51 @@ void RobotControl::ReadButtons()
 		
 	m_bFlipped = m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed();
 	
+	if(m_bFlipped)
+	{
+		m_flippedStateValue = m_driveJoyStick.ElevatorFlip()->Value();
+	}
+	
 	if(m_bCargo)
 	{
 		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoTop;
+		}
 	
 		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoMid;
-	
+		}
+
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoBottom;
+		}
 	}
 
 	else
 	{
 		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchTop;
-	
+		}
+		
 		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchMid;
-	
+		}
+
 		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchBottom;
+		}
 	}
 
 	if(m_driveJoyStick.CentricityToggle()->Changed() && m_driveJoyStick.CentricityToggle()->Pressed())
@@ -159,5 +183,6 @@ bool RobotControl::RobotCentric()
 
 void RobotControl::CargoEjected()
 {
+	m_bChangedHeight = true;
 	m_ladderTargetHeight = eLadderHeightGround;
 }

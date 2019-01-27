@@ -10,6 +10,17 @@
 
 typedef enum
 {
+	eLadderHeightGround = 0,
+	eLadderHeightCargoBottom,
+	eLadderHeightCargoMid,
+	eLadderHeightCargoTop,
+	eLadderHeightHatchBottom,
+	eLadderHeightHatchMid,
+	eLadderHeightHatchTop,
+} LadderHeight;
+
+typedef enum
+{
 	eElevatorSwitch = 0,
 	eTemp1,
 	eTemp2,
@@ -21,17 +32,6 @@ typedef enum
 	eTemp8,
 	eTemp9,
 }	DigitalInput;
-
-typedef enum
-{
-	eLadderHeightGround = 0,
-	eLadderHeightCargoBottom,
-	eLadderHeightCargoMid,
-	eLadderHeightCargoTop,
-	eLadderHeightHatchBottom,
-	eLadderHeightHatchMid,
-	eLadderHeightHatchTop,
-} LadderHeight;
 
 class RobotControl
 {
@@ -55,7 +55,8 @@ class RobotControl
 
 				DriveJoystick m_driveJoyStick;
 
-				bool m_bCargo, m_bAction, m_bFlipped;
+				bool m_bCargo, m_bAction, m_bFlipped, m_bChangedHeight;
+				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;
 	protected :

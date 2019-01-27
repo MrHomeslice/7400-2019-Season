@@ -9,6 +9,8 @@ Ladder::Ladder()
 {
     m_pDrives[0] = new WPI_TalonSRX(0);
     m_pDrives[1] = new WPI_TalonSRX(1);
+
+    m_ladderState = eLadderStateDisabled;
 }
 
 void Ladder::Initialize()
@@ -36,5 +38,57 @@ void Ladder::Initialize()
 
 void Ladder::Periodic()
 {
-    
+    ProcessLadderStates();
+}
+
+void Ladder::ProcessLadderStates()
+{
+    switch(m_ladderState)
+    {
+        case eLadderStateDisabled :
+        {
+            g_rc.m_bChangedHeight = false;
+        }
+
+        case eLadderStateEnabled  :
+        {
+            m_pDrives[0]->Set(LadderSetPosition());
+            m_pDrives[1]->Set(LadderSetPosition());
+        }
+    }
+}
+
+int Ladder::LadderPosition()
+{
+    return 0;
+}
+
+int Ladder::LadderSetPosition()
+{
+    switch(g_rc.m_ladderTargetHeight)
+    {
+        case eLadderHeightGround      :
+            return LADDER_GROUND_HEIGHT;
+
+	    case eLadderHeightCargoBottom :
+            return LADDER_CARGO_BOTTOM_HEIGHT;
+
+	    case eLadderHeightCargoMid    :
+            return LADDER_CARGO_MID_HEIGHT;
+        
+        case eLadderHeightCargoTop    :
+            return LADDER_CARGO_TOP_HEIGHT;
+        
+        case eLadderHeightHatchBottom :
+            return LADDER_HATCH_BOTTOM_HEIGHT;
+        
+        case eLadderHeightHatchMid    :
+            return LADDER_HATCH_MID_HEIGHT;
+        
+        case eLadderHeightHatchTop    :
+            return LADDER_HATCH_TOP_HEIGHT;
+        
+    }
+
+    return 0;
 }

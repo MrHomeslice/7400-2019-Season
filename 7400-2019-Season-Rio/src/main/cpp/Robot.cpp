@@ -8,7 +8,7 @@ MeeseeksProperties g_mp;
 RobotControl	   g_rc;
 
 Robot::Robot()
-	 :  m_cargoControl(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR)
+	 :  m_cargoControl(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR, DELIVERY_SYSTEM_INTAKE_MOTOR)
 
 {
 }

@@ -3,9 +3,10 @@
 
 extern RobotControl g_rc;
 
-CargoControl::CargoControl(int leftID, int rightID)
+CargoControl::CargoControl(int leftID, int rightID, int intakeID)
               : m_left(leftID),
 		        m_right(rightID),
+				m_intakeMotor(intakeID),
                 m_acquiredSwitch(0)
 {
     m_cargoState = eCargoStateNull;
@@ -15,10 +16,16 @@ CargoControl::CargoControl(int leftID, int rightID)
     m_flippingCounter = 0;
 }
 
+void CargoControl::MotorsOff()
+{
+	m_left.Set(0);
+	m_right.Set(0);
+	m_intakeMotor.Set(0);
+}
+
 void CargoControl::Aquire()
 {
-    m_left.Set(-0.2);
-    m_right.Set(0.2);
+	m_intakeMotor.Set(0.2);
 }
 
 void CargoControl::Eject()
@@ -35,74 +42,89 @@ void CargoControl::ProcessCargoState()
 	{
 		case eCargoStateNull     :
 		{
+			MotorsOff();
+
 			if(g_rc.m_bAction)
-			{
-				m_cargoState = eCargoStateAquiring;
-			}
+				SetNewState(eCargoStateAquiring);
 
 			break;
 		}
 		case eCargoStateAquiring :
-		{			
-			if(m_acquiredSwitch.Get()) 
+		{
+			Aquire();
+
+			if(m_acquiredSwitch.Get())
 			{
-				m_cargoState = eCargoStateAquired;
+				SetNewState(eCargoStateAquired);
+				m_flippingCounter = 0;
 			}
 
-			if(g_rc.m_bAction)
-			{
-				m_cargoState = eCargoStateNull;
-			}
+			else if(g_rc.m_bAction) //Abort
+				SetNewState(eCargoStateNull);
 
 			break;
 		}
 		case eCargoStateAquired  :
 		{
+			MotorsOff();
+			
 			if(g_rc.m_bFlipped)
 			{
-				m_cargoState = eCargoStateFlipped;
+				SetNewState(eCargoStateForwardFlip);
+				m_flippingCounter = 0;
 			}
 
 			break;
 		}
+
+		case eCargoStateForwardFlip :
+		{
+			m_pneumatics.Flip(g_rc.m_flippedStateValue);
+
+			if(++m_flippingCounter == FLIP_CYLCE_COUNT)
+				
+
+			break;
+		}
+
 		case eCargoStateFlipped  :
 		{
-            m_pneumatics.Flip(g_rc.m_driveJoyStick.ElevatorFlip()->Value());
-
 			if(g_rc.m_bAction)
 			{
-				m_cargoState = eCargoStateEjecting;
+				SetNewState(eCargoStateEjecting);
                 m_ejectCounter = 0;
+				Eject();
 			}
 
 			break;
 		}
 		case eCargoStateEjecting :
 		{
-			m_ejectCounter++;
-			if(m_ejectCounter == EJECT_CYCLE_COUNT)
-				m_cargoState = eCargoStateEjected;
 			
+			if(++m_ejectCounter == EJECT_CYCLE_COUNT)
+				SetNewState(eCargoStateEjected);
+
 			break;
 		}
 
 		case eCargoStateEjected  :
 		{
-			m_pneumatics.Flip(g_rc.m_driveJoyStick.ElevatorFlip()->Value());
+			MotorsOff();
 
-			m_cargoState = eCargoStateFlipping;
+			m_pneumatics.Flip(g_rc.m_flippedStateValue);
+
+			SetNewState(eCargoStateBackFlip);
             m_flippingCounter = 0;
 
 			break;
 		}
 
-        case eCargoStateFlipping :
+        case eCargoStateBackFlip :
         {
-            m_flippingCounter++;
-            if(m_flippingCounter == FLIP_CYLCE_COUNT)
+            if(++m_flippingCounter == FLIP_CYLCE_COUNT)
             {
                 g_rc.CargoEjected();
-                m_cargoState = eCargoStateNull;
+                SetNewState(eCargoStateNull);
             }
 
             break;
@@ -117,4 +139,26 @@ void CargoControl::NewStateCheck()
 		printf("State: %d\n", m_cargoState);
 		m_lastCargoState = m_cargoState;
 	}
+}
+
+void CargoControl::SetNewState(CargoState state)
+{
+	m_cargoState = state;
+	printf("New State: %s\n", StateToString());
+}
+
+const char* CargoControl::StateToString()
+{
+	switch(m_cargoState)
+	{
+		case eCargoStateNull		: return "Cargo State: Null";
+		case eCargoStateAquiring 	: return "Cargo State: Aquiring";
+		case eCargoStateForwardFlip : return "Cargo State: Forward Flip";
+		case eCargoStateAquired 	: return "Cargo State: Aquired";
+		case eCargoStateFlipped 	: return "Cargo State: Flipped";
+		case eCargoStateEjecting	: return "Cargo State: Ejecting";
+		case eCargoStateEjected  	: return "Cargo State: Ejected";
+		case eCargoStateBackFlip 	: return "Cargo State: Back Flip";
+	}
+	return "Unkown State";
 }

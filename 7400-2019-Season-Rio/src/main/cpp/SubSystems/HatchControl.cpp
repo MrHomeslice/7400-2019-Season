@@ -1,4 +1,7 @@
 #include "HatchControl.h"
+#include "..\Control\RobotControl.h"
+
+extern RobotControl g_rc;
 
 HatchControl::HatchControl(int movementID, int grabberID)
              : m_movementMotor(movementID),
@@ -44,7 +47,10 @@ void HatchControl::Periodic()
     {
         case eGrabberStateNull :
         {
-
+            GrabbersOff();
+            
+            if(g_rc.m_bAction)
+                m_grabberState = eGrabberStateAquiring;
 
             break;
         }
@@ -87,4 +93,19 @@ double HatchControl::HatchCurrent()
 double HatchControl::GrabberCurrent()
 {
     return m_grabberMotor.GetOutputCurrent();
+}
+
+void HatchControl::Aquire()
+{
+    m_grabberMotor.Set(0.2);
+}
+
+void HatchControl::Eject()
+{
+    m_grabberMotor.Set(-0.2);
+}
+
+void HatchControl::GrabbersOff()
+{
+    m_grabberMotor.Set(0);
 }

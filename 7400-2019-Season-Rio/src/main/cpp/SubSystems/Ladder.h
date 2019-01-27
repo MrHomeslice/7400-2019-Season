@@ -4,6 +4,20 @@
 #include <ctre/Phoenix.h>
 #include "Defines.h"
 
+#define LADDER_GROUND_HEIGHT 0
+#define LADDER_CARGO_BOTTOM_HEIGHT 100
+#define LADDER_CARGO_MID_HEIGHT 200
+#define LADDER_CARGO_TOP_HEIGHT 300
+#define LADDER_HATCH_BOTTOM_HEIGHT 400
+#define LADDER_HATCH_MID_HEIGHT 500
+#define LADDER_HATCH_TOP_HEIGHT 600
+
+typedef enum
+{
+    eLadderStateDisabled = 0,
+    eLadderStateEnabled
+} LadderState;
+
 class Ladder
 {
     public:
@@ -11,6 +25,10 @@ class Ladder
 
             void Initialize();
             void Periodic();
+            void ProcessLadderStates();
+            int  LadderPosition();
+            int  LadderSetPosition();
+            
 
             static constexpr float kDefaultDrivesF = 0.0;
 			static constexpr float kDefaultDrivesP = 10.0;
@@ -18,8 +36,8 @@ class Ladder
 			static constexpr float kDefaultDrivesD = 100;
     protected:
              WPI_TalonSRX *m_pDrives[2];
-
              std::string   m_name;
+             LadderState   m_ladderState;
 };
 
 #endif
