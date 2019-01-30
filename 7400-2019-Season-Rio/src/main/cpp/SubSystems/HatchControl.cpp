@@ -11,7 +11,7 @@ HatchControl::HatchControl(int movementID, int grabberID)
 
 void HatchControl::Periodic()
 {
-    switch(m_hatchStateMove)
+    switch(m_hatchMoveState)
     {
 
         case eHatchMoveStateIn        :
@@ -24,14 +24,14 @@ void HatchControl::Periodic()
         case eHatchMoveStateMovingIn  :
         {
             if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
-                m_hatchStateMove = eHatchMoveStateIn;
+                m_hatchMoveState = eHatchMoveStateIn;
 
             break;
         }
         case eHatchMoveStateOut       :
         {
             if(g_rc.m_bAbort)
-                m_hatchStateMove = eHatchMoveStateMovingIn;
+                m_hatchMoveState = eHatchMoveStateMovingIn;
 
             break;
         }
@@ -41,10 +41,10 @@ void HatchControl::Periodic()
             m_hatchMoveCounter = 0;
             
             if(g_rc.m_bAbort)
-                m_hatchStateMove = eHatchMoveStateMovingIn;
+                m_hatchMoveState = eHatchMoveStateMovingIn;
 
             if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
-                m_hatchStateMove = eHatchMoveStateOut;
+                m_hatchMoveState = eHatchMoveStateOut;
 
             break;
         }
@@ -77,11 +77,11 @@ void HatchControl::Periodic()
         case eGrabberStateAquired  :
         {
             GrabbersOff();
-            m_hatchStateMove = eHatchMoveStateMovingIn;
+            m_hatchMoveState = eHatchMoveStateMovingIn;
             if(g_rc.m_bAction)
             {
                 m_grabberState   = eGrabberStateEjecting;
-                m_hatchStateMove = eHatchMoveStateMovingOut;
+                m_hatchMoveState = eHatchMoveStateMovingOut;
                 m_ejectCounter   = 0;
             }
 
@@ -90,7 +90,7 @@ void HatchControl::Periodic()
 
         case eGrabberStateEjecting :
         {
-            if(m_hatchStateMove == eHatchMoveStateOut)
+            if(m_hatchMoveState == eHatchMoveStateOut)
                 Eject();
             
             if(++m_ejectCounter == HATCH_EJECT_TIME)
@@ -102,7 +102,7 @@ void HatchControl::Periodic()
         case eGrabberStateEjected  :
         {
             GrabbersOff();
-            m_hatchStateMove = eHatchMoveStateMovingIn;
+            m_hatchMoveState = eHatchMoveStateMovingIn;
             m_grabberState   = eGrabberStateNull;
 
             break;

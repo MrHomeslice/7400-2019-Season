@@ -36,7 +36,7 @@ class HatchControl
 
 				WPI_TalonSRX m_movementMotor, m_grabberMotor;
 
-                HatchMoveState m_HatchMoveState;
+                HatchMoveState m_hatchMoveState;
                 GrabberState   m_grabberState;
 
                 int m_ejectCounter, m_hatchMoveCounter;
