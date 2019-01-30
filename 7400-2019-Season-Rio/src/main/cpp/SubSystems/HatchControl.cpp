@@ -14,13 +14,6 @@ void HatchControl::Periodic()
     switch(m_hatchStateMove)
     {
 
-        case eHatchStateMoveMovingIn  :
-        {
-            
-
-            break;
-        }
-
         case eHatchStateMoveIn        :
         {
 
@@ -28,16 +21,24 @@ void HatchControl::Periodic()
             break;
         }
 
-        case eHatchStateMoveMovingOut :
+        case eHatchStateMoveMovingIn  :
         {
+            
 
+            break;
+        }
+        case eHatchStateMoveOut       :
+        {
+            if(g_rc.m_bAbort)
+                m_hatchStateMove = eHatchStateMoveMovingIn;
 
             break;
         }
 
-        case eHatchStateMoveOut       :
+        case eHatchStateMoveMovingOut :
         {
-
+            if(g_rc.m_bAbort)
+                m_hatchStateMove = eHatchStateMoveMovingIn;
 
             break;
         }
@@ -57,28 +58,46 @@ void HatchControl::Periodic()
 
         case eGrabberStateAquiring :
         {
-            
+            Aquire();
+            if(GrabberCurrent() > GRABBER_THRESHOLD_CURRENT)
+                m_grabberState = eGrabberStateAquired;
+
+            if(g_rc.m_bAbort)
+                m_grabberState = eGrabberStateNull;
 
             break;
         }
 
         case eGrabberStateAquired  :
         {
-
+            GrabbersOff();
+            m_hatchStateMove = eHatchStateMoveMovingIn;
+            if(g_rc.m_bAction)
+            {
+                m_grabberState   = eGrabberStateEjecting;
+                m_hatchStateMove = eHatchStateMoveMovingOut;
+                m_ejectCounter   = 0;
+            }
 
             break;
         }
 
         case eGrabberStateEjecting :
         {
-
+            if(m_hatchStateMove == eHatchStateMoveOut)
+                Eject();
+            
+            if(++m_ejectCounter == HATCH_EJECT_TIME)
+                m_grabberState = eGrabberStateEjected;
 
             break;
         }
 
         case eGrabberStateEjected  :
         {
-
+            GrabbersOff();
+            m_hatchStateMove = eHatchStateMoveMovingIn;
+            m_grabberState   = eGrabberStateNull;
 
             break;
         }

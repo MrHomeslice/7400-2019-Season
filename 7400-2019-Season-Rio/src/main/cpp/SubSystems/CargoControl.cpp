@@ -59,7 +59,7 @@ void CargoControl::ProcessCargoState()
 				m_flippingCounter = 0;
 			}
 
-			else if(g_rc.m_bAction) //Abort
+			else if(g_rc.m_bAbort)
 				SetNewState(eCargoStateNull);
 
 			break;

@@ -55,7 +55,7 @@ class RobotControl
 
 				DriveJoystick m_driveJoyStick;
 
-				bool m_bCargo, m_bAction, m_bFlipped, m_bChangedHeight;
+				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight;
 				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;

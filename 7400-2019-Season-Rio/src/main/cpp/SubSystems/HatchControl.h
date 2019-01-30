@@ -17,6 +17,10 @@ typedef enum
     eGrabberStateEjected
 } GrabberState;
 
+#define GRABBER_THRESHOLD_CURRENT 1
+#define HATCH_EJECT_TIME          1
+#define HATCH_MOVE_TIME           1
+
 class HatchControl
 {
 	public    : HatchControl(int movementID, int grabberID);
@@ -34,4 +38,6 @@ class HatchControl
 
                 HatchStateMove m_hatchStateMove;
                 GrabberState   m_grabberState;
+
+                int m_ejectCounter;
 };

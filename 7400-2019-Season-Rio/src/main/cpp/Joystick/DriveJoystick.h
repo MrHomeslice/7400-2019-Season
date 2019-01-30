@@ -12,6 +12,7 @@ class DriveJoystick : public MeeseeksJoystick
 				JSButton *TopHeight()	 { return &m_topHeight;	   }
 				JSButton *MidHeight()	 { return &m_midHeight;	   }
 				JSButton *BottomHeight() { return &m_bottomHeight; }
+				JSButton *Abort() { return &m_abort; }
 
 				JoystickValueButton *ElevatorFlip() 	{ return &m_elevatorFlip;     }
 				JoystickValueButton *CentricityToggle() { return &m_centricityToggle; }
@@ -19,7 +20,7 @@ class DriveJoystick : public MeeseeksJoystick
 				void Periodic();
 	protected :
 				JSButton m_allign, m_action;
-				JSButton m_topHeight, m_midHeight, m_bottomHeight;
+				JSButton m_topHeight, m_midHeight, m_bottomHeight, m_abort;
 				JoystickValueButton m_elevatorFlip, m_centricityToggle;
 				
 };
