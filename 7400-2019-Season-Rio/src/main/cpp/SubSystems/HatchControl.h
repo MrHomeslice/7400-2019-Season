@@ -23,7 +23,7 @@ typedef enum
 
 class HatchControl
 {
-	public    : HatchControl(int movementID, int grabberID);
+	public    : HatchControl(int movementID, int grabberID, int hatchID);
 
                 void Periodic();
                 void Aquire();
@@ -34,7 +34,7 @@ class HatchControl
                 double HatchCurrent();
                 double GrabberCurrent();
 
-				WPI_TalonSRX m_movementMotor, m_grabberMotor;
+				WPI_TalonSRX m_movementMotor, m_grabberMotor, m_hatchMotor;
 
                 HatchMoveState m_hatchMoveState;
                 GrabberState   m_grabberState;

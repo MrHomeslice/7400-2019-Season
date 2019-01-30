@@ -13,7 +13,7 @@
   },
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
   "wpilib.online": true,
-  "C_Cpp.intelliSenseEngineFallback": "Disabled",
+  "C_Cpp.intelliSenseEngineFallback": "Enabled",
   "files.associations": {
     "algorithm": "cpp",
     "array": "cpp",

@@ -3,9 +3,10 @@
 
 extern RobotControl g_rc;
 
-HatchControl::HatchControl(int movementID, int grabberID)
+HatchControl::HatchControl(int movementID, int grabberID, int hatchID)
              : m_movementMotor(movementID),
-               m_grabberMotor(grabberID)
+               m_grabberMotor(grabberID),
+               m_hatchMotor(hatchID)
 {
 }
 
@@ -17,7 +18,10 @@ void HatchControl::Periodic()
         case eHatchMoveStateIn        :
         {
             m_hatchMoveCounter = 0;
-
+            if(g_rc.m_bAction)
+            {
+                m_hatchMoveState = eHatchMoveStateMovingOut;
+            }
             break;
         }
 
