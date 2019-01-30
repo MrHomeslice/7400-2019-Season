@@ -2,11 +2,11 @@
 
 typedef enum 
 {
-	eHatchStateMoveIn = 0,
-    eHatchStateMoveOut,
-    eHatchStateMoveMovingIn,
-    eHatchStateMoveMovingOut
-} HatchStateMove;
+	eHatchMoveStateIn = 0,
+    eHatchMoveStateOut,
+    eHatchMoveStateMovingIn,
+    eHatchMoveStateMovingOut
+} HatchMoveState;
 
 typedef enum
 {
@@ -36,8 +36,8 @@ class HatchControl
 
 				WPI_TalonSRX m_movementMotor, m_grabberMotor;
 
-                HatchStateMove m_hatchStateMove;
+                HatchMoveState m_HatchMoveState;
                 GrabberState   m_grabberState;
 
-                int m_ejectCounter;
+                int m_ejectCounter, m_hatchMoveCounter;
 };
