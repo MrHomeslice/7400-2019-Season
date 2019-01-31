@@ -143,7 +143,7 @@ void HatchControl::GrabbersOff()
     m_grabberMotor.Set(0);
 }
 
-void HatchControl::SetState()
+void HatchControl::SetHatchState(HatchMoveState newValue)
 {
-    
+
 }
