@@ -7,8 +7,8 @@ extern TableController    g_tc;
 extern MeeseeksProperties g_mp;
 
 SwerveModule::SwerveModule(int steerID, int driveID, const char *pName, int steerOffset)
-			: m_steer(steerID),
-			  m_drive(driveID),
+			: m_steer(steerID, true),
+			  m_drive(driveID, true),
 			  m_name(pName),
 			  m_steerOffset(steerOffset)
 {
@@ -195,17 +195,17 @@ void SwerveModule::ReportStatus()
 {
 	g_tc.PutInt(m_reportSteerError.c_str(),     m_steer.GetClosedLoopError(kPIDLoopIdx));
 	g_tc.PutInt(m_reportSteerTarget.c_str(),    m_steer.GetSelectedSensorPosition(kPIDLoopIdx));
-	g_tc.PutInt(m_reportSteerAnalogRaw.c_str(), m_steer.GetSensorCollection().GetAnalogInRaw());
+	//g_tc.PutInt(m_reportSteerAnalogRaw.c_str(), m_steer.GetSensorCollection().GetAnalogInRaw());
 
-	int analogIn = m_steer.GetSensorCollection().GetAnalogIn();
+	//int analogIn = m_steer.GetSensorCollection().GetAnalogIn();
 
-	unsigned int analogValue  = analogIn & 0x000003FF;
-	unsigned int overflowBits = analogIn & 0x00FFFC00;
+	//unsigned int analogValue  = analogIn & 0x000003FF;
+	//unsigned int overflowBits = analogIn & 0x00FFFC00;
 
-	overflowBits >>= 10;
+	//overflowBits >>= 10;
 
-	g_tc.PutInt(m_reportSteerAnalogValue.c_str(),  analogValue);
-	g_tc.PutInt(m_reportSteerOverflowBits.c_str(), overflowBits);
+	//g_tc.PutInt(m_reportSteerAnalogValue.c_str(),  analogValue);
+	//g_tc.PutInt(m_reportSteerOverflowBits.c_str(), overflowBits);
 	g_tc.PutDouble(m_reportSteerCurrent.c_str(), m_steer.GetOutputCurrent());
 	g_tc.PutDouble(m_reportDriveCurrent.c_str(), m_drive.GetOutputCurrent());
 }
@@ -219,12 +219,12 @@ void SwerveModule::SetSteerOffset(int steerOffset)
 {
 	m_steerOffset = steerOffset;
 }
-
+/*
 int SwerveModule::GetRawSteerPosition()
 {
 	return m_steer.GetSensorCollection().GetAnalogInRaw();
 }
-
+*/
 void SwerveModule::ToZero()
 {
 	SetSteerPosition(m_steerOffset);
