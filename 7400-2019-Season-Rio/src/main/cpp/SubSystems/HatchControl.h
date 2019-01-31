@@ -26,12 +26,16 @@ class HatchControl
 	public    : HatchControl(int movementID, int grabberID, int hatchID);
 
                 void Periodic();
-                void Aquire();
-                void Eject();
-                void GrabbersOff();
-                void SetHatchState(HatchMoveState newValue);
 
 	protected :
+                void   SetAquireGrabbers();
+                void   SetEjectGrabbers();
+                void   SetGrabbersOff();
+                void   SetMoveMotorIn();
+                void   SetMoveMotorOut();
+                void   SetMoveMotorOff();
+                void   SetHatchState(HatchMoveState newValue);
+                void   SetGrabberState(GrabberState newValue);
                 double HatchCurrent();
                 double GrabberCurrent();
 

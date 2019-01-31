@@ -17,38 +17,46 @@ void HatchControl::Periodic()
 
         case eHatchMoveStateIn        :
         {
+            SetMoveMotorOff();
+
             m_hatchMoveCounter = 0;
             if(g_rc.m_bAction)
             {
-                m_hatchMoveState = eHatchMoveStateMovingOut;
+                SetHatchState(eHatchMoveStateMovingOut);
             }
             break;
         }
 
         case eHatchMoveStateMovingIn  :
         {
+            SetMoveMotorIn();
+
             if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
-                m_hatchMoveState = eHatchMoveStateIn;
+                SetHatchState(eHatchMoveStateIn);
 
             break;
         }
         case eHatchMoveStateOut       :
         {
+            SetMoveMotorOff();
+
             if(g_rc.m_bAbort)
-                m_hatchMoveState = eHatchMoveStateMovingIn;
+                SetHatchState(eHatchMoveStateMovingIn);
 
             break;
         }
 
         case eHatchMoveStateMovingOut :
         {
+            SetMoveMotorOut();
+
             m_hatchMoveCounter = 0;
             
             if(g_rc.m_bAbort)
-                m_hatchMoveState = eHatchMoveStateMovingIn;
+                SetHatchState(eHatchMoveStateMovingIn);
 
             if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
-                m_hatchMoveState = eHatchMoveStateOut;
+                SetHatchState(eHatchMoveStateOut);
 
             break;
         }
@@ -58,10 +66,10 @@ void HatchControl::Periodic()
     {
         case eGrabberStateNull :
         {
-            GrabbersOff();
+            SetGrabbersOff();
             
             if(g_rc.m_bAction)
-                m_grabberState = eGrabberStateAquiring;
+                SetGrabberState(eGrabberStateAquiring);
 
             break;
         }
@@ -69,27 +77,27 @@ void HatchControl::Periodic()
         case eGrabberStateAquiring :
         {
             if(m_hatchMoveState == eHatchMoveStateOut)
-                Aquire();
+                SetAquireGrabbers();
 
             if(GrabberCurrent() > GRABBER_THRESHOLD_CURRENT)
-                m_grabberState = eGrabberStateAquired;
+                SetGrabberState(eGrabberStateAquired);
 
             if(g_rc.m_bAbort)
-                m_grabberState = eGrabberStateNull;
+                SetGrabberState(eGrabberStateNull);
 
             break;
         }
 
         case eGrabberStateAquired  :
         {
-            GrabbersOff();
+            SetGrabbersOff();
 
-            m_hatchMoveState = eHatchMoveStateMovingIn;
+            SetHatchState(eHatchMoveStateMovingIn);
 
             if(g_rc.m_bAction)
             {
-                m_grabberState   = eGrabberStateEjecting;
-                m_hatchMoveState = eHatchMoveStateMovingOut;
+                SetGrabberState(eGrabberStateEjecting);
+                SetHatchState(eHatchMoveStateMovingOut);
                 m_ejectCounter   = 0;
             }
 
@@ -99,19 +107,19 @@ void HatchControl::Periodic()
         case eGrabberStateEjecting :
         {
             if(m_hatchMoveState == eHatchMoveStateOut)
-                Eject();
+                SetEjectGrabbers();
             
             if(++m_ejectCounter == HATCH_EJECT_TIME)
-                m_grabberState = eGrabberStateEjected;
+                SetGrabberState(eGrabberStateEjected);
 
             break;
         }
 
         case eGrabberStateEjected  :
         {
-            GrabbersOff();
-            m_hatchMoveState = eHatchMoveStateMovingIn;
-            m_grabberState   = eGrabberStateNull;
+            SetGrabbersOff();
+            SetHatchState(eHatchMoveStateMovingIn);
+            SetGrabberState(eGrabberStateNull);
 
             break;
         }
@@ -128,22 +136,42 @@ double HatchControl::GrabberCurrent()
     return m_grabberMotor.GetOutputCurrent();
 }
 
-void HatchControl::Aquire()
+void HatchControl::SetAquireGrabbers()
 {
     m_grabberMotor.Set(0.2);
 }
 
-void HatchControl::Eject()
+void HatchControl::SetEjectGrabbers()
 {
     m_grabberMotor.Set(-0.2);
 }
 
-void HatchControl::GrabbersOff()
+void HatchControl::SetGrabbersOff()
 {
     m_grabberMotor.Set(0);
 }
 
+void HatchControl::SetMoveMotorIn()
+{
+    m_movementMotor.Set(0.2);
+}
+
+void HatchControl::SetMoveMotorOut()
+{
+    m_movementMotor.Set(-0.2);
+}
+
+void HatchControl::SetMoveMotorOff()
+{
+    m_movementMotor.Set(0);
+}
+
 void HatchControl::SetHatchState(HatchMoveState newValue)
 {
+    m_hatchMoveState = newValue;
+}
 
+void HatchControl::SetGrabberState(GrabberState newValue)
+{
+    m_grabberState = newValue;
 }
