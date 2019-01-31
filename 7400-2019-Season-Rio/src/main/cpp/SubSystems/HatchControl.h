@@ -1,3 +1,6 @@
+#ifndef HATCH_CONTROL_HEADER_INCLUDED
+#define HATCH_CONTROL_HEADER_INCLUDED
+
 #include <ctre/Phoenix.h>
 #include "CanSimulator.h"
 
@@ -48,3 +51,5 @@ class HatchControl
 
                 int m_ejectCounter, m_hatchMoveCounter;
 };
+
+#endif

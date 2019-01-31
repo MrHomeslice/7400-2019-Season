@@ -5,6 +5,8 @@
 #include "..\Joystick\DriveJoystick.h"
 #include "Defines.h"
 #include "..\SubSystems\Ladder.h"
+#include "..\SubSystems\CargoControl.h"
+#include "..\SubSystems\HatchControl.h"
 
 #define JOYSTICK_1	0
 
@@ -66,6 +68,8 @@ class RobotControl
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
 				bool           m_bXYZChanged, m_bRobotCentric;
 
+				CargoControl   m_cargoControl;
+				HatchControl   m_hatchControl;
 				Ladder         m_ladder;
 				
 };

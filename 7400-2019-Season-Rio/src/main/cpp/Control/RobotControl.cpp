@@ -5,7 +5,9 @@
 extern MeeseeksProperties g_mp;
 
 RobotControl::RobotControl()
-			 : m_driveJoyStick(JOYSTICK_1)
+			 : m_driveJoyStick(JOYSTICK_1),
+			   m_cargoControl(0, 1, 2),
+			   m_hatchControl(0, 1, 2)
 						  
 {
 	m_x 	 = -10.0;
@@ -54,6 +56,8 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	m_bRobotCentric = m_driveJoyStick.CentricityToggle()->Value() == 1 ? true : false;
 
+	m_hatchControl.Periodic();
+	m_cargoControl.ProcessCargoState();
 	m_ladder.Periodic();
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
