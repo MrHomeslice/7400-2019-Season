@@ -124,16 +124,14 @@ void HatchControl::Periodic()
             break;
         }
     }
-}
 
-double HatchControl::HatchCurrent()
-{
-    return m_movementMotor.GetOutputCurrent();
+    printf("%s\n", HatchMoveStateToString());
+    printf("%s\n\n", GrabberStateToString());
 }
 
 double HatchControl::GrabberCurrent()
 {
-    return m_grabberMotor.GetOutputCurrent();
+    return GRABBER_THRESHOLD_CURRENT;//m_grabberMotor.GetOutputCurrent();
 }
 
 void HatchControl::SetAquireGrabbers()
@@ -174,4 +172,29 @@ void HatchControl::SetHatchState(HatchMoveState newValue)
 void HatchControl::SetGrabberState(GrabberState newValue)
 {
     m_grabberState = newValue;
+}
+
+const char* HatchControl::HatchMoveStateToString()
+{
+	switch(m_hatchMoveState)
+	{
+		case eHatchMoveStateIn		  : return "Hatch Move State: In";
+		case eHatchMoveStateMovingIn  : return "Hatch Move State: Moving In";
+		case eHatchMoveStateOut       : return "Hatch Move State: Out";
+		case eHatchMoveStateMovingOut : return "Hatch Move State: Moving Out";
+	}
+	return "Unkown State";
+}
+
+const char* HatchControl::GrabberStateToString()
+{
+	switch(m_grabberState)
+	{
+		case eGrabberStateNull	   : return "Grabber State: Null";
+		case eGrabberStateAquiring : return "Grabber State: Aquiring";
+		case eGrabberStateAquired  : return "Grabber State: Aquired";
+		case eGrabberStateEjecting : return "Grabber State: Ejecting";
+		case eGrabberStateEjected  : return "Grabber State: Ejected";
+	}
+	return "Unkown State";
 }

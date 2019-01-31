@@ -28,16 +28,17 @@ class HatchControl
                 void Periodic();
 
 	protected :
-                void   SetAquireGrabbers();
-                void   SetEjectGrabbers();
-                void   SetGrabbersOff();
-                void   SetMoveMotorIn();
-                void   SetMoveMotorOut();
-                void   SetMoveMotorOff();
-                void   SetHatchState(HatchMoveState newValue);
-                void   SetGrabberState(GrabberState newValue);
-                double HatchCurrent();
-                double GrabberCurrent();
+                void        SetAquireGrabbers();
+                void        SetEjectGrabbers();
+                void        SetGrabbersOff();
+                void        SetMoveMotorIn();
+                void        SetMoveMotorOut();
+                void        SetMoveMotorOff();
+                void        SetHatchState(HatchMoveState newValue);
+                void        SetGrabberState(GrabberState newValue);
+                double      GrabberCurrent();
+                const char* HatchMoveStateToString();
+                const char* GrabberStateToString();
 
 				WPI_TalonSRX m_movementMotor, m_grabberMotor, m_hatchMotor;
 
