@@ -1,4 +1,5 @@
 #include <ctre/Phoenix.h>
+#include "CanSImulator.h"
 
 typedef enum 
 {
