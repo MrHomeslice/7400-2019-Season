@@ -4,9 +4,9 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID)
-              : m_left(leftID),
-		        m_right(rightID),
-				m_intakeMotor(intakeID),
+              : m_left(leftID, true),
+		        m_right(rightID, true),
+				m_intakeMotor(intakeID, true),
                 m_acquiredSwitch(0)
 {
     m_cargoState = eCargoStateNull;

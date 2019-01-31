@@ -3,6 +3,7 @@
 
 #include <ctre/Phoenix.h>
 #include "Defines.h"
+#include "CanSimulator.h"
 
 #define LADDER_GROUND_HEIGHT 0
 #define LADDER_CARGO_BOTTOM_HEIGHT 100
@@ -35,9 +36,9 @@ class Ladder
 			static constexpr float kDefaultDrivesI = 0.002;
 			static constexpr float kDefaultDrivesD = 100;
     protected:
-             WPI_TalonSRX *m_pDrives[2];
-             std::string   m_name;
-             LadderState   m_ladderState;
+             WPI_TalonSRX_ *m_pDrives[2];
+             std::string    m_name;
+             LadderState    m_ladderState;
 };
 
 #endif

@@ -4,9 +4,9 @@
 extern RobotControl g_rc;
 
 HatchControl::HatchControl(int movementID, int grabberID, int hatchID)
-             : m_movementMotor(movementID),
-               m_grabberMotor(grabberID),
-               m_hatchMotor(hatchID)
+             : m_movementMotor(movementID, true),
+               m_grabberMotor(grabberID, true),
+               m_hatchMotor(hatchID, true)
 {
 }
 

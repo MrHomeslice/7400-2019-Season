@@ -4,6 +4,7 @@
 #include <ctre/Phoenix.h>
 #include <frc/wpilib.h>
 #include "..\Pneumatics\Pneumatics.h"
+#include "CanSimulator.h"
 
 #define DELIVERY_SYSTEM_LEFT_MOTOR   0
 #define DELIVERY_SYSTEM_RIGHT_MOTOR  1
@@ -37,7 +38,7 @@ class CargoControl
 	protected :
 				const char* StateToString();
 
-				WPI_TalonSRX      m_left, m_right, m_intakeMotor;
+				WPI_TalonSRX_     m_left, m_right, m_intakeMotor;
 				frc::DigitalInput m_acquiredSwitch;
 				CargoState        m_cargoState, m_lastCargoState;
 				Pneumatics        m_pneumatics;

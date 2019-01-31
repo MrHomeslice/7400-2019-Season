@@ -7,8 +7,8 @@ extern RobotControl	   g_rc;
 
 Ladder::Ladder()
 {
-    m_pDrives[0] = new WPI_TalonSRX(0);
-    m_pDrives[1] = new WPI_TalonSRX(1);
+    m_pDrives[0] = new WPI_TalonSRX_(0, true);
+    m_pDrives[1] = new WPI_TalonSRX_(1, true);
 
     m_ladderState = eLadderStateDisabled;
 }

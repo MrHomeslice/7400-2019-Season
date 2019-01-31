@@ -1,4 +1,5 @@
 #include <ctre/Phoenix.h>
+#include "CanSimulator.h"
 
 typedef enum 
 {
@@ -40,7 +41,7 @@ class HatchControl
                 const char* HatchMoveStateToString();
                 const char* GrabberStateToString();
 
-				WPI_TalonSRX m_movementMotor, m_grabberMotor, m_hatchMotor;
+				WPI_TalonSRX_  m_movementMotor, m_grabberMotor, m_hatchMotor;
 
                 HatchMoveState m_hatchMoveState;
                 GrabberState   m_grabberState;
