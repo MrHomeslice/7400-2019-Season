@@ -1,7 +1,7 @@
 #ifndef SWERVE_MODULE_H_INCLUDED
 #define SWERVE_MODULE_H_INCLUDED
 
-#include <ctre/Phoenix.h>
+#include "CanSimulator.h"
 #include "Defines.h"
 
 #define STEER_ENCODER_ZERO_OFFSET (0.0) //(1000.0)
@@ -19,7 +19,7 @@ class SwerveModule
 				int GetSteerPosition();
 				void SetSteerPosition(int setPosition);
 
-				int GetRawSteerPosition();
+				//int GetRawSteerPosition();
 
 				void SetSteerPIDValues();
 				void SetDrivePIDValues();
@@ -42,11 +42,11 @@ class SwerveModule
 				void SetDrivePercentOutput(double percentOutput);
 				void ReportStatus();
 
-				WPI_TalonSRX m_steer, m_drive;
-				double       m_steerEncoderPulsesPerDegree, m_steerEncoderPulsesPerRotation, m_driveNegate;
-				std::string  m_name, m_reportAngle, m_reportMagnitude, m_reportSteerError, m_reportSteerTarget,
-				             m_reportSteerAnalogRaw, m_reportSteerAnalogValue, m_reportSteerOverflowBits, m_reportSteerCurrent, m_reportDriveCurrent;
-				int          m_steerOffset;
+				WPI_TalonSRX_ m_steer, m_drive;
+				double        m_steerEncoderPulsesPerDegree, m_steerEncoderPulsesPerRotation, m_driveNegate;
+				std::string   m_name, m_reportAngle, m_reportMagnitude, m_reportSteerError, m_reportSteerTarget,
+				              m_reportSteerAnalogRaw, m_reportSteerAnalogValue, m_reportSteerOverflowBits, m_reportSteerCurrent, m_reportDriveCurrent;
+				int           m_steerOffset;
 
 };
 
