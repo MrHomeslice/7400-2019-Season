@@ -68,7 +68,9 @@ void HatchControl::Periodic()
 
         case eGrabberStateAquiring :
         {
-            Aquire();
+            if(m_hatchMoveState == eHatchMoveStateOut)
+                Aquire();
+
             if(GrabberCurrent() > GRABBER_THRESHOLD_CURRENT)
                 m_grabberState = eGrabberStateAquired;
 
@@ -81,7 +83,9 @@ void HatchControl::Periodic()
         case eGrabberStateAquired  :
         {
             GrabbersOff();
+
             m_hatchMoveState = eHatchMoveStateMovingIn;
+
             if(g_rc.m_bAction)
             {
                 m_grabberState   = eGrabberStateEjecting;
@@ -137,4 +141,9 @@ void HatchControl::Eject()
 void HatchControl::GrabbersOff()
 {
     m_grabberMotor.Set(0);
+}
+
+void HatchControl::SetState()
+{
+    
 }

@@ -29,6 +29,7 @@ class HatchControl
                 void Aquire();
                 void Eject();
                 void GrabbersOff();
+                void SetState();
 
 	protected :
                 double HatchCurrent();
