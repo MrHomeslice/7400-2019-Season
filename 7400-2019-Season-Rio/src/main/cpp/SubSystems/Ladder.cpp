@@ -7,8 +7,8 @@ extern RobotControl	   g_rc;
 
 Ladder::Ladder()
 {
-    m_pDrives[0] = new WPI_TalonSRX_(0, true);
-    m_pDrives[1] = new WPI_TalonSRX_(1, true);
+    m_pDrives[0] = new WPI_TalonSRX_(0, "Ladder Drive 1", true);
+    m_pDrives[1] = new WPI_TalonSRX_(1, "Ladder Drive 2", true);
 
     m_ladderState = eLadderStateDisabled;
 }
@@ -52,43 +52,36 @@ void Ladder::ProcessLadderStates()
 
         case eLadderStateEnabled  :
         {
-            m_pDrives[0]->Set(LadderSetPosition());
-            m_pDrives[1]->Set(LadderSetPosition());
+            m_pDrives[0]->Set(SetLadderPosition());
+            m_pDrives[1]->Set(SetLadderPosition());
         }
     }
 }
 
-int Ladder::LadderPosition()
-{
-    return 0;
-}
-
-int Ladder::LadderSetPosition()
+int Ladder::SetLadderPosition()
 {
     switch(g_rc.m_ladderTargetHeight)
     {
-        case eLadderHeightGround      :
-            return LADDER_GROUND_HEIGHT;
+        case eLadderHeightGround      : return LADDER_GROUND_HEIGHT;
 
-	    case eLadderHeightCargoBottom :
-            return LADDER_CARGO_BOTTOM_HEIGHT;
+	    case eLadderHeightCargoBottom : return LADDER_CARGO_BOTTOM_HEIGHT;
 
-	    case eLadderHeightCargoMid    :
-            return LADDER_CARGO_MID_HEIGHT;
+	    case eLadderHeightCargoMid    : return LADDER_CARGO_MID_HEIGHT;
         
-        case eLadderHeightCargoTop    :
-            return LADDER_CARGO_TOP_HEIGHT;
+        case eLadderHeightCargoTop    : return LADDER_CARGO_TOP_HEIGHT;
         
-        case eLadderHeightHatchBottom :
-            return LADDER_HATCH_BOTTOM_HEIGHT;
+        case eLadderHeightHatchBottom : return LADDER_HATCH_BOTTOM_HEIGHT;
         
-        case eLadderHeightHatchMid    :
-            return LADDER_HATCH_MID_HEIGHT;
+        case eLadderHeightHatchMid    : return LADDER_HATCH_MID_HEIGHT;
         
-        case eLadderHeightHatchTop    :
-            return LADDER_HATCH_TOP_HEIGHT;
+        case eLadderHeightHatchTop    : return LADDER_HATCH_TOP_HEIGHT;
         
     }
 
     return 0;
+}
+
+double Ladder::GetLadderPosition()
+{
+    return g_tc.GetDouble("CANSim/LadderHeight", 1.337);
 }

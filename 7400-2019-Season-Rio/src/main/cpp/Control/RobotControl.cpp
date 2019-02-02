@@ -56,8 +56,11 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	m_bRobotCentric = m_driveJoyStick.CentricityToggle()->Value() == 1 ? true : false;
 
-	m_hatchControl.Periodic();
-	m_cargoControl.ProcessCargoState();
+	if(m_bCargo)
+		m_cargoControl.ProcessCargoState();
+	else
+		m_hatchControl.Periodic();
+	
 	m_ladder.Periodic();
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
@@ -124,6 +127,7 @@ void RobotControl::ReadButtons()
 		printf("Allignment Changed...\n");
 
 	m_bAction = m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed();
+	//printf("%d\n", m_bAction);
 		
 	m_bFlipped = m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed();
 
@@ -191,4 +195,10 @@ void RobotControl::CargoEjected()
 {
 	m_bChangedHeight = true;
 	m_ladderTargetHeight = eLadderHeightGround;
+}
+
+bool RobotControl::IsLadderAtHeight()
+{
+	double delta = fabs(m_ladder.GetLadderPosition() - m_ladder.SetLadderPosition());
+	return delta < MAX_LADDER_POSITION_ERROR && m_ladder.GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
 }

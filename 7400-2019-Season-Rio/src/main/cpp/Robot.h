@@ -20,10 +20,9 @@ class Robot : public frc::TimedRobot
 							void DisabledInit();
 							void DisabledPeriodic();
 
-							NavXGyro       m_gyro;
-							RobotControl   m_control;
-							SwerveDrive    m_swerve;
-							CargoControl   m_cargoControl;
+							NavXGyro     m_gyro;
+							SwerveDrive  m_swerve;
+							CargoControl m_cargoControl;
 };
 
 #endif

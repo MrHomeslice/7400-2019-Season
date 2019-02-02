@@ -23,7 +23,7 @@ void Robot::RobotInit()
 
 	m_gyro.Initialize();
 
-	m_control.Initialize();
+	g_rc.Initialize();
 
 	m_swerve.Initialize();
 }
@@ -50,16 +50,16 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
 	static std::string state = "Idle";
 
-	bool bControlChanged = m_control.Periodic(true);
+	bool bControlChanged = g_rc.Periodic(true);
 
-	bool bCargoState = m_control.Cargo();
+	bool bCargoState = g_rc.Cargo();
 
 	if(bControlChanged)
 	{
-		m_swerve.Drive(m_control.X(), m_control.Y(), m_control.Z(), m_control.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+		m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 	}
 
-	m_control.ReadButtons();
+	g_rc.ReadButtons();
 
 	m_swerve.Periodic();
 }
@@ -71,12 +71,16 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-	m_swerve.Disable();
-	m_swerve.Periodic();
-	return;
+	//double x = g_tc.GetDouble("Swerve/ResetPID", -1000.0);
+	double x = g_tc.GetDouble("CANSim/GrabberCurrent", -1000.0);
+	double y = g_tc.GetDouble("Target/Y", -1000.0);
 
-	double x = g_tc.GetDouble("/Target/X", -1000.0);
-	double y = g_tc.GetDouble("/Target/Y", -1000.0);
+	
+	//printf("x: %.6f\n", x);
+
+	//m_swerve.Disable();
+	//m_swerve.Periodic();
+	return;
 
 	double rotation = (x - 320) / 320.0;
 
@@ -97,7 +101,7 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
-	m_control.Periodic(false);
+	g_rc.Periodic(false);
 }
 
 int main() 

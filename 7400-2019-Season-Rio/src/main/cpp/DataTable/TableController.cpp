@@ -22,8 +22,9 @@ double TableController::GetNumber(const char *pName, double defaultNumber)
 	auto entryValue = nt::GetEntryValue(entry);
 
 	if (entryValue && entryValue->IsDouble())
-
+	{
 		return entryValue->GetDouble();
+	}
 
 	return defaultNumber;
 }

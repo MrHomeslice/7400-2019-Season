@@ -4,9 +4,9 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID)
-              : m_left(leftID, true),
-		        m_right(rightID, true),
-				m_intakeMotor(intakeID, true),
+              : m_left(leftID, "Left Cargo Motor",true),
+		        m_right(rightID, "Right Cargo Motor", true),
+				m_intakeMotor(intakeID, "Intake Motor", true),
                 m_acquiredSwitch(0)
 {
     m_cargoState = eCargoStateNull;
@@ -82,14 +82,14 @@ void CargoControl::ProcessCargoState()
 			m_pneumatics.Flip(g_rc.m_flippedStateValue);
 
 			if(++m_flippingCounter == FLIP_CYLCE_COUNT)
-				
+				SetNewState(eCargoStateFlipped);
 
 			break;
 		}
 
 		case eCargoStateFlipped  :
 		{
-			if(g_rc.m_bAction)
+			if(g_rc.m_bAction && g_rc.IsLadderAtHeight())
 			{
 				SetNewState(eCargoStateEjecting);
                 m_ejectCounter = 0;
@@ -115,6 +115,7 @@ void CargoControl::ProcessCargoState()
 
 			SetNewState(eCargoStateBackFlip);
             m_flippingCounter = 0;
+			g_rc.m_ladderTargetHeight = eLadderHeightGround;
 
 			break;
 		}

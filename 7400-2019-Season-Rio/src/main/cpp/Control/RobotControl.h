@@ -10,6 +10,8 @@
 
 #define JOYSTICK_1	0
 
+#define MAX_LADDER_POSITION_ERROR 10
+
 typedef enum
 {
 	eLadderHeightGround = 0,
@@ -54,10 +56,11 @@ class RobotControl
 				void ProcessLadderState();
 				void ReadButtons();
 				void CargoEjected();
+				bool IsLadderAtHeight();
 
 				DriveJoystick m_driveJoyStick;
 
-				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight;
+				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight, m_bLadderAtHeight;
 				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;

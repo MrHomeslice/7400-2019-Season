@@ -1,13 +1,16 @@
 #ifndef CAN_SIMULATOR_HEADER_INCLUDED
 #define CAN_SIMULATOR_HEADER_INCLUDED
 
+#include "C:\Users\amenk\Documents\GitHub\7400-2019-Season\7400-2019-Season-Rio\src\main\cpp\DataTable\TableController.h"
 #include <ctre/Phoenix.h>
+
+extern TableController g_tc;
 
 using namespace ctre::phoenix;
 
 class WPI_TalonSRX_
 {
-  public    : WPI_TalonSRX_(int canID, bool bSim = false);
+  public    : WPI_TalonSRX_(int canID, const char *pName, bool bSim = false);
 
 	ErrorCode Config_kF(int index, double value, int timeOut)
   {
@@ -103,12 +106,29 @@ class WPI_TalonSRX_
   {
     if (!m_bSim)
       m_talon.Set(speed);
+    else
+    {
+      std::string name = "CANSim/";
+
+      name += m_name;
+
+      g_tc.PutDouble(name.c_str(), speed);
+    }
   }
 
   void Set(motorcontrol::ControlMode mode, double value)
   {
     if (!m_bSim)
       m_talon.Set(mode, value);
+    else
+    {
+      std::string name = "CANSim/";
+
+      name += m_name;
+
+      g_tc.PutDouble(name.c_str(), value);
+    }
+
   }
 
   int GetClosedLoopError(int pidIndex = 0)
@@ -127,7 +147,8 @@ class WPI_TalonSRX_
   double GetOutputCurrent()
   {
     if (m_bSim)
-      return 0.0;
+      return g_tc.GetDouble("CANSim/GrabberCurrent", 1.337);
+      //return g_tc.GetDouble("CANSim/GrabberCurrent", 0);
       
     return m_talon.GetOutputCurrent();
   }
@@ -135,9 +156,11 @@ class WPI_TalonSRX_
   //g_tc.PutInt(m_reportSteerTarget.c_str(),    m_steer.GetSelectedSensorPosition(kPIDLoopIdx));
 	//g_tc.PutInt(m_reportSteerAnalogRaw.c_str(), m_steer.GetSensorCollection().GetAnalogInRaw());
 
+              std::string  m_name;
   protected :
               WPI_TalonSRX m_talon;
               bool         m_bSim;
+              
 };
 
 

@@ -2,7 +2,7 @@
 #define HATCH_CONTROL_HEADER_INCLUDED
 
 #include <ctre/Phoenix.h>
-#include "CanSimulator.h"
+#include "CanSImulator.h"
 
 typedef enum 
 {
@@ -21,15 +21,18 @@ typedef enum
     eGrabberStateEjected
 } GrabberState;
 
-#define GRABBER_THRESHOLD_CURRENT 1
-#define HATCH_EJECT_TIME          1
-#define HATCH_MOVE_TIME           1
+#define GRABBER_THRESHOLD_CURRENT 5
+#define HATCH_EJECT_TIME          100
+#define HATCH_MOVE_TIME           100
 
 class HatchControl
 {
 	public    : HatchControl(int movementID, int grabberID, int hatchID);
 
                 void Periodic();
+
+                HatchMoveState GetHatchMoveState();
+                GrabberState   GetGrabberState();
 
 	protected :
                 void        SetAquireGrabbers();
@@ -46,8 +49,8 @@ class HatchControl
 
 				WPI_TalonSRX_  m_movementMotor, m_grabberMotor, m_hatchMotor;
 
-                HatchMoveState m_hatchMoveState;
-                GrabberState   m_grabberState;
+                HatchMoveState m_hatchMoveState, m_lastHatchMoveState;
+                GrabberState   m_grabberState, m_lastGrabberState;
 
                 int m_ejectCounter, m_hatchMoveCounter;
 };

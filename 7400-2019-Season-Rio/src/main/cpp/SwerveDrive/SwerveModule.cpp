@@ -7,11 +7,18 @@ extern TableController    g_tc;
 extern MeeseeksProperties g_mp;
 
 SwerveModule::SwerveModule(int steerID, int driveID, const char *pName, int steerOffset)
-			: m_steer(steerID, true),
-			  m_drive(driveID, true),
+			: m_steer(steerID, "Steer Motor" ,true),
+			  m_drive(driveID, "Drive Motor",true),
 			  m_name(pName),
 			  m_steerOffset(steerOffset)
 {
+	std::string strName(pName);
+
+	m_steer.m_name = strName + " " + m_steer.m_name;
+	m_drive.m_name = strName + " " + m_drive.m_name;
+
+	printf("Steer: %s\n Drive: %s\n", m_steer.m_name.c_str(), m_drive.m_name.c_str());
+
 #ifdef STEER_QUAD_ENCODER
 	double planetryRotationsPerOutputRotations = 1.0 / 1.2;
 	double motorRotationsPerPlanetryRotation   = 71.0;
