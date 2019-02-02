@@ -1,7 +1,7 @@
 #ifndef CAN_SIMULATOR_HEADER_INCLUDED
 #define CAN_SIMULATOR_HEADER_INCLUDED
 
-#include "../DataTable/TableController.h"
+#include "DataTable\TableController.h"
 #include <ctre/Phoenix.h>
 
 extern TableController g_tc;

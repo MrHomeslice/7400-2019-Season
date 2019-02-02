@@ -2,7 +2,7 @@
 #define HATCH_CONTROL_HEADER_INCLUDED
 
 #include <ctre/Phoenix.h>
-#include "CanSImulator.h"
+#include "..\CanSImulator.h"
 
 typedef enum 
 {

@@ -3,7 +3,7 @@
 
 #include <ctre/Phoenix.h>
 #include "Defines.h"
-#include "CanSimulator.h"
+#include "..\CanSimulator.h"
 
 #define LADDER_GROUND_HEIGHT       0
 #define LADDER_HATCH_BOTTOM_HEIGHT 100

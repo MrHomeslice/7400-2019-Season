@@ -3,74 +3,100 @@
 
 extern RobotControl g_rc;
 
-CargoControl::CargoControl(int leftID, int rightID, int intakeID)
-              : m_left(leftID, "Left Cargo Motor",true),
-		        m_right(rightID, "Right Cargo Motor", true),
+CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
+              : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
+		        m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
 				m_intakeMotor(intakeID, "Intake Motor", true),
+				m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
                 m_acquiredSwitch(0)
 {
     m_cargoState = eCargoStateNull;
 	m_lastCargoState = eCargoStateNull;
 
-    m_ejectCounter = 0;
+	m_captureState = eCargoCaptureStateUp;
+	m_lastCaptureState = eCargoCaptureStateUp;
+
+    m_ejectCounter    = 0;
     m_flippingCounter = 0;
+	m_captureCounter  = 0;
 }
 
-void CargoControl::MotorsOff()
+void CargoControl::Periodic()
 {
-	m_left.Set(0);
-	m_right.Set(0);
-	m_intakeMotor.Set(0);
+	ProcessCargoState();
+	ProcessCaptureState();
 }
 
-void CargoControl::Aquire()
+void CargoControl::SetCapturePIDValues()
 {
-	m_intakeMotor.Set(0.2);
-}
+	double f = g_tc.GetDouble("Capture/F", kDefaultCaptureF);
+	double p = g_tc.GetDouble("Capture/P", kDefaultCaptureP);
+	double i = g_tc.GetDouble("Capture/I", kDefaultCaptureI);
+	double d = g_tc.GetDouble("Capture/D", kDefaultCaptureD);
 
-void CargoControl::Eject()
-{
-    m_left.Set(0.2);
-    m_right.Set(-0.2);
+	printf("Cargo Capture P %.6f I %.6f D %.6f F %.6f\n", p, i, d, f);
+
+	ctre::phoenix::ErrorCode err = m_cargoCaptureMotor.Config_kF(kPIDLoopIdx, f, kTimeoutMs);
+	if (err != 0) printf("Cargo Capture, error %d Config_kF\n", err);
+
+	err = m_cargoCaptureMotor.Config_kP(kPIDLoopIdx, p, kTimeoutMs);
+	if (err != 0) printf("Cargo Capture, error %d Config_kP\n", err);
+
+	err = m_cargoCaptureMotor.Config_kI(kPIDLoopIdx, i, kTimeoutMs);
+	if (err != 0) printf("Cargo Capture, error %d Config_kI\n", err);
+
+	err = m_cargoCaptureMotor.Config_kD(kPIDLoopIdx, d, kTimeoutMs);
+	if (err != 0) printf("Cargo Capture, error %d Config_kD\n", err);
 }
 
 void CargoControl::ProcessCargoState()
 {
-	NewStateCheck();
+	NewCargoStateCheck();
 
 	switch (m_cargoState)
 	{
 		case eCargoStateNull     :
 		{
-			MotorsOff();
+			EjectMotorsOff();
+			IntakeMotorOff();
+			CaptureMotorOff();
 
 			if(g_rc.m_bAction)
-				SetNewState(eCargoStateAquiring);
+			{
+				SetNewCargoState(eCargoStateAquiring);
+				IntakeMotorOn();
+				LowerCapture();
+
+				m_captureCounter = 0;
+			}
 
 			break;
 		}
 		case eCargoStateAquiring :
 		{
-			Aquire();
+			if(++m_captureCounter >= CAPTURE_MOVE_TIME)
+				CaptureMotorOff();
 
 			if(m_acquiredSwitch.Get())
 			{
-				SetNewState(eCargoStateAquired);
+				SetNewCargoState(eCargoStateAquired);
+				GrabCargo();
+				SetNewCaptureState(eCargoCaptureStateMovingUp);
 				m_flippingCounter = 0;
 			}
 
 			else if(g_rc.m_bAbort)
-				SetNewState(eCargoStateNull);
+				SetNewCargoState(eCargoStateNull);
 
 			break;
 		}
 		case eCargoStateAquired  :
 		{
-			MotorsOff();
+			IntakeMotorOff();
 			
 			if(g_rc.m_bFlipped)
 			{
-				SetNewState(eCargoStateForwardFlip);
+				SetNewCargoState(eCargoStateForwardFlip);
 				m_flippingCounter = 0;
 			}
 
@@ -82,7 +108,7 @@ void CargoControl::ProcessCargoState()
 			m_pneumatics.Flip(g_rc.m_flippedStateValue);
 
 			if(++m_flippingCounter == FLIP_CYLCE_COUNT)
-				SetNewState(eCargoStateFlipped);
+				SetNewCargoState(eCargoStateFlipped);
 
 			break;
 		}
@@ -91,9 +117,9 @@ void CargoControl::ProcessCargoState()
 		{
 			if(g_rc.m_bAction && g_rc.IsLadderAtHeight())
 			{
-				SetNewState(eCargoStateEjecting);
+				SetNewCargoState(eCargoStateEjecting);
                 m_ejectCounter = 0;
-				Eject();
+				EjectCargo();
 			}
 
 			break;
@@ -102,18 +128,18 @@ void CargoControl::ProcessCargoState()
 		{
 			
 			if(++m_ejectCounter == EJECT_CYCLE_COUNT)
-				SetNewState(eCargoStateEjected);
+				SetNewCargoState(eCargoStateEjected);
 
 			break;
 		}
 
 		case eCargoStateEjected  :
 		{
-			MotorsOff();
+			EjectMotorsOff();
 
 			m_pneumatics.Flip(g_rc.m_flippedStateValue);
 
-			SetNewState(eCargoStateBackFlip);
+			SetNewCargoState(eCargoStateBackFlip);
             m_flippingCounter = 0;
 			g_rc.m_ladderTargetHeight = eLadderHeightGround;
 
@@ -125,7 +151,7 @@ void CargoControl::ProcessCargoState()
             if(++m_flippingCounter == FLIP_CYLCE_COUNT)
             {
                 g_rc.CargoEjected();
-                SetNewState(eCargoStateNull);
+                SetNewCargoState(eCargoStateNull);
             }
 
             break;
@@ -133,22 +159,116 @@ void CargoControl::ProcessCargoState()
 	}
 }
 
-void CargoControl::NewStateCheck()
+void CargoControl::ProcessCaptureState()
+{
+	NewCaptureStateCheck();
+
+	switch(m_captureState)
+	{
+		case eCargoCaptureStateUp :
+		{
+			CaptureMotorOff();
+
+			break;
+		}
+
+		case eCargoCaptureStateMovingDown :
+		{
+			LowerCapture();
+			
+			break;
+		}
+
+		case eCargoCaptureStateDown :
+		{
+			CaptureMotorOff();
+			
+			break;
+		}
+
+		case eCargoCaptureStateMovingUp :
+		{
+			RaiseCapture();
+			
+			break;
+		}
+	}
+}
+
+void CargoControl::EjectMotorsOff()
+{
+	m_leftGrabberMotor.Set(0);
+	m_rightGrabberMotor.Set(0);
+}
+
+void CargoControl::IntakeMotorOff()
+{
+	m_intakeMotor.Set(0);
+}
+
+void CargoControl::CaptureMotorOff()
+{
+	m_cargoCaptureMotor.Set(0);
+}
+
+void CargoControl::LowerCapture()
+{
+	m_cargoCaptureMotor.Set(0.2);
+}
+
+void CargoControl::RaiseCapture()
+{
+	m_cargoCaptureMotor.Set(-0.2);
+}
+
+void CargoControl::IntakeMotorOn()
+{
+	m_intakeMotor.Set(0.2);
+}
+
+void CargoControl::GrabCargo()
+{
+    m_leftGrabberMotor.Set(0.2);
+    m_rightGrabberMotor.Set(-0.2);
+}
+
+void CargoControl::EjectCargo()
+{
+    m_leftGrabberMotor.Set(-0.2);
+    m_rightGrabberMotor.Set(0.2);
+}
+
+void CargoControl::NewCargoStateCheck()
 {
 	if(m_lastCargoState != m_cargoState)
 	{
-		printf("State: %d\n", m_cargoState);
+		printf("Cargo State: %d\n", m_cargoState);
 		m_lastCargoState = m_cargoState;
 	}
 }
 
-void CargoControl::SetNewState(CargoState state)
+void CargoControl::NewCaptureStateCheck()
 {
-	m_cargoState = state;
-	printf("New State: %s\n", StateToString());
+	if(m_lastCaptureState != m_captureState)
+	{
+		printf("Capture State: %d\n", m_captureState);
+		m_lastCaptureState = m_captureState;
+	}
 }
 
-const char* CargoControl::StateToString()
+void CargoControl::SetNewCargoState(CargoState state)
+{
+	m_cargoState = state;
+	printf("New State: %s\n", CargoStateToString());
+}
+
+void CargoControl::SetNewCaptureState(CargoCaptureState state)
+{
+	m_captureState = state;
+	printf("New State: %s\n", CaptureStateToString());
+}
+
+const char* CargoControl::CargoStateToString()
 {
 	switch(m_cargoState)
 	{
@@ -161,5 +281,17 @@ const char* CargoControl::StateToString()
 		case eCargoStateEjected  	: return "Cargo State: Ejected";
 		case eCargoStateBackFlip 	: return "Cargo State: Back Flip";
 	}
-	return "Unkown State";
+	return "Unkown Cargo State";
+}
+
+const char* CargoControl::CaptureStateToString()
+{
+	switch(m_captureState)
+	{
+		case eCargoCaptureStateUp	      : return "Capture State: Up";
+		case eCargoCaptureStateMovingDown : return "Capture State: Moving Down";
+		case eCargoCaptureStateDown		  : return "Capture State: Down";
+		case eCargoCaptureStateMovingUp   : return "Capture State: Moving Up";
+	}
+	return "Unkown Capture State";
 }

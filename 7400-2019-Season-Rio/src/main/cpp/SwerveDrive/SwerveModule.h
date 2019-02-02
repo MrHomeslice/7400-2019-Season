@@ -1,7 +1,7 @@
 #ifndef SWERVE_MODULE_H_INCLUDED
 #define SWERVE_MODULE_H_INCLUDED
 
-#include "CanSimulator.h"
+#include "..\CanSimulator.h"
 #include "Defines.h"
 
 #define STEER_ENCODER_ZERO_OFFSET (0.0) //(1000.0)

@@ -33,10 +33,8 @@ void HatchControl::Periodic()
             
             SetMoveMotorIn();
 
-            if(m_hatchMoveCounter == 0)
+            if(--m_hatchMoveCounter == 0)
                  SetHatchState(eHatchMoveStateIn);
-            else
-                m_hatchMoveCounter--;
 
             break;
         }
@@ -60,12 +58,8 @@ void HatchControl::Periodic()
                 SetHatchState(eHatchMoveStateMovingIn);
 
             printf("%d\n", m_hatchMoveCounter);
-            if(m_hatchMoveCounter == HATCH_MOVE_TIME)
-            {
+            if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
                 SetHatchState(eHatchMoveStateOut);
-            }
-            else
-                m_hatchMoveCounter++;
 
             break;
         }
