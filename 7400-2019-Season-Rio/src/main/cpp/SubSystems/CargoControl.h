@@ -15,10 +15,19 @@
 #define FLIP_CYLCE_COUNT  50
 #define CAPTURE_MOVE_TIME 50
 
+#define CAPTURE_LOWER_POSITION  100
+#define CAPTURE_READY_POSITION  500
+#define CAPTURE_RAISE_POSITION 1200
+#define MAXIMUM_CAPTURE_ERROR    20
+#define MAXIMUM_CAPTURE_CURRENT  10
+
 typedef enum 
 {
 	eCargoStateNull = 0,
+	eCargoStateIntaking,
 	eCargoStateAquiring,
+	eCargoStateWaitingForReady,
+	eCargoStateWaitingForAcquired,
 	eCargoStateAquired,
 	eCargoStateForwardFlip,
 	eCargoStateFlipped,
@@ -48,7 +57,8 @@ class CargoControl
 				void CaptureMotorOff();
 				void LowerCapture();
 				void RaiseCapture();
-                void IntakeMotorOn();
+				void ReadyCapture();
+        void IntakeMotorOn();
 				void GrabCargo();
 				void EjectCargo();
 				void NewCargoStateCheck();
@@ -65,8 +75,10 @@ class CargoControl
 				const char* CargoStateToString();
 				const char* CaptureStateToString();
 
+				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
+
 				WPI_TalonSRX_     m_leftGrabberMotor, m_rightGrabberMotor, m_intakeMotor, m_cargoCaptureMotor;
-				frc::DigitalInput m_acquiredSwitch;
+				frc::DigitalInput m_acquiredSwitch, m_intakingSwitch;
 				CargoState        m_cargoState, m_lastCargoState;
 				CargoCaptureState m_captureState, m_lastCaptureState;
 				Pneumatics        m_pneumatics;

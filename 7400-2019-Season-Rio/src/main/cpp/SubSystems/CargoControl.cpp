@@ -4,20 +4,20 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
-              : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
-		        m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
-				m_intakeMotor(intakeID, "Intake Motor", true),
-				m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
-                m_acquiredSwitch(0)
+            : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
+		        	m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
+							m_intakeMotor(intakeID, "Intake Motor", true),
+							m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
+              m_acquiredSwitch(0), m_intakingSwitch(1)
 {
-    m_cargoState = eCargoStateNull;
+  m_cargoState = eCargoStateNull;
 	m_lastCargoState = eCargoStateNull;
 
 	m_captureState = eCargoCaptureStateUp;
 	m_lastCaptureState = eCargoCaptureStateUp;
 
-    m_ejectCounter    = 0;
-    m_flippingCounter = 0;
+  m_ejectCounter    = 0;
+  m_flippingCounter = 0;
 	m_captureCounter  = 0;
 }
 
@@ -25,6 +25,17 @@ void CargoControl::Periodic()
 {
 	ProcessCargoState();
 	ProcessCaptureState();
+}
+
+bool CargoControl::MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent)
+{
+	if (m_cargoCaptureMotor.GetOutputCurrent() > maxCurrent)
+		return true;
+
+	if (abs(m_cargoCaptureMotor.GetSelectedSensorPosition(0) - targetPosition) < maxError)
+		return true;
+
+	return false;
 }
 
 void CargoControl::SetCapturePIDValues()
@@ -55,34 +66,32 @@ void CargoControl::ProcessCargoState()
 
 	switch (m_cargoState)
 	{
-		case eCargoStateNull     :
+		case eCargoStateNull :
 		{
 			EjectMotorsOff();
 			IntakeMotorOff();
-			CaptureMotorOff();
+			RaiseCapture();
 
-			if(g_rc.m_bAction)
+			if (g_rc.m_bAction)
 			{
-				SetNewCargoState(eCargoStateAquiring);
+				SetNewCargoState(eCargoStateIntaking);
 				IntakeMotorOn();
 				LowerCapture();
-
-				m_captureCounter = 0;
 			}
 
 			break;
 		}
-		case eCargoStateAquiring :
+		
+		case eCargoStateIntaking :
 		{
-			if(++m_captureCounter >= CAPTURE_MOVE_TIME)
+			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT))
 				CaptureMotorOff();
 
-			if(m_acquiredSwitch.Get())
+			if (m_intakingSwitch.Get())
 			{
-				SetNewCargoState(eCargoStateAquired);
-				GrabCargo();
-				SetNewCaptureState(eCargoCaptureStateMovingUp);
-				m_flippingCounter = 0;
+				IntakeMotorOff();
+				ReadyCapture();
+				SetNewCargoState(eCargoStateWaitingForReady);
 			}
 
 			else if(g_rc.m_bAbort)
@@ -90,16 +99,45 @@ void CargoControl::ProcessCargoState()
 
 			break;
 		}
-		case eCargoStateAquired  :
+
+		case eCargoStateWaitingForReady :
 		{
-			IntakeMotorOff();
-			
-			if(g_rc.m_bFlipped)
+			if (MonitorCaptureMotor(CAPTURE_READY_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) {
+				CaptureMotorOff();
+				GrabCargo();
+				IntakeMotorOn();
+				SetNewCargoState(eCargoStateWaitingForAcquired);
+			}
+			else if(g_rc.m_bAbort)
+				SetNewCargoState(eCargoStateNull);
+
+			break;
+		}
+
+		case eCargoStateWaitingForAcquired :
+		{
+			if (m_acquiredSwitch.Get())
+			{
+				IntakeMotorOff();
+				EjectMotorsOff();
+				SetNewCargoState(eCargoStateAquired);
+			}
+			else if(g_rc.m_bAbort)
+				SetNewCargoState(eCargoStateNull);
+
+			break;
+		}
+
+		case eCargoStateAquired  :
+		{			
+			if (g_rc.m_bFlipped)
 			{
 				SetNewCargoState(eCargoStateForwardFlip);
 				m_flippingCounter = 0;
 			}
-
+			else if(g_rc.m_bAbort)
+				SetNewCargoState(eCargoStateNull);
+				
 			break;
 		}
 
@@ -107,7 +145,7 @@ void CargoControl::ProcessCargoState()
 		{
 			m_pneumatics.Flip(g_rc.m_flippedStateValue);
 
-			if(++m_flippingCounter == FLIP_CYLCE_COUNT)
+			if (++m_flippingCounter == FLIP_CYLCE_COUNT)
 				SetNewCargoState(eCargoStateFlipped);
 
 			break;
@@ -213,12 +251,17 @@ void CargoControl::CaptureMotorOff()
 
 void CargoControl::LowerCapture()
 {
-	m_cargoCaptureMotor.Set(0.2);
+	m_cargoCaptureMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, CAPTURE_LOWER_POSITION);
 }
 
 void CargoControl::RaiseCapture()
 {
-	m_cargoCaptureMotor.Set(-0.2);
+	m_cargoCaptureMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, CAPTURE_RAISE_POSITION);
+}
+
+void CargoControl::ReadyCapture()
+{
+	m_cargoCaptureMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, CAPTURE_READY_POSITION);
 }
 
 void CargoControl::IntakeMotorOn()
@@ -272,14 +315,14 @@ const char* CargoControl::CargoStateToString()
 {
 	switch(m_cargoState)
 	{
-		case eCargoStateNull		: return "Cargo State: Null";
-		case eCargoStateAquiring 	: return "Cargo State: Aquiring";
+		case eCargoStateNull				: return "Cargo State: Null";
+		case eCargoStateAquiring 		: return "Cargo State: Aquiring";
 		case eCargoStateForwardFlip : return "Cargo State: Forward Flip";
-		case eCargoStateAquired 	: return "Cargo State: Aquired";
-		case eCargoStateFlipped 	: return "Cargo State: Flipped";
-		case eCargoStateEjecting	: return "Cargo State: Ejecting";
-		case eCargoStateEjected  	: return "Cargo State: Ejected";
-		case eCargoStateBackFlip 	: return "Cargo State: Back Flip";
+		case eCargoStateAquired 		: return "Cargo State: Aquired";
+		case eCargoStateFlipped 		: return "Cargo State: Flipped";
+		case eCargoStateEjecting		: return "Cargo State: Ejecting";
+		case eCargoStateEjected  		: return "Cargo State: Ejected";
+		case eCargoStateBackFlip 		: return "Cargo State: Back Flip";
 	}
 	return "Unkown Cargo State";
 }
