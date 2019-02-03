@@ -135,9 +135,7 @@ void RobotControl::ReadButtons()
 	m_bAbort = m_driveJoyStick.Abort()->Changed() && m_driveJoyStick.Abort()->Pressed();
 	
 	if(m_bFlipped)
-	{
 		m_flippedStateValue = m_driveJoyStick.ElevatorFlip()->Value();
-	}
 	
 	if(m_bCargo)
 	{
@@ -194,7 +192,7 @@ void RobotControl::ReadButtons()
 
 	if(m_driveJoyStick.CameraSelection()->Changed() && m_driveJoyStick.CameraSelection()->Pressed())
 	{
-		g_tc.PutInt("Jetson/ThisIsNotADance", m_driveJoyStick.CameraSelection()->Value());
+		g_tc.PutDouble("Jetson/ThisIsNotADance", m_driveJoyStick.CameraSelection()->Value());
 	}
 }
 
