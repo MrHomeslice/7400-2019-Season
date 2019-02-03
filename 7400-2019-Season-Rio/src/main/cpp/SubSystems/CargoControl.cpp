@@ -4,10 +4,10 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
-            : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
-		        	m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
-							m_intakeMotor(intakeID, "Intake Motor", true),
-							m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
+            : m_leftGrabberMotor(leftID, "Left_Grabber_Motor",true),
+		        	m_rightGrabberMotor(rightID, "Right_Grabber_Motor", true),
+							m_intakeMotor(intakeID, "Intake_Motor", true),
+							m_cargoCaptureMotor(captureID, "Cargo_Capture_Motor", true),
               m_acquiredSwitch(0), m_intakingSwitch(1)
 {
   m_cargoState = eCargoStateNull;
@@ -74,6 +74,7 @@ void CargoControl::ProcessCargoState()
 
 			if (g_rc.m_bAction)
 			{
+				printf("g_rc.m_bAction = true\n");
 				SetNewCargoState(eCargoStateIntaking);
 				IntakeMotorOn();
 				LowerCapture();
@@ -84,11 +85,14 @@ void CargoControl::ProcessCargoState()
 		
 		case eCargoStateIntaking :
 		{
-			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT))
+			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) {
+				printf("MonitorCaptureMotor returns true\n");
 				CaptureMotorOff();
+			}
 
 			if (m_intakingSwitch.Get())
 			{
+				printf("m_intakingSwitch.Get() == true\n");
 				IntakeMotorOff();
 				ReadyCapture();
 				SetNewCargoState(eCargoStateWaitingForReady);
@@ -103,6 +107,7 @@ void CargoControl::ProcessCargoState()
 		case eCargoStateWaitingForReady :
 		{
 			if (MonitorCaptureMotor(CAPTURE_READY_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) {
+				printf("MonitorCaptureMotor returns true\n");
 				CaptureMotorOff();
 				GrabCargo();
 				IntakeMotorOn();
@@ -316,7 +321,10 @@ const char* CargoControl::CargoStateToString()
 	switch(m_cargoState)
 	{
 		case eCargoStateNull				: return "Cargo State: Null";
+		case eCargoStateIntaking    : return "Cargo State: Intaking";
 		case eCargoStateAquiring 		: return "Cargo State: Aquiring";
+		case eCargoStateWaitingForReady : return "Cargo State: Waiting For Ready";
+		case eCargoStateWaitingForAcquired : return "Cargo State: Waiting For Acquired";
 		case eCargoStateForwardFlip : return "Cargo State: Forward Flip";
 		case eCargoStateAquired 		: return "Cargo State: Aquired";
 		case eCargoStateFlipped 		: return "Cargo State: Flipped";

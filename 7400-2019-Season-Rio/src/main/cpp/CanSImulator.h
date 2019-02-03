@@ -96,8 +96,10 @@ class WPI_TalonSRX_
 
   int GetSelectedSensorPosition(int pidIdx = 0)
   {
-    if (m_bSim)
-      return 0;
+    if (m_bSim) {
+
+      return g_tc.GetDouble(name.c_str(), 0.0);       
+    }
 
     return m_talon.GetSelectedSensorPosition(pidIdx);
   }
@@ -146,8 +148,12 @@ class WPI_TalonSRX_
 
   double GetOutputCurrent()
   {
-    if (m_bSim)
-      return g_tc.GetDouble("CANSim/GrabberCurrent", 1.337);
+    if (m_bSim) {
+
+      std::string name = "CANSim/" + m_name + "-Current";
+
+      return g_tc.GetDouble(name.c_str(), 0.0);
+    }
       //return g_tc.GetDouble("CANSim/GrabberCurrent", 0);
       
     return m_talon.GetOutputCurrent();
