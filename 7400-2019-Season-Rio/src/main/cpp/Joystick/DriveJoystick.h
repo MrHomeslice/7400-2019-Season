@@ -7,21 +7,24 @@ class DriveJoystick : public MeeseeksJoystick
 {
 	public    : DriveJoystick(int joyStickPort);
 
-				JSButton *Allign()	   	 { return &m_allign; 	   }
-				JSButton *Action()	   	 { return &m_action;	   }
-				JSButton *TopHeight()	 { return &m_topHeight;	   }
-				JSButton *MidHeight()	 { return &m_midHeight;	   }
-				JSButton *BottomHeight() { return &m_bottomHeight; }
-				JSButton *Abort() { return &m_abort; }
+				JSButton *Allign()	   	    { return &m_allign; 	     }
+				JSButton *Action()	    	{ return &m_action;	         }
+				JSButton *TopHeight()	    { return &m_topHeight;	     }
+				JSButton *MidHeight()	    { return &m_midHeight;	     }
+				JSButton *BottomHeight()    { return &m_bottomHeight;    }
+				JSButton *CargoShipHeight() { return &m_cargoShipHeight; }
+				JSButton *Abort() 		    { return &m_abort; 		     }
 
 				JoystickValueButton *ElevatorFlip() 	{ return &m_elevatorFlip;     }
 				JoystickValueButton *CentricityToggle() { return &m_centricityToggle; }
+				JoystickValueButton *CameraSelection()  { return &m_cameraSelection;  }
 				
 				void Periodic();
 	protected :
 				JSButton m_allign, m_action;
-				JSButton m_topHeight, m_midHeight, m_bottomHeight, m_abort;
-				JoystickValueButton m_elevatorFlip, m_centricityToggle;
+				JSButton m_topHeight, m_midHeight, m_bottomHeight, m_cargoShipHeight; 
+				JSButton m_abort;
+				JoystickValueButton m_elevatorFlip, m_centricityToggle, m_cameraSelection;
 				
 };
 

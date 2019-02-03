@@ -4,27 +4,22 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
-            : m_leftGrabberMotor(leftID, "Left_Grabber_Motor",true),
-		        	m_rightGrabberMotor(rightID, "Right_Grabber_Motor", true),
-							m_intakeMotor(intakeID, "Intake_Motor", true),
-							m_cargoCaptureMotor(captureID, "Cargo_Capture_Motor", true),
-              m_acquiredSwitch(0), m_intakingSwitch(1)
+             : m_leftGrabberMotor(leftID, "Left_Grabber_Motor",true),
+		       m_rightGrabberMotor(rightID, "Right_Grabber_Motor", true),
+		 	   m_intakeMotor(intakeID, "Intake_Motor", true),
+			   m_cargoCaptureMotor(captureID, "Cargo_Capture_Motor", true),
+               m_acquiredSwitch(0), m_intakingSwitch(1)
 {
-  m_cargoState = eCargoStateNull;
-	m_lastCargoState = eCargoStateNull;
+    m_cargoState = eCargoStateNull;
+    m_lastCargoState = eCargoStateNull;
 
-	m_captureState = eCargoCaptureStateUp;
-	m_lastCaptureState = eCargoCaptureStateUp;
-
-  m_ejectCounter    = 0;
-  m_flippingCounter = 0;
-	m_captureCounter  = 0;
+    m_ejectCounter    = 0;
+    m_flippingCounter = 0;
 }
 
 void CargoControl::Periodic()
 {
 	ProcessCargoState();
-	ProcessCaptureState();
 }
 
 bool CargoControl::MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent)
@@ -125,31 +120,19 @@ void CargoControl::ProcessCargoState()
 			{
 				IntakeMotorOff();
 				EjectMotorsOff();
-				SetNewCargoState(eCargoStateAquired);
-			}
-			else if(g_rc.m_bAbort)
-				SetNewCargoState(eCargoStateNull);
-
-			break;
-		}
-
-		case eCargoStateAquired  :
-		{			
-			if (g_rc.m_bFlipped)
-			{
 				SetNewCargoState(eCargoStateForwardFlip);
+				m_pneumatics.Flip(g_rc.m_flippedStateValue);
 				m_flippingCounter = 0;
+				
 			}
 			else if(g_rc.m_bAbort)
 				SetNewCargoState(eCargoStateNull);
-				
+
 			break;
 		}
 
 		case eCargoStateForwardFlip :
 		{
-			m_pneumatics.Flip(g_rc.m_flippedStateValue);
-
 			if (++m_flippingCounter == FLIP_CYLCE_COUNT)
 				SetNewCargoState(eCargoStateFlipped);
 
@@ -199,42 +182,6 @@ void CargoControl::ProcessCargoState()
 
             break;
         }
-	}
-}
-
-void CargoControl::ProcessCaptureState()
-{
-	NewCaptureStateCheck();
-
-	switch(m_captureState)
-	{
-		case eCargoCaptureStateUp :
-		{
-			CaptureMotorOff();
-
-			break;
-		}
-
-		case eCargoCaptureStateMovingDown :
-		{
-			LowerCapture();
-			
-			break;
-		}
-
-		case eCargoCaptureStateDown :
-		{
-			CaptureMotorOff();
-			
-			break;
-		}
-
-		case eCargoCaptureStateMovingUp :
-		{
-			RaiseCapture();
-			
-			break;
-		}
 	}
 }
 
@@ -295,54 +242,26 @@ void CargoControl::NewCargoStateCheck()
 	}
 }
 
-void CargoControl::NewCaptureStateCheck()
-{
-	if(m_lastCaptureState != m_captureState)
-	{
-		printf("Capture State: %d\n", m_captureState);
-		m_lastCaptureState = m_captureState;
-	}
-}
-
 void CargoControl::SetNewCargoState(CargoState state)
 {
 	m_cargoState = state;
 	printf("New State: %s\n", CargoStateToString());
 }
 
-void CargoControl::SetNewCaptureState(CargoCaptureState state)
-{
-	m_captureState = state;
-	printf("New State: %s\n", CaptureStateToString());
-}
-
 const char* CargoControl::CargoStateToString()
 {
 	switch(m_cargoState)
 	{
-		case eCargoStateNull				: return "Cargo State: Null";
-		case eCargoStateIntaking    : return "Cargo State: Intaking";
-		case eCargoStateAquiring 		: return "Cargo State: Aquiring";
-		case eCargoStateWaitingForReady : return "Cargo State: Waiting For Ready";
+		case eCargoStateNull			   : return "Cargo State: Null";
+		case eCargoStateIntaking           : return "Cargo State: Intaking";
+		case eCargoStateAquiring 		   : return "Cargo State: Aquiring";
+		case eCargoStateWaitingForReady    : return "Cargo State: Waiting For Ready";
 		case eCargoStateWaitingForAcquired : return "Cargo State: Waiting For Acquired";
-		case eCargoStateForwardFlip : return "Cargo State: Forward Flip";
-		case eCargoStateAquired 		: return "Cargo State: Aquired";
-		case eCargoStateFlipped 		: return "Cargo State: Flipped";
-		case eCargoStateEjecting		: return "Cargo State: Ejecting";
-		case eCargoStateEjected  		: return "Cargo State: Ejected";
-		case eCargoStateBackFlip 		: return "Cargo State: Back Flip";
+		case eCargoStateForwardFlip 	   : return "Cargo State: Forward Flip";
+		case eCargoStateFlipped 		   : return "Cargo State: Flipped";
+		case eCargoStateEjecting		   : return "Cargo State: Ejecting";
+		case eCargoStateEjected  		   : return "Cargo State: Ejected";
+		case eCargoStateBackFlip 		   : return "Cargo State: Back Flip";
 	}
 	return "Unkown Cargo State";
-}
-
-const char* CargoControl::CaptureStateToString()
-{
-	switch(m_captureState)
-	{
-		case eCargoCaptureStateUp	      : return "Capture State: Up";
-		case eCargoCaptureStateMovingDown : return "Capture State: Moving Down";
-		case eCargoCaptureStateDown		  : return "Capture State: Down";
-		case eCargoCaptureStateMovingUp   : return "Capture State: Moving Up";
-	}
-	return "Unkown Capture State";
 }

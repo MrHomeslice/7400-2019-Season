@@ -5,6 +5,7 @@
 #include <frc/wpilib.h>
 #include "..\Pneumatics\Pneumatics.h"
 #include "..\CanSimulator.h"
+#include "..\include\Defines.h"
 
 #define DELIVERY_SYSTEM_LEFT_MOTOR    0
 #define DELIVERY_SYSTEM_RIGHT_MOTOR   1
@@ -28,21 +29,12 @@ typedef enum
 	eCargoStateAquiring,
 	eCargoStateWaitingForReady,
 	eCargoStateWaitingForAcquired,
-	eCargoStateAquired,
 	eCargoStateForwardFlip,
 	eCargoStateFlipped,
 	eCargoStateEjecting,
 	eCargoStateEjected,
 	eCargoStateBackFlip
 } CargoState;
-
-typedef enum
-{
-	eCargoCaptureStateUp = 0,
-	eCargoCaptureStateMovingDown,
-	eCargoCaptureStateDown,
-	eCargoCaptureStateMovingUp
-} CargoCaptureState;
 
 class CargoControl
 {
@@ -58,13 +50,11 @@ class CargoControl
 				void LowerCapture();
 				void RaiseCapture();
 				void ReadyCapture();
-        void IntakeMotorOn();
+       			void IntakeMotorOn();
 				void GrabCargo();
 				void EjectCargo();
 				void NewCargoStateCheck();
-				void NewCaptureStateCheck();
 				void SetNewCargoState(CargoState state);
-				void SetNewCaptureState(CargoCaptureState state);
 
 				static constexpr float kDefaultCaptureF = 0.0;
 				static constexpr float kDefaultCaptureP = 10.0;
@@ -73,17 +63,15 @@ class CargoControl
 
 	protected :
 				const char* CargoStateToString();
-				const char* CaptureStateToString();
 
 				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
 
 				WPI_TalonSRX_     m_leftGrabberMotor, m_rightGrabberMotor, m_intakeMotor, m_cargoCaptureMotor;
 				frc::DigitalInput m_acquiredSwitch, m_intakingSwitch;
 				CargoState        m_cargoState, m_lastCargoState;
-				CargoCaptureState m_captureState, m_lastCaptureState;
 				Pneumatics        m_pneumatics;
 
-				int m_ejectCounter, m_flippingCounter, m_captureCounter;
+				int m_ejectCounter, m_flippingCounter;
 };
 
 #endif

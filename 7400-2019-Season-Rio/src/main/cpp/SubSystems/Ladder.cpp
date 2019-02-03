@@ -64,6 +64,8 @@ int Ladder::SetLadderPosition()
     {
         case eLadderHeightGround      : return LADDER_GROUND_HEIGHT;
 
+        case eLadderHeightCargoShip   : return LADDER_CARGO_SHIP_HEIGHT;
+
 	    case eLadderHeightCargoBottom : return LADDER_CARGO_BOTTOM_HEIGHT;
 
 	    case eLadderHeightCargoMid    : return LADDER_CARGO_MID_HEIGHT;

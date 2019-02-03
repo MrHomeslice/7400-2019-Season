@@ -15,6 +15,7 @@
 typedef enum
 {
 	eLadderHeightGround = 0,
+	eLadderHeightCargoShip,
 	eLadderHeightCargoBottom,
 	eLadderHeightCargoMid,
 	eLadderHeightCargoTop,

@@ -1,8 +1,10 @@
 #include "RobotControl.h"
 #include <frc/GenericHID.h>
 #include "..\MeeseeksProperties.h"
+#include "..\DataTable\TableController.h"
 
 extern MeeseeksProperties g_mp;
+extern TableController	  g_tc;
 
 RobotControl::RobotControl()
 			 : m_driveJoyStick(JOYSTICK_1),
@@ -124,10 +126,9 @@ void RobotControl::ReadButtons()
 {
 
 	if(m_driveJoyStick.Allign()->Changed() && m_driveJoyStick.Allign()->Pressed())
-		printf("Allignment Changed...\n");
+		printf("Allignment Pressed...\n");
 
 	m_bAction = m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed();
-	//printf("%d\n", m_bAction);
 		
 	m_bFlipped = m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed();
 
@@ -140,6 +141,12 @@ void RobotControl::ReadButtons()
 	
 	if(m_bCargo)
 	{
+		if(m_driveJoyStick.CargoShipHeight()->Changed() && m_driveJoyStick.CargoShipHeight()->Pressed())
+		{
+			m_bChangedHeight = true;
+			m_ladderTargetHeight = eLadderHeightCargoShip;
+		}
+
 		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
 		{
 			m_bChangedHeight = true;
@@ -183,6 +190,11 @@ void RobotControl::ReadButtons()
 	if(m_driveJoyStick.CentricityToggle()->Changed() && m_driveJoyStick.CentricityToggle()->Pressed())
 	{
 		printf("Centricity Value: %d\n", m_driveJoyStick.CentricityToggle()->Value());
+	}
+
+	if(m_driveJoyStick.CameraSelection()->Changed() && m_driveJoyStick.CameraSelection()->Pressed())
+	{
+		g_tc.PutInt("Jetson/ThisIsNotADance", m_driveJoyStick.CameraSelection()->Value());
 	}
 }
 
