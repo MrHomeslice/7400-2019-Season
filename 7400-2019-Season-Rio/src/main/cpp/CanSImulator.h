@@ -97,6 +97,7 @@ class WPI_TalonSRX_
   int GetSelectedSensorPosition(int pidIdx = 0)
   {
     if (m_bSim) {
+      std::string name = "CANSim/" + m_name + "-Position";
 
       return g_tc.GetDouble(name.c_str(), 0.0);       
     }
