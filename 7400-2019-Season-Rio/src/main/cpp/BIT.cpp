@@ -8,7 +8,7 @@ BIT::BIT()
      b_testInProgress(true),
      b_testComplete(false)
 {
-    m_BIT_State = eSteerTest;
+    m_BIT_State = eSwerveTest;
 }
 
 void BIT::Run()
@@ -18,28 +18,17 @@ void BIT::Run()
     {
         switch(m_BIT_State)
         {
-            case eSteerTest:
+            case eSwerveTest:
             {
-                //Insert Test Code
-                b_testComplete = true;
-                
-                if(b_testComplete)
-                {
-                    b_testComplete = false;
-                    m_BIT_State = eRotationTest;
-                }
-            }
-
-            case eRotationTest:
-            {
-                //Insert Test Code
-                b_testComplete = true;
+                b_testComplete = m_swerve.BITTest();
                 
                 if(b_testComplete)
                 {
                     b_testComplete = false;
                     m_BIT_State = eIntakeMotorTest;
                 }
+                else
+                    printf("SWERVE TEST FAILED");
             }
 
             case eIntakeMotorTest:

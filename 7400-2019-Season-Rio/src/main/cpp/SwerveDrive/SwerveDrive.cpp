@@ -140,7 +140,12 @@ void SwerveDrive::CalculateDriveVectors(DoubleXY *pDestCorners)
 
 void SwerveDrive::SetSteerPosition(int module, int position)
 {
-	m_module[module]->SetSteerPosition(position);
+	m_module[module]->SetSteerPosition(position);//1024
+}
+
+int SwerveDrive::GetSteerPosition(int module)
+{
+	return m_module[module]->GetSteerPosition();
 }
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
@@ -206,8 +211,44 @@ void SwerveDrive::ShowOffsets()
 	}
 }
 
-void SwerveDrive::ToZero()
+void SwerveModule::Set(double angle, double speed)// Set values and control modes for the motors.
 {
-	for (int index=0; index<4; index++)
-		m_module[index]->ToZero();
+	int steerTargetPosition = SetSteerAngle(angle);
+	SetDrivePercentOutput(speed);
+}	
+
+bool SwerveDrive::BITTest()
+{
+	int angle = 0;
+	int modNum = 0;
+	int testTime = 0;
+
+	if(testTime == 0)
+		m_module[modNum]->Set(angle, 0);
+
+	if(testTime >= 25)
+		m_module[modNum]->Set(angle, .5);
+	else if(testTime >= 50)
+		m_module[modNum]->Set(angle, -.5);
+	else
+	{
+		m_module[modNum]->Set(angle, 0);
+		angle += 40.96;
+	}
+
+	testTime++;	
+	
+	if(testTime == 75)
+	{
+		if(modNum != 3)
+		{
+			modNum++;
+			testTime = 0;
+		}
+		else
+			return true;
+	}
+	else
+		return false;
 }
+
