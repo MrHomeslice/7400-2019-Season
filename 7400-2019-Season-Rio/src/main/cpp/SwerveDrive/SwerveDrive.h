@@ -27,6 +27,9 @@ class SwerveDrive
 							void Disable();
 							void ShowOffsets();
 							void ToZero();
+							int GetSteerPosition(int module);
+							void Set(double angle, double speed);
+							bool BITTest();						
 	protected :
 							void RectangularToBoundedCircle(double &x, double &y);
 							void RotateCorners(double rotation, eRotationPoint rotationPoint, DoubleXY *pDestRect);
