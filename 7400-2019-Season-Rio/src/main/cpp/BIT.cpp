@@ -4,14 +4,25 @@
 #include "BIT.h"
 
 BIT::BIT()
-    :m_cargoControl(DELIVERY_SYSTEM_LEFT_MOTOR, DELIVERY_SYSTEM_RIGHT_MOTOR, DELIVERY_SYSTEM_INTAKE_MOTOR, DELIVERY_SYSTEM_CAPTURE_MOTOR),
-     b_testInProgress(true),
-     b_testComplete(false)
 {
-    m_BIT_State = eSwerveTest;
 }
 
-void BIT::Run()
+void BIT::Initialize(SwerveDrive *pSwerve, CargoControl *pCargoControl)
+{
+    m_pSwerve       = pSwerve;
+    m_pCargoControl = pCargoControl;
+
+    m_BIT_State = eSwerveTest;
+
+    b_testInProgress = true;
+    b_testComplete   = false;
+
+    m_angle    = 0.0;
+    m_modNum   = 0;
+    m_testTime = 0;
+}
+
+void BIT::Periodic()
 {
     //SEND HELP
     if(b_testInProgress)
@@ -20,15 +31,16 @@ void BIT::Run()
         {
             case eSwerveTest:
             {
-                b_testComplete = m_swerve.BITTest();
+                b_testComplete = m_pSwerve->BITTest(m_angle, m_modNum, m_testTime);
                 
                 if(b_testComplete)
                 {
                     b_testComplete = false;
                     m_BIT_State = eIntakeMotorTest;
+                    printf("Motor Test Complete\n");
                 }
-                else
-                    printf("SWERVE TEST FAILED");
+                
+                break;
             }
 
             case eIntakeMotorTest:
@@ -41,6 +53,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eIntakeMechanismRotation;
                 }
+                break;
             }
 
             case eIntakeMechanismRotation:
@@ -53,6 +66,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eLadderTest;
                 }
+                break;
             }
 
             case eLadderTest:
@@ -65,6 +79,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eFlipTest;
                 }
+                break;
             }
 
             case eFlipTest:
@@ -77,6 +92,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eCargoGrabberTest;
                 }
+                break;
             }
 
             case eCargoGrabberTest:
@@ -89,6 +105,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eHatchGrabTest;
                 }
+                break;
             }
 
             case eHatchGrabTest:
@@ -101,6 +118,7 @@ void BIT::Run()
                     b_testComplete = false;
                     m_BIT_State = eHatchLinearTest;
                 }
+                break;
             }
 
             case eHatchLinearTest:
@@ -111,6 +129,7 @@ void BIT::Run()
                 {
                     b_testInProgress = false;
                 }
+                break;
             }
         }
     }

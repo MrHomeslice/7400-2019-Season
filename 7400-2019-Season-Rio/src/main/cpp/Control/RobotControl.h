@@ -12,8 +12,8 @@
 
 #define MAX_LADDER_POSITION_ERROR 10
 
-#define ALLIGNMENT_X_CORRECTION 5
-#define ALLIGNMENT_Z_CORRECTION 5
+#define ALLIGNMENT_X_CORRECTION .2
+#define ALLIGNMENT_Z_CORRECTION .2
 
 typedef enum
 {
@@ -68,6 +68,10 @@ class RobotControl
 				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;
+
+				CargoControl   m_cargoControl;
+				HatchControl   m_hatchControl;
+				Ladder         m_ladder;
 	protected :
 				double Deadband(double x, double d);
 
@@ -75,9 +79,7 @@ class RobotControl
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
 				bool           m_bXYZChanged, m_bRobotCentric;
 
-				CargoControl   m_cargoControl;
-				HatchControl   m_hatchControl;
-				Ladder         m_ladder;
+				
 				
 };
 

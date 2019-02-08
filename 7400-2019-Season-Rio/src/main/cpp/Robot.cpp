@@ -3,6 +3,8 @@
 #include "DataTable\TableController.h"
 #include "Control\RobotControl.h"
 
+#define BIT_IS_ENABLED
+
 TableController    g_tc;
 MeeseeksProperties g_mp;
 RobotControl	   g_rc;
@@ -34,6 +36,10 @@ void Robot::TeleopInit()
 	m_swerve.SetPIDValues();
 
 	m_swerve.Disable();
+
+#ifdef BIT_IS_ENABLED
+	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
+#endif
 }
 
 void ShowState(std::string &oldState, const char *pNewState)
@@ -46,20 +52,25 @@ void ShowState(std::string &oldState, const char *pNewState)
 
 void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
-	static std::string state = "Idle";
+	#ifdef BIT_IS_ENABLED
+		m_BIT.Periodic();
 
-	bool bControlChanged = g_rc.Periodic(true);
+	#else
+		static std::string state = "Idle";
 
-	bool bCargoState = g_rc.Cargo();
+		bool bControlChanged = g_rc.Periodic(true);
 
-	if(bControlChanged)
-	{
-		m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
-	}
+		bool bCargoState = g_rc.Cargo();
 
-	g_rc.ReadButtons();
+		if(bControlChanged)
+		{
+			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+		}
 
-	m_swerve.Periodic();
+		g_rc.ReadButtons();
+
+		m_swerve.Periodic();
+	#endif
 }
 
 void Robot::AutonomousInit()

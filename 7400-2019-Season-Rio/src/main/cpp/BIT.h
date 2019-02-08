@@ -18,21 +18,22 @@ typedef enum
     eCargoGrabberTest,
     eHatchGrabTest,
     eHatchLinearTest,
-}BIT_State;
-
-
+} BIT_State;
 
 class BIT
 {
     public : BIT();
-            void Run();
+            void Initialize(SwerveDrive *pSwerve, CargoControl *pCargoControl);
+            void Periodic();
 
             BIT_State m_BIT_State;
 
             bool b_testInProgress,b_testComplete;
     protected :
-            NavXGyro     m_gyro;
-			SwerveDrive  m_swerve;
-			CargoControl m_cargoControl;
+            SwerveDrive  *m_pSwerve;
+			CargoControl *m_pCargoControl;
+
+            int m_modNum, m_testTime;
+            double m_angle;
 
 };

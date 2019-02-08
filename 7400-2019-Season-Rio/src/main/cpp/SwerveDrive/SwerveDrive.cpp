@@ -211,35 +211,40 @@ void SwerveDrive::ShowOffsets()
 	}
 }
 
-void SwerveModule::Set(double angle, double speed)// Set values and control modes for the motors.
+bool SwerveDrive::BITTest(double &angle, int &modNum, int &testTime)
 {
-	int steerTargetPosition = SetSteerAngle(angle);
-	SetDrivePercentOutput(speed);
-}	
-
-bool SwerveDrive::BITTest()
-{
-	int angle = 0;
-	int modNum = 0;
-	int testTime = 0;
-
 	if(testTime == 0)
 		m_module[modNum]->Set(angle, 0);
 
-	if(testTime >= 25)
+	if(testTime <= 25)
+	{
 		m_module[modNum]->Set(angle, .5);
-	else if(testTime >= 50)
+		printf("Test Time : %d\n", testTime);
+		printf("Angle :%.6f\n", angle);
+		printf("Module Number :%d\n", modNum);
+	}
+	else if(testTime <= 50)
+	{
 		m_module[modNum]->Set(angle, -.5);
+		printf("Test Time : %d\n", testTime);
+		printf("Angle :%.6f\n", angle);
+		printf("Module Number :%d\n", modNum);
+	}
 	else
 	{
 		m_module[modNum]->Set(angle, 0);
 		angle += 40.96;
+		printf("Test Time : %d\n", testTime);
+		printf("Angle :%.6f\n", angle);
+		printf("Module Number :%d\n", modNum);
 	}
 
 	testTime++;	
 	
-	if(testTime == 75)
+	if(testTime == 76)
 	{
+		angle = 0;
+
 		if(modNum != 3)
 		{
 			modNum++;

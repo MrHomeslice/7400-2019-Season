@@ -58,7 +58,7 @@ bool RobotControl::Periodic(bool bTeleop)
 			m_bAllign = false;
 		else
 		{
-			double xOffSet  = g_tc.GetDouble("Target/XOffSet", 0);
+			double xOffSet  = g_tc.GetDouble("Target/XOffset", 0);
 			double distance = g_tc.GetDouble("Target/Distance", 0);
 
 			m_y = distance / 10.0;
@@ -70,14 +70,14 @@ bool RobotControl::Periodic(bool bTeleop)
 			else
 				m_x = 0;
 
-			if(approachAngle > 0)
+			if(approachAngle > 90)
 				m_z = -ALLIGNMENT_Z_CORRECTION;
-			else if(approachAngle < 0)
+			else if(approachAngle < 90)
 				m_z = ALLIGNMENT_Z_CORRECTION;
 			else
 				m_z = 0;
 
-			g_tc.PutDouble("Target/XOffSet", m_x);
+			g_tc.PutDouble("Target/XOffset", m_x);
 			g_tc.PutDouble("Target/Distance", m_y);
 			g_tc.PutDouble("Target/ApproachAngle", m_z);
 		}
