@@ -3,10 +3,32 @@
 
 #include "DataTable\TableController.h"
 #include <ctre/Phoenix.h>
+#include <WPILib.h>
 
 extern TableController g_tc;
 
 using namespace ctre::phoenix;
+
+class DigitalInput_
+{
+  public    : DigitalInput_(int port, const char *pName, bool bSim);
+
+              bool Get() {
+                if (m_bSim) {
+                  std::string name = "CANSim/" + m_name + "-Input";
+
+                  return g_tc.GetInt(name.c_str(), 0);       
+                }
+                else
+
+                return m_digitalInput.Get();
+              }
+
+  protected :
+              frc::DigitalInput m_digitalInput;
+              bool              m_bSim;
+              std::string       m_name;
+};
 
 class WPI_TalonSRX_
 {

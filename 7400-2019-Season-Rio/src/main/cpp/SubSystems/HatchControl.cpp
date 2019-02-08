@@ -120,7 +120,10 @@ void HatchControl::Periodic()
                 SetEjectGrabbers();
 
                 if(++m_ejectCounter == HATCH_EJECT_TIME)
+                {
                     SetGrabberState(eGrabberStateEjected);
+                    SetHatchState(eHatchMoveStateMovingIn);
+                }
             }
             
             break;
@@ -129,9 +132,12 @@ void HatchControl::Periodic()
         case eGrabberStateEjected  :
         {
             SetGrabbersOff();
-            SetHatchState(eHatchMoveStateMovingIn);
-            SetGrabberState(eGrabberStateNull);
-            g_rc.m_ladderTargetHeight = eLadderHeightGround;
+
+            if(GetHatchMoveState() == eHatchMoveStateIn)
+            {
+                g_rc.m_ladderTargetHeight = eLadderHeightGround;
+                SetGrabberState(eGrabberStateNull);
+            }
 
             break;
         }

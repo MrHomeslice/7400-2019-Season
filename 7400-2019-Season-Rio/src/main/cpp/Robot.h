@@ -22,7 +22,6 @@ class Robot : public frc::TimedRobot
 
 							NavXGyro     m_gyro;
 							SwerveDrive  m_swerve;
-							CargoControl m_cargoControl;
 };
 
 #endif

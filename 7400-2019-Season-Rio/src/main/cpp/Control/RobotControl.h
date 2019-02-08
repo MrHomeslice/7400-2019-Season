@@ -12,6 +12,9 @@
 
 #define MAX_LADDER_POSITION_ERROR 10
 
+#define ALLIGNMENT_X_CORRECTION 5
+#define ALLIGNMENT_Z_CORRECTION 5
+
 typedef enum
 {
 	eLadderHeightGround = 0,
@@ -61,7 +64,7 @@ class RobotControl
 
 				DriveJoystick m_driveJoyStick;
 
-				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight, m_bLadderAtHeight;
+				bool m_bCargo, m_bAllign, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight, m_bLadderAtHeight;
 				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;

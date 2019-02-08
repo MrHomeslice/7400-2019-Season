@@ -50,9 +50,45 @@ bool RobotControl::Periodic(bool bTeleop)
 {
 	m_driveJoyStick.Periodic();
 
-	m_x 	 =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
-	m_y	     = -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
-	m_z 	 =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
+	if(m_bAllign)
+	{
+		double approachAngle = g_tc.GetDouble("Target/ApproachAngle", 0);
+
+		if(approachAngle == -1000)
+			m_bAllign = false;
+		else
+		{
+			double xOffSet  = g_tc.GetDouble("Target/XOffSet", 0);
+			double distance = g_tc.GetDouble("Target/Distance", 0);
+
+			m_y = distance / 10.0;
+
+			if(xOffSet > 0)
+				m_x = -ALLIGNMENT_X_CORRECTION;
+			else if(xOffSet < 0)
+				m_x = ALLIGNMENT_X_CORRECTION;
+			else
+				m_x = 0;
+
+			if(approachAngle > 0)
+				m_z = -ALLIGNMENT_Z_CORRECTION;
+			else if(approachAngle < 0)
+				m_z = ALLIGNMENT_Z_CORRECTION;
+			else
+				m_z = 0;
+
+			g_tc.PutDouble("Target/XOffSet", m_x);
+			g_tc.PutDouble("Target/Distance", m_y);
+			g_tc.PutDouble("Target/ApproachAngle", m_z);
+		}
+	}
+	else
+	{
+		m_x 	 =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
+		m_y	     = -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
+		m_z 	 =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
+	}
+
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
 	m_pov    = m_driveJoyStick.GetPOV();
 
@@ -126,7 +162,7 @@ void RobotControl::ReadButtons()
 {
 
 	if(m_driveJoyStick.Allign()->Changed() && m_driveJoyStick.Allign()->Pressed())
-		printf("Allignment Pressed...\n");
+		m_bAllign = true;
 
 	m_bAction = m_driveJoyStick.Action()->Changed() && m_driveJoyStick.Action()->Pressed();
 		
@@ -139,25 +175,25 @@ void RobotControl::ReadButtons()
 	
 	if(m_bCargo)
 	{
-		if(m_driveJoyStick.CargoShipHeight()->Changed() && m_driveJoyStick.CargoShipHeight()->Pressed())
+		if(m_driveJoyStick.CargoShipHeight()->Changed() && m_driveJoyStick.CargoShipHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoShip;
 		}
 
-		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoTop;
 		}
 	
-		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoMid;
 		}
 
-		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoBottom;
@@ -166,19 +202,19 @@ void RobotControl::ReadButtons()
 
 	else
 	{
-		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed())
+		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed() && m_hatchControl.GetGrabberState() == eGrabberStateAquired)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchTop;
 		}
 		
-		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed())
+		if(m_driveJoyStick.MidHeight()->Changed() && m_driveJoyStick.MidHeight()->Pressed() && m_hatchControl.GetGrabberState() == eGrabberStateAquired)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchMid;
 		}
 
-		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed())
+		if(m_driveJoyStick.BottomHeight()->Changed() && m_driveJoyStick.BottomHeight()->Pressed() && m_hatchControl.GetGrabberState() == eGrabberStateAquired)
 		{
 			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightHatchBottom;
@@ -198,7 +234,7 @@ void RobotControl::ReadButtons()
 
 bool RobotControl::RobotCentric()
 {
-	return m_driveJoyStick.CentricityToggle()->Value();
+	return m_driveJoyStick.CentricityToggle()->Value() || m_bAllign;
 }
 
 void RobotControl::CargoEjected()

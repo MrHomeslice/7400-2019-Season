@@ -26,7 +26,6 @@ typedef enum
 {
 	eCargoStateNull = 0,
 	eCargoStateIntaking,
-	eCargoStateAquiring,
 	eCargoStateWaitingForReady,
 	eCargoStateWaitingForAcquired,
 	eCargoStateForwardFlip,
@@ -55,6 +54,8 @@ class CargoControl
 				void EjectCargo();
 				void NewCargoStateCheck();
 				void SetNewCargoState(CargoState state);
+				
+				CargoState GetCargoState();
 
 				static constexpr float kDefaultCaptureF = 0.0;
 				static constexpr float kDefaultCaptureP = 10.0;
@@ -67,7 +68,7 @@ class CargoControl
 				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
 
 				WPI_TalonSRX_     m_leftGrabberMotor, m_rightGrabberMotor, m_intakeMotor, m_cargoCaptureMotor;
-				frc::DigitalInput m_acquiredSwitch, m_intakingSwitch;
+				DigitalInput_     m_acquiredSwitch, m_intakingSwitch;
 				CargoState        m_cargoState, m_lastCargoState;
 				Pneumatics        m_pneumatics;
 

@@ -4,11 +4,11 @@
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
-             : m_leftGrabberMotor(leftID, "Left_Grabber_Motor",true),
-		       m_rightGrabberMotor(rightID, "Right_Grabber_Motor", true),
-		 	   m_intakeMotor(intakeID, "Intake_Motor", true),
-			   m_cargoCaptureMotor(captureID, "Cargo_Capture_Motor", true),
-               m_acquiredSwitch(0), m_intakingSwitch(1)
+             : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
+		       m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
+		 	   m_intakeMotor(intakeID, "Intake Motor", true),
+			   m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
+               m_acquiredSwitch(0, "Acquired", true), m_intakingSwitch(1, "Intake", true)
 {
     m_cargoState = eCargoStateNull;
     m_lastCargoState = eCargoStateNull;
@@ -80,10 +80,8 @@ void CargoControl::ProcessCargoState()
 		
 		case eCargoStateIntaking :
 		{
-			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) {
-				printf("MonitorCaptureMotor returns true\n");
+			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT))
 				CaptureMotorOff();
-			}
 
 			if (m_intakingSwitch.Get())
 			{
@@ -233,6 +231,11 @@ void CargoControl::EjectCargo()
     m_rightGrabberMotor.Set(0.2);
 }
 
+CargoState CargoControl::GetCargoState()
+{
+	return m_cargoState;
+}
+
 void CargoControl::NewCargoStateCheck()
 {
 	if(m_lastCargoState != m_cargoState)
@@ -254,7 +257,6 @@ const char* CargoControl::CargoStateToString()
 	{
 		case eCargoStateNull			   : return "Cargo State: Null";
 		case eCargoStateIntaking           : return "Cargo State: Intaking";
-		case eCargoStateAquiring 		   : return "Cargo State: Aquiring";
 		case eCargoStateWaitingForReady    : return "Cargo State: Waiting For Ready";
 		case eCargoStateWaitingForAcquired : return "Cargo State: Waiting For Acquired";
 		case eCargoStateForwardFlip 	   : return "Cargo State: Forward Flip";
