@@ -3,9 +3,7 @@
 
 #include <frc/wpilib.h>
 #include "Gyro/NavXGyro.h"
-#include "Control/RobotControl.h"
 #include "SwerveDrive/SwerveDrive.h"
-#include "Pneumatics/Pneumatics.h"
 #include "SubSystems/CargoControl.h"
 #include "BIT.h"
 

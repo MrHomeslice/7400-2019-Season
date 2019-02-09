@@ -99,7 +99,8 @@ void CargoControl::ProcessCargoState()
 
 		case eCargoStateWaitingForReady :
 		{
-			if (MonitorCaptureMotor(CAPTURE_READY_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) {
+			if (MonitorCaptureMotor(CAPTURE_READY_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT)) 
+			{
 				printf("MonitorCaptureMotor returns true\n");
 				CaptureMotorOff();
 				GrabCargo();
@@ -121,7 +122,6 @@ void CargoControl::ProcessCargoState()
 				SetNewCargoState(eCargoStateForwardFlip);
 				m_pneumatics.Flip(g_rc.m_flippedStateValue);
 				m_flippingCounter = 0;
-				
 			}
 			else if(g_rc.m_bAbort)
 				SetNewCargoState(eCargoStateNull);
@@ -150,7 +150,6 @@ void CargoControl::ProcessCargoState()
 		}
 		case eCargoStateEjecting :
 		{
-			
 			if(++m_ejectCounter == EJECT_CYCLE_COUNT)
 				SetNewCargoState(eCargoStateEjected);
 

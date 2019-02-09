@@ -23,8 +23,6 @@ void Robot::RobotInit()
 
 	m_gyro.Initialize();
 
-	g_rc.Initialize();
-
 	m_swerve.Initialize();
 }
 

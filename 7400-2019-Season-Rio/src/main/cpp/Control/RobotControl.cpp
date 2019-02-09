@@ -84,9 +84,9 @@ bool RobotControl::Periodic(bool bTeleop)
 	}
 	else
 	{
-		m_x 	 =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
-		m_y	     = -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
-		m_z 	 =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
+		m_x =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
+		m_y	= -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
+		m_z =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
 	}
 
 	m_slider = (m_driveJoyStick.GetThrottle() + 1) / 2;
@@ -113,22 +113,7 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_bXYZChanged = false;
 	}
 
-	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;
-
-	if(m_driveJoyStick.GetPOVState() == -1) //Left
-	{
-
-	}
-
-	else if(m_driveJoyStick.GetPOVState() == 1) //Right
-	{
-
-	}	
-
-	else //Center
-	{
-		
-	}	
+	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;	
 
 	return m_bXYZChanged;
 }
@@ -199,7 +184,6 @@ void RobotControl::ReadButtons()
 			m_ladderTargetHeight = eLadderHeightCargoBottom;
 		}
 	}
-
 	else
 	{
 		if(m_driveJoyStick.TopHeight()->Changed() && m_driveJoyStick.TopHeight()->Pressed() && m_hatchControl.GetGrabberState() == eGrabberStateAquired)
@@ -228,7 +212,7 @@ void RobotControl::ReadButtons()
 
 	if(m_driveJoyStick.CameraSelection()->Changed() && m_driveJoyStick.CameraSelection()->Pressed())
 	{
-		g_tc.PutDouble("Jetson/ThisIsNotADance", m_driveJoyStick.CameraSelection()->Value());
+		g_tc.PutDouble("Jetson/Camera", m_driveJoyStick.CameraSelection()->Value());
 	}
 }
 

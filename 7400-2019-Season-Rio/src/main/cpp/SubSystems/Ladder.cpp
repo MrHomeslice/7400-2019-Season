@@ -52,8 +52,8 @@ void Ladder::ProcessLadderStates()
 
         case eLadderStateEnabled  :
         {
-            m_pDrives[0]->Set(SetLadderPosition());
-            m_pDrives[1]->Set(SetLadderPosition());
+            m_pDrives[0]->Set(SetLadderPosition()); 
+            m_pDrives[1]->Set(SetLadderPosition()); //change to follower mode
         }
     }
 }

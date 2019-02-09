@@ -42,9 +42,6 @@ void HatchControl::Periodic()
         {
             SetMoveMotorOff();
 
-            if(g_rc.m_bAbort)
-                SetHatchState(eHatchMoveStateMovingIn);
-
             break;
         }
 
@@ -53,9 +50,6 @@ void HatchControl::Periodic()
             //printf("eHatchMoveStateMovingOut %d\n", m_hatchMoveCounter);
 
             SetMoveMotorOut();
-
-            if(g_rc.m_bAbort)
-                SetHatchState(eHatchMoveStateMovingIn);
 
             printf("%d\n", m_hatchMoveCounter);
             if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
@@ -94,7 +88,10 @@ void HatchControl::Periodic()
             }
 
             if(g_rc.m_bAbort)
+            {
                 SetGrabberState(eGrabberStateNull);
+                SetHatchState(eHatchMoveStateMovingIn);
+            }
 
             break;
         }
