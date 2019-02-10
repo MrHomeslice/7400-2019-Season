@@ -3,7 +3,7 @@
 #include "DataTable\TableController.h"
 #include "Control\RobotControl.h"
 
-#define BIT_IS_ENABLED
+//#define BIT_IS_ENABLED
 
 TableController    g_tc;
 MeeseeksProperties g_mp;
@@ -111,7 +111,7 @@ void Robot::DisabledInit()
 
 void Robot::DisabledPeriodic()
 {
-	g_rc.Periodic(false);
+	//g_rc.Periodic(false);
 }
 
 int main() 

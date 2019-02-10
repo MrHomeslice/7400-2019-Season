@@ -108,7 +108,9 @@ void CargoControl::ProcessCargoState()
 				SetNewCargoState(eCargoStateWaitingForAcquired);
 			}
 			else if(g_rc.m_bAbort)
+			{
 				SetNewCargoState(eCargoStateNull);
+			}
 
 			break;
 		}

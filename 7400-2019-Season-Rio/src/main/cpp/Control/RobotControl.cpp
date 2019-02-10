@@ -153,7 +153,7 @@ void RobotControl::ReadButtons()
 		
 	m_bFlipped = m_driveJoyStick.ElevatorFlip()->Changed() && m_driveJoyStick.ElevatorFlip()->Pressed();
 
-	m_bAbort = m_driveJoyStick.Abort()->Changed() && m_driveJoyStick.Abort()->Pressed();
+	m_bAbort = m_driveJoyStick.Abort()->Pressed();
 	
 	if(m_bFlipped)
 		m_flippedStateValue = m_driveJoyStick.ElevatorFlip()->Value();

@@ -1,10 +1,10 @@
 #ifndef SRC_JOYSTICKREPEATBUTTON_H_
 #define SRC_JOYSTICKREPEATBUTTON_H_
 
-#include "JoystickValueButton.h"
+#include "JoystickButton.h"
 #include <frc/Timer.h>
 
-class JoystickRepeatButton : public JoystickValueButton
+class JoystickRepeatButton : public JSButton
 {
 public :
 	JoystickRepeatButton(int index, int valueCount, int initialValue = 0,
@@ -14,7 +14,7 @@ private :
 
 	frc::Timer m_timer;
 	double m_dwellTime, m_waitTime, m_lastUpdateTime;
-	bool m_bWaitingForDwell;
+	bool m_bWaitingForDwell, m_bTimerRunning;
 };
 
 #endif /* SRC_JOYSTICKREPEATBUTTON_H_ */
