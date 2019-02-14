@@ -54,6 +54,7 @@ class CargoControl
 				void EjectCargo();
 				void NewCargoStateCheck();
 				void SetNewCargoState(CargoState state);
+				void StartWithCargo();
 				
 				CargoState GetCargoState();
 
@@ -68,7 +69,6 @@ class CargoControl
 				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
 
 				WPI_TalonSRX_     m_leftGrabberMotor, m_rightGrabberMotor, m_intakeMotor, m_cargoCaptureMotor;
-				DigitalInput_     m_acquiredSwitch, m_intakingSwitch;
 				CargoState        m_cargoState, m_lastCargoState;
 				Pneumatics        m_pneumatics;
 

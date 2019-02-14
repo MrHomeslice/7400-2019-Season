@@ -7,10 +7,9 @@ CargoControl::CargoControl(int leftID, int rightID, int intakeID, int captureID)
              : m_leftGrabberMotor(leftID, "Left Grabber Motor",true),
 		       m_rightGrabberMotor(rightID, "Right Grabber Motor", true),
 		 	   m_intakeMotor(intakeID, "Intake Motor", true),
-			   m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true),
-               m_acquiredSwitch(0, "Acquired", true), m_intakingSwitch(1, "Intake", true)
+			   m_cargoCaptureMotor(captureID, "Cargo Capture Motor", true)
 {
-    m_cargoState = eCargoStateNull;
+    m_cargoState     = eCargoStateNull;
     m_lastCargoState = eCargoStateNull;
 
     m_ejectCounter    = 0;
@@ -67,7 +66,7 @@ void CargoControl::ProcessCargoState()
 			IntakeMotorOff();
 			RaiseCapture();
 
-			if (g_rc.m_bAction)
+			if (g_rc.m_bAction && g_rc.m_bCargo)
 			{
 				printf("g_rc.m_bAction = true\n");
 				SetNewCargoState(eCargoStateIntaking);
@@ -83,9 +82,9 @@ void CargoControl::ProcessCargoState()
 			if (MonitorCaptureMotor(CAPTURE_LOWER_POSITION, MAXIMUM_CAPTURE_ERROR, MAXIMUM_CAPTURE_CURRENT))
 				CaptureMotorOff();
 
-			if (m_intakingSwitch.Get())
+			if (g_rc.m_cargoIntakingSwitch.Get())
 			{
-				printf("m_intakingSwitch.Get() == true\n");
+				printf("m_cargoIntakingSwitch.Get() == true\n");
 				IntakeMotorOff();
 				ReadyCapture();
 				SetNewCargoState(eCargoStateWaitingForReady);
@@ -117,7 +116,7 @@ void CargoControl::ProcessCargoState()
 
 		case eCargoStateWaitingForAcquired :
 		{
-			if (m_acquiredSwitch.Get())
+			if (g_rc.m_cargoAcquiredSwitch.Get())
 			{
 				IntakeMotorOff();
 				EjectMotorsOff();
@@ -267,4 +266,10 @@ const char* CargoControl::CargoStateToString()
 		case eCargoStateBackFlip 		   : return "Cargo State: Back Flip";
 	}
 	return "Unkown Cargo State";
+}
+
+void CargoControl::StartWithCargo()
+{
+	m_cargoState     = eCargoStateWaitingForAcquired;
+	m_lastCargoState = eCargoStateWaitingForAcquired;
 }

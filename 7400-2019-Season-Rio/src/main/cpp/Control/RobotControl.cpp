@@ -9,8 +9,9 @@ extern TableController	  g_tc;
 RobotControl::RobotControl()
 			 : m_driveJoyStick(JOYSTICK_1),
 			   m_cargoControl(0, 1, 2, 3),
-			   m_hatchControl(0, 1, 2)
-						  
+			   m_hatchControl(0, 1, 2),
+			   m_cargoAcquiredSwitch(0, "Acquired", true), m_cargoIntakingSwitch(1, "Intake", true),
+			   m_hasHatchSwitch(2, "Has Cargo", true), m_competitionSwitch(3, "Competition", true)
 {
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;
@@ -28,6 +29,14 @@ RobotControl::RobotControl()
 void RobotControl::Initialize()
 {
 	m_ladder.Initialize();
+
+	if(m_competitionSwitch.Get())
+	{
+	 	if(m_hasHatchSwitch.Get())
+	 		m_hatchControl.StartWithHatch();
+		else
+			m_cargoControl.StartWithCargo();
+	}
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -94,11 +103,8 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	m_bRobotCentric = m_driveJoyStick.CentricityToggle()->Value() == 1 ? true : false;
 
-	if(m_bCargo)
-		m_cargoControl.Periodic();
-	else
-		m_hatchControl.Periodic();
-	
+	m_cargoControl.Periodic();
+	m_hatchControl.Periodic();	
 	m_ladder.Periodic();
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 

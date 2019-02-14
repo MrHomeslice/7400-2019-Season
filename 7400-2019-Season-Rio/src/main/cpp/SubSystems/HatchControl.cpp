@@ -65,7 +65,7 @@ void HatchControl::Periodic()
         {
             SetGrabbersOff();
             
-            if(g_rc.m_bAction)
+            if(g_rc.m_bAction && !g_rc.m_bCargo)
             {
                 SetGrabberState(eGrabberStateAquiring);
                 SetHatchState(eHatchMoveStateMovingOut);
@@ -104,7 +104,7 @@ void HatchControl::Periodic()
             {
                 SetGrabberState(eGrabberStateEjecting);
                 SetHatchState(eHatchMoveStateMovingOut);
-                m_ejectCounter   = 0;
+                m_ejectCounter = 0;
             }
 
             break;
@@ -231,4 +231,10 @@ const char* HatchControl::GrabberStateToString()
 		case eGrabberStateEjected  : return "Grabber State: Ejected";
 	}
 	return "Unkown State";
+}
+
+void HatchControl::StartWithHatch()
+{
+    m_grabberState     = eGrabberStateAquired;
+    m_lastGrabberState = eGrabberStateAquired;
 }

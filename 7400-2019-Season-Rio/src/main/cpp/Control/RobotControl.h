@@ -68,6 +68,8 @@ class RobotControl
 				int m_flippedStateValue;
 
 				LadderHeight m_ladderTargetHeight;
+				
+				DigitalInput_ m_competitionSwitch, m_hasHatchSwitch, m_cargoAcquiredSwitch, m_cargoIntakingSwitch;
 
 				CargoControl   m_cargoControl;
 				HatchControl   m_hatchControl;

@@ -30,6 +30,7 @@ class HatchControl
 	public    : HatchControl(int movementID, int grabberID, int hatchID);
 
                 void Periodic();
+                void StartWithHatch();
 
                 HatchMoveState GetHatchMoveState();
                 GrabberState   GetGrabberState();
@@ -47,7 +48,7 @@ class HatchControl
                 const char* HatchMoveStateToString();
                 const char* GrabberStateToString();
 
-				WPI_TalonSRX_  m_movementMotor, m_grabberMotor, m_hatchMotor;
+				WPI_TalonSRX_  m_movementMotor, m_grabberMotor, m_hatchMotor;     
 
                 HatchMoveState m_hatchMoveState, m_lastHatchMoveState;
                 GrabberState   m_grabberState, m_lastGrabberState;
