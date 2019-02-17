@@ -6,12 +6,13 @@
 #include <WPILib.h>
 
 extern TableController g_tc;
+extern bool g_bSim;
 
 using namespace ctre::phoenix;
 
 class DigitalInput_
 {
-  public    : DigitalInput_(int port, const char *pName, bool bSim);
+  public    : DigitalInput_(int port, const char *pName, bool bSim = g_bSim);
 
               bool Get() {
                 if (m_bSim) {
@@ -32,7 +33,7 @@ class DigitalInput_
 
 class WPI_TalonSRX_
 {
-  public    : WPI_TalonSRX_(int canID, const char *pName, bool bSim = false);
+  public    : WPI_TalonSRX_(int canID, const char *pName, bool bSim = g_bSim);
 
 	ErrorCode Config_kF(int index, double value, int timeOut)
   {
@@ -86,7 +87,7 @@ class WPI_TalonSRX_
   {
     if (m_bSim) return ErrorCode::OK;
 
-    return m_talon.ConfigNominalOutputForward(percentOut, 0);
+    return m_talon.ConfigNominalOutputForward(percentOut, timeoutMs);
   }
 
   ErrorCode ConfigNominalOutputReverse(double percentOut, int timeoutMs = 0)
@@ -100,7 +101,7 @@ class WPI_TalonSRX_
   {
     if (m_bSim) return ErrorCode::OK;
 
-    return m_talon.ConfigPeakOutputForward(percentOut, 0);
+    return m_talon.ConfigPeakOutputForward(percentOut, timeoutMs);
   }
 
   ErrorCode ConfigPeakOutputReverse(double percentOut, int timeoutMs = 0)
