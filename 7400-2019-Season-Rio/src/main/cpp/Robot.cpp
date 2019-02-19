@@ -9,7 +9,7 @@ TableController    g_tc;
 MeeseeksProperties g_mp;
 RobotControl	   g_rc;
 
-bool g_bSim = true;
+bool g_bSim = false;
 
 Robot::Robot()
 {
@@ -56,7 +56,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 		m_BIT.Periodic();
 
 	#else
-		static std::string state = "Idle";
+		//static std::string state = "Idle";
 
 		bool bControlChanged = g_rc.Periodic(true);
 
@@ -75,6 +75,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 void Robot::AutonomousInit()
 {
+	//m_swerve.SetSteerOffsets();
 	TeleopInit();
 	printf("AutonomousInit()\n");
 }

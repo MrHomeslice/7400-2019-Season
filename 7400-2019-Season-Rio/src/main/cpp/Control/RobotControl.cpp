@@ -55,6 +55,25 @@ double RobotControl::Deadband(double input, double deadbandHalfWidth)
 	return input * slope + yInercept;
 }
 
+void RobotControl::PeriodicTest()
+{
+		m_x =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
+		m_y	= -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
+		m_z =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
+
+	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
+	{
+		m_bXYZChanged = true;
+		m_lastX = m_x;
+		m_lastY = m_y;
+		m_lastZ = m_z;
+	}
+	else
+	{
+		m_bXYZChanged = false;
+	}		
+}
+
 bool RobotControl::Periodic(bool bTeleop)
 {
 	m_driveJoyStick.Periodic();

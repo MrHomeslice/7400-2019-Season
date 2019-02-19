@@ -46,6 +46,7 @@ class RobotControl
 	public    : RobotControl();
 
 				bool Periodic(bool bTeleop);
+				void PeriodicTest();
 				bool XYZChanged();
 				void Initialize();
 

@@ -5,55 +5,71 @@
 extern TableController g_tc;
 extern RobotControl	   g_rc;
 
+#define ELEVATOR_MASTER  10
+#define ELEVATOR_SLAVE   11
+
+const double kDefaultLadderF = 0.0;
+const double kDefaultLadderP = 0.3;
+const double kDefaultLadderI = 0.0;
+const double kDefaultLadderD = 0.0;
+
 Ladder::Ladder()
 {
-    m_pDrives[0] = new WPI_TalonSRX_(0, "Ladder Drive 1", true);
-    m_pDrives[1] = new WPI_TalonSRX_(1, "Ladder Drive 2", true);
+    m_pDrives[0] = new WPI_TalonSRX_(ELEVATOR_MASTER, "Ladder Drive 1");
+    m_pDrives[1] = new WPI_TalonSRX_(ELEVATOR_SLAVE, "Ladder Drive 2");
 
     m_ladderState = eLadderStateDisabled;
 }
 
 void Ladder::Initialize()
 {
-    double f = g_tc.GetDouble("Swerve/Steer/F", kDefaultDrivesF);
-	double p = g_tc.GetDouble("Swerve/Steer/P", kDefaultDrivesP);
-	double i = g_tc.GetDouble("Swerve/Steer/I", kDefaultDrivesI);
-	double d = g_tc.GetDouble("Swerve/Steer/D", kDefaultDrivesD);
+    m_pDrives[1]->Follow(*m_pDrives[0]);
 
-    for(int n = 0; n < 2; n++)
-    {
-        ctre::phoenix::ErrorCode err = m_pDrives[n]->Config_kF(kPIDLoopIdx, f, kTimeoutMs);
-        if (err != 0) printf("%s Steer, error %d Config_kF\n", m_name.c_str(), err);
+    m_pDrives[0]->ConfigPeakOutputReverse(-0.4);
+    m_pDrives[0]->ConfigPeakOutputForward(1.0);    
+    
+    double f = g_tc.GetDouble("Ladder/F", kDefaultLadderF);
+	double p = g_tc.GetDouble("Ladder/P", kDefaultLadderP);
+	double i = g_tc.GetDouble("Ladder/I", kDefaultLadderI);
+	double d = g_tc.GetDouble("Ladder/D", kDefaultLadderD);
 
-        err = m_pDrives[n]->Config_kP(kPIDLoopIdx, p, kTimeoutMs);
-        if (err != 0) printf("%s Steer, error %d Config_kP\n", m_name.c_str(), err);
+    ctre::phoenix::ErrorCode err = m_pDrives[0]->Config_kF(kPIDLoopIdx, f, kTimeoutMs);
+    if (err != 0) printf("%s Ladder, error %d Config_kF\n", m_name.c_str(), err);
 
-        err = m_pDrives[n]->Config_kI(kPIDLoopIdx, i, kTimeoutMs);
-        if (err != 0) printf("%s Steer, error %d Config_kI\n", m_name.c_str(), err);
+    err = m_pDrives[0]->Config_kP(kPIDLoopIdx, p, kTimeoutMs);
+    if (err != 0) printf("%s Ladder, error %d Config_kP\n", m_name.c_str(), err);
 
-        err = m_pDrives[n]->Config_kD(kPIDLoopIdx, d, kTimeoutMs);
-        if (err != 0) printf("%s Steer, error %d Config_kD\n", m_name.c_str(), err);
-    }
+    err = m_pDrives[0]->Config_kI(kPIDLoopIdx, i, kTimeoutMs);
+    if (err != 0) printf("%s Ladder, error %d Config_kI\n", m_name.c_str(), err);
+
+    err = m_pDrives[0]->Config_kD(kPIDLoopIdx, d, kTimeoutMs);
+    if (err != 0) printf("%s Ladder, error %d Config_kD\n", m_name.c_str(), err);
 }
 
 void Ladder::Periodic()
 {
     ProcessLadderStates();
+    // Uncoment to following line to force ladder buttons to be enabled
+    //m_ladderState = eLadderStateEnabled; 
 }
 
 void Ladder::ProcessLadderStates()
 {
+    int ladderPosition;
+
     switch(m_ladderState)
     {
         case eLadderStateDisabled :
         {
             g_rc.m_bChangedHeight = false;
+            break;
         }
 
         case eLadderStateEnabled  :
         {
-            m_pDrives[0]->Set(SetLadderPosition()); 
-            m_pDrives[1]->Set(SetLadderPosition()); //change to follower mode
+            ladderPosition = SetLadderPosition();
+            m_pDrives[0]->Set(motorcontrol::ControlMode::Position, ladderPosition);
+            break;
         }
     }
 }

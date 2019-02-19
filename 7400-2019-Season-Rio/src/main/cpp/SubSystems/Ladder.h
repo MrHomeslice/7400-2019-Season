@@ -6,13 +6,15 @@
 #include "..\CanSimulator.h"
 
 #define LADDER_GROUND_HEIGHT       0
-#define LADDER_HATCH_BOTTOM_HEIGHT 100
-#define LADDER_CARGO_BOTTOM_HEIGHT 200
-#define LADDER_CARGO_SHIP_HEIGHT   300
-#define LADDER_HATCH_MID_HEIGHT    400
-#define LADDER_CARGO_MID_HEIGHT    500
-#define LADDER_HATCH_TOP_HEIGHT    600
-#define LADDER_CARGO_TOP_HEIGHT    700
+#define LADDER_CARGO_SHIP_HEIGHT   1200
+
+#define LADDER_HATCH_TOP_HEIGHT    30000
+#define LADDER_HATCH_MID_HEIGHT    15000
+#define LADDER_HATCH_BOTTOM_HEIGHT 0
+
+#define LADDER_CARGO_TOP_HEIGHT    35000
+#define LADDER_CARGO_MID_HEIGHT    20000
+#define LADDER_CARGO_BOTTOM_HEIGHT 5000
 
 typedef enum
 {
@@ -35,10 +37,10 @@ class Ladder
 			static constexpr float kDefaultDrivesP = 10.0;
 			static constexpr float kDefaultDrivesI = 0.002;
 			static constexpr float kDefaultDrivesD = 100;
+             LadderState    m_ladderState;            
     protected:
              WPI_TalonSRX_ *m_pDrives[2];
              std::string    m_name;
-             LadderState    m_ladderState;
 };
 
 #endif

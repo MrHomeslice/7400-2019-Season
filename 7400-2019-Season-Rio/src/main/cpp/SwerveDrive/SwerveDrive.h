@@ -5,14 +5,19 @@
 #include <frc/wpilib.h>
 #include "Defines.h"
 
+
 #define BACK_LEFT_STEER   2
 #define BACK_LEFT_DRIVE   3
 #define FRONT_LEFT_STEER  4
 #define FRONT_LEFT_DRIVE  5
-#define BACK_RIGHT_STEER  6
-#define BACK_RIGHT_DRIVE  7
-#define FRONT_RIGHT_STEER 8
-#define FRONT_RIGHT_DRIVE 9
+#define FRONT_RIGHT_STEER 6
+#define FRONT_RIGHT_DRIVE 7
+#define BACK_RIGHT_STEER  8
+#define BACK_RIGHT_DRIVE  9
+//#define ELEVATOR_MASTER  10
+//#define ELEVATOR_SLAVE   11
+//#define BALL_INTAKE      12
+//#define INTAKE_TILT      13
 
 class SwerveDrive
 {

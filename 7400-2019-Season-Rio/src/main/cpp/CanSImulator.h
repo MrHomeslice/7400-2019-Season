@@ -1,9 +1,9 @@
 #ifndef CAN_SIMULATOR_HEADER_INCLUDED
 #define CAN_SIMULATOR_HEADER_INCLUDED
 
-#include "DataTable\TableController.h"
+#include "DataTable/TableController.h"
 #include <ctre/Phoenix.h>
-#include <WPILib.h>
+#include <frc/WPILib.h>
 
 extern TableController g_tc;
 extern bool g_bSim;
@@ -35,162 +35,35 @@ class WPI_TalonSRX_
 {
   public    : WPI_TalonSRX_(int canID, const char *pName, bool bSim = g_bSim);
 
-	ErrorCode Config_kF(int index, double value, int timeOut)
-  {
-    if (m_bSim) return ErrorCode::OK;
+              motorcontrol::SensorCollection &GetSensorCollection();
 
-    return m_talon.Config_kF(index, value, timeOut);
-  }
+              double GetOutputCurrent();
 
-	ErrorCode Config_kP(int index, double value, int timeOut)
-  {
-    if (m_bSim) return ErrorCode::OK;
+              void Follow(WPI_TalonSRX_ &master);
+              void SetSensorPhase(bool bPhaseSensor);
+              void SetSafetyEnabled(bool enabled);
+              void Set(double speed);
+              void Set(motorcontrol::ControlMode mode, double value);
 
-    return m_talon.Config_kP(index, value, timeOut);
-  }
+              int GetSelectedSensorPosition(int pidIdx = 0);
+              int GetClosedLoopError(int pidIndex = 0);
 
-	ErrorCode Config_kI(int index, double value, int timeOut)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.Config_kI(index, value, timeOut);
-  }
-
-	ErrorCode Config_kD(int index, double value, int timeOut)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.Config_kD(index, value, timeOut);
-  }
-
-  ErrorCode ConfigOpenloopRamp(double value, int index)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigOpenloopRamp(value, index);
-  }
-
-  ErrorCode ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice feedbackDevice, int index, int timeOut)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigSelectedFeedbackSensor(feedbackDevice, index, timeOut);
-  }
-
-  void SetSensorPhase(bool bPhaseSensor)
-  {
-    if (!m_bSim)
-      m_talon.SetSensorPhase(bPhaseSensor);
-  }
-
-  ErrorCode ConfigNominalOutputForward(double percentOut, int timeoutMs = 0)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigNominalOutputForward(percentOut, timeoutMs);
-  }
-
-  ErrorCode ConfigNominalOutputReverse(double percentOut, int timeoutMs = 0)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigNominalOutputReverse(percentOut, timeoutMs);
-  }
-
-  ErrorCode ConfigPeakOutputForward(double percentOut, int timeoutMs = 0)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigPeakOutputForward(percentOut, timeoutMs);
-  }
-
-  ErrorCode ConfigPeakOutputReverse(double percentOut, int timeoutMs = 0)
-  {
-    if (m_bSim) return ErrorCode::OK;
-
-    return m_talon.ConfigPeakOutputReverse(percentOut, timeoutMs);
-  }
-
-  void SetSafetyEnabled(bool enabled)
-  {
-    if (!m_bSim)
-      m_talon.SetSafetyEnabled(enabled);
-  }
-
-  int GetSelectedSensorPosition(int pidIdx = 0)
-  {
-    if (m_bSim) {
-      std::string name = "CANSim/" + m_name + "-Position";
-
-      return g_tc.GetDouble(name.c_str(), 0.0);       
-    }
-
-    return m_talon.GetSelectedSensorPosition(pidIdx);
-  }
-
-  void Set(double speed)
-  {
-    if (!m_bSim)
-      m_talon.Set(speed);
-    else
-    {
-      std::string name = "CANSim/";
-
-      name += m_name;
-
-      g_tc.PutDouble(name.c_str(), speed);
-    }
-  }
-
-  void Set(motorcontrol::ControlMode mode, double value)
-  {
-    if (!m_bSim)
-      m_talon.Set(mode, value);
-    else
-    {
-      std::string name = "CANSim/";
-
-      name += m_name;
-
-      g_tc.PutDouble(name.c_str(), value);
-    }
-
-  }
-
-  int GetClosedLoopError(int pidIndex = 0)
-  {
-    if (m_bSim)
-      return 0;
-
-    return m_talon.GetClosedLoopError(pidIndex);
-  }
-
-  motorcontrol::SensorCollection &GetSensorCollection()
-  {
-    return m_talon.GetSensorCollection();
-  }
-
-  double GetOutputCurrent()
-  {
-    if (m_bSim) {
-
-      std::string name = "CANSim/" + m_name + "-Current";
-
-      return g_tc.GetDouble(name.c_str(), 0.0);
-    }
-      //return g_tc.GetDouble("CANSim/GrabberCurrent", 0);
-      
-    return m_talon.GetOutputCurrent();
-  }
-	
-  //g_tc.PutInt(m_reportSteerTarget.c_str(),    m_steer.GetSelectedSensorPosition(kPIDLoopIdx));
-	//g_tc.PutInt(m_reportSteerAnalogRaw.c_str(), m_steer.GetSensorCollection().GetAnalogInRaw());
-
+              ErrorCode Config_kF(int index, double value, int timeOut);
+ 	            ErrorCode Config_kP(int index, double value, int timeOut);
+ 	            ErrorCode Config_kI(int index, double value, int timeOut);
+ 	            ErrorCode Config_kD(int index, double value, int timeOut);
+              ErrorCode ConfigOpenloopRamp(double value, int index);
+              ErrorCode ConfigSelectedFeedbackSensor(motorcontrol::FeedbackDevice feedbackDevice, int index, int timeOut);
+              ErrorCode ConfigNominalOutputForward(double percentOut, int timeoutMs = 0);
+              ErrorCode ConfigNominalOutputReverse(double percentOut, int timeoutMs = 0);
+              ErrorCode ConfigPeakOutputForward(double percentOut, int timeoutMs = 0);
+              ErrorCode ConfigPeakOutputReverse(double percentOut, int timeoutMs = 0);
+              ErrorCode SetSelectedSensorPosition(int sensorPos, int pidIdx = 0, int timeoutMs = 50);
+ 
               std::string  m_name;
   protected :
               WPI_TalonSRX m_talon;
-              bool         m_bSim;
-              
+              bool         m_bSim;              
 };
 
 
