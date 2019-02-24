@@ -10,8 +10,8 @@ RobotControl::RobotControl()
 			 : m_driveJoyStick(JOYSTICK_1),
 			   m_cargoControl(0, 1, 2, 3),
 			   m_hatchControl(0, 1, 2),
-			   m_cargoAcquiredSwitch(0, "Acquired"), m_cargoIntakingSwitch(1, "Intake"),
-			   m_hasHatchSwitch(2, "Has Cargo"), m_competitionSwitch(3, "Competition")
+			   m_cargoAcquiredSwitch(0, "Acquired", true), m_cargoIntakingSwitch(1, "Intake", true),
+			   m_hasHatchSwitch(2, "Has Cargo", true), m_competitionSwitch(3, "Competition", true)
 {
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;

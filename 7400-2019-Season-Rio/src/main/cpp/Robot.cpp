@@ -9,8 +9,6 @@ TableController    g_tc;
 MeeseeksProperties g_mp;
 RobotControl	   g_rc;
 
-bool g_bSim = true;
-
 Robot::Robot()
 {
 }

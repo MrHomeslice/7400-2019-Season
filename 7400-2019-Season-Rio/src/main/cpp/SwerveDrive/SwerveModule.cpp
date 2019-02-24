@@ -7,8 +7,8 @@ extern TableController    g_tc;
 extern MeeseeksProperties g_mp;
 
 SwerveModule::SwerveModule(int steerID, int driveID, const char *pName, int steerOffset)
-			: m_steer(steerID, "Steer Motor"),
-			  m_drive(driveID, "Drive Motor"),
+			: m_steer(steerID, "Steer Motor" ,true),
+			  m_drive(driveID, "Drive Motor",true),
 			  m_name(pName),
 			  m_steerOffset(steerOffset)
 {
