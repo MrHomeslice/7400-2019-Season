@@ -9,7 +9,7 @@ TableController    g_tc;
 MeeseeksProperties g_mp;
 RobotControl	   g_rc;
 
-bool g_bSim = false;
+bool g_bSim = true;
 
 Robot::Robot()
 {
@@ -58,13 +58,11 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 	#else
 		//static std::string state = "Idle";
 
-		bool bControlChanged = g_rc.Periodic(true);
-
-		bool bCargoState = g_rc.Cargo();
+		bool bControlChanged = g_rc.PeriodicTest();
 
 		if(bControlChanged)
 		{
-			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() || g_rc.m_bAllign ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
 
 		g_rc.ReadButtons();

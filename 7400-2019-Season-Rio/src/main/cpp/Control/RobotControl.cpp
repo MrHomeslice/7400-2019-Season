@@ -55,8 +55,16 @@ double RobotControl::Deadband(double input, double deadbandHalfWidth)
 	return input * slope + yInercept;
 }
 
-void RobotControl::PeriodicTest()
+bool RobotControl::PeriodicTest()
 {
+		if (m_driveJoyStick.GetRawButton(1)) 
+		{
+			AutoMoveToTarget();
+			return true;
+		}
+		
+		m_bAllign = false;
+		
 		m_x =  Deadband(m_driveJoyStick.GetX(), g_mp.m_deadbandX);
 		m_y	= -Deadband(m_driveJoyStick.GetY(), g_mp.m_deadbandY);
 		m_z =  Deadband(m_driveJoyStick.GetZ(), g_mp.m_deadbandZ);
@@ -72,6 +80,8 @@ void RobotControl::PeriodicTest()
 	{
 		m_bXYZChanged = false;
 	}		
+
+	return m_bXYZChanged;
 }
 
 bool RobotControl::Periodic(bool bTeleop)
@@ -80,6 +90,9 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	if(m_bAllign)
 	{
+		AutoMoveToTarget();
+
+		/*
 		double approachAngle = g_tc.GetDouble("Target/ApproachAngle", 0);
 
 		if(approachAngle == -1000)
@@ -109,6 +122,7 @@ bool RobotControl::Periodic(bool bTeleop)
 			g_tc.PutDouble("Target/Distance", m_y);
 			g_tc.PutDouble("Target/ApproachAngle", m_z);
 		}
+		*/
 	}
 	else
 	{
@@ -141,6 +155,106 @@ bool RobotControl::Periodic(bool bTeleop)
 	m_bCargo = m_driveJoyStick.GetThrottle() > 0.0 ? true : false;	
 
 	return m_bXYZChanged;
+}
+
+// #define MIKEES_NOT_WORKING
+
+void RobotControl::AutoMoveToTarget()
+{
+	double targetLineSlope = g_tc.GetDouble("Target/LineSlope", -1000.0);
+	double targetXDelta    = g_tc.GetDouble("Target/XOffset",    -1000.0);
+	double targetDistance  = g_tc.GetDouble("Target/Distance",  -1000.0);
+
+	// printf("%.6f %.6f %.6f\n", targetLineSlope, targetXDelta, targetDistance);
+
+	if (targetLineSlope == -1000 || targetXDelta == -1000 || targetDistance == -1000) //Lost tracked target
+	{
+		m_bAllign = false;
+
+		m_x = 0.0;
+		m_y = 0.0;
+		m_z = 0.0;
+		
+		return;
+	}
+
+#ifdef MIKEES_NOT_WORKING	
+
+	double lateral = 0.0;
+	double twist = 0.0;
+
+	bool finishedRot = false;
+	bool finishedLat = false;
+
+	if (fabs(targetLineSlope) > 0.01)
+	{
+		if (targetDistance > 30)
+		{
+			twist = targetLineSlope * 1.5 / 100.0;
+		}
+		else
+		{
+			twist = targetLineSlope * 1.5f * (targetDistance / 30.0f) / 100.0;
+		}
+	}
+	else
+	{
+		finishedRot = true;
+	}
+
+	if (fabs(targetXDelta) > 5)
+	{
+		if (targetDistance > 30)
+		{
+			lateral = -targetXDelta / 10.0 * 2.5;
+		}
+		else
+		{
+			lateral = -targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0f) / 100.0;
+		}
+	}
+	else
+	{
+		finishedLat = true;
+	}
+
+	double forward = (finishedRot && finishedLat) ? -15.0 / 15: -7.5 / 100.0;
+#endif
+
+  // m_x = lateral;
+	// m_y = forward;
+	// m_z = twist;
+
+	// printf("%.6f %.6f %.6f\n", lateral, forward, twist);
+
+	m_x = targetXDelta / 320.0;
+	m_z = targetLineSlope / -0.5;
+
+	if (m_x > 0.6)
+	 	m_x = 0.6;
+	if (m_x < -0.6)
+		m_x = -0.6;
+
+		
+	if (m_z > 0.6)
+	 	m_z = 0.6;
+	if (m_z < -0.6)
+		m_z = -0.6;
+
+
+	printf("%.6f %.6f %.6f\n", m_x, m_y, m_z);
+
+
+  m_bAllign = true;		
+
+
+	// printf("%.6f %.6f\n", targetXDelta, m_x);
+
+	//transform.Translate(lateral * Time.deltaTime, 0.0f, forward * Time.deltaTime);
+
+
+
+  //transform.eulerAngles = new Vector3(0.0f, -heading * 10.0f, 0.0f);
 }
 
 bool RobotControl::XYZChanged()
