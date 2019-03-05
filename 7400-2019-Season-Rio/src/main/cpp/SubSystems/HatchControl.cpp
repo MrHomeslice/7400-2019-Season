@@ -4,237 +4,235 @@
 extern RobotControl g_rc;
 
 HatchControl::HatchControl(int movementID, int grabberID, int hatchID)
-             : m_movementMotor(movementID, "Movement Motor", true),
-               m_grabberMotor(grabberID, "Grabber Motor", true),
-               m_hatchMotor(hatchID, "Hatch Motor", true)
+             : m_hatchGrab(23), m_hatchSlide(24),
+			m_hatchSliderState(eHatchSliderStateInitialize), m_hatchGrabState(eHatchGrabStateInitialize)
 {
-    m_hatchMoveState     = eHatchMoveStateIn;
-    m_lastHatchMoveState = eHatchMoveStateIn;
-    m_grabberState       = eGrabberStateNull;
-    m_lastGrabberState   = eGrabberStateNull;
+		m_hatchGrabCounter = 0;
+		m_hatchGrabInitialPosition = 0;
 }
 
 void HatchControl::Periodic()
 {
-    switch(m_hatchMoveState)
-    {
-        case eHatchMoveStateIn        :
-        {
-            SetMoveMotorOff();
+	double sliderError;
+	double grabError;
 
-            m_hatchMoveCounter = 0;
-
-            break;
-        }
-
-        case eHatchMoveStateMovingIn  :
-        {
-            //printf("eHatchMoveStateMovingIn %d\n", m_hatchMoveCounter);
-            
-            SetMoveMotorIn();
-
-            if(--m_hatchMoveCounter == 0)
-                 SetHatchState(eHatchMoveStateIn);
-
-            break;
-        }
-        case eHatchMoveStateOut       :
-        {
-            SetMoveMotorOff();
-
-            break;
-        }
-
-        case eHatchMoveStateMovingOut :
-        {
-            //printf("eHatchMoveStateMovingOut %d\n", m_hatchMoveCounter);
-
-            SetMoveMotorOut();
-
-            printf("%d\n", m_hatchMoveCounter);
-            if(++m_hatchMoveCounter == HATCH_MOVE_TIME)
-                SetHatchState(eHatchMoveStateOut);
-
-            break;
-        }
-    }
-
-    switch(m_grabberState)
-    {        
-        case eGrabberStateNull :
-        {
-            SetGrabbersOff();
-            
-            if(g_rc.m_bAction && !g_rc.m_bCargo)
-            {
-                SetGrabberState(eGrabberStateAquiring);
-                SetHatchState(eHatchMoveStateMovingOut);
-            }
-
-            break;
-        }
-
-        case eGrabberStateAquiring :
-        {
-            if(m_hatchMoveState == eHatchMoveStateOut)
-            {
-                SetAquireGrabbers();
-
-                if(GrabberCurrent() >= GRABBER_THRESHOLD_CURRENT)
-                {
-                    SetGrabberState(eGrabberStateAquired);
-                    SetHatchState(eHatchMoveStateMovingIn);
-                }
-            }
-
-            if(g_rc.m_bAbort)
-            {
-                SetGrabberState(eGrabberStateNull);
-                SetHatchState(eHatchMoveStateMovingIn);
-            }
-
-            break;
-        }
-
-        case eGrabberStateAquired  :
-        {
-            SetGrabbersOff();
-
-            if(g_rc.m_bAction && g_rc.IsLadderAtHeight())
-            {
-                SetGrabberState(eGrabberStateEjecting);
-                SetHatchState(eHatchMoveStateMovingOut);
-                m_ejectCounter = 0;
-            }
-
-            break;
-        }
-
-        case eGrabberStateEjecting :
-        {
-            if(m_hatchMoveState == eHatchMoveStateOut)
-            {
-                SetEjectGrabbers();
-
-                if(++m_ejectCounter == HATCH_EJECT_TIME)
-                {
-                    SetGrabberState(eGrabberStateEjected);
-                    SetHatchState(eHatchMoveStateMovingIn);
-                }
-            }
-            
-            break;
-        }
-
-        case eGrabberStateEjected  :
-        {
-            SetGrabbersOff();
-
-            if(GetHatchMoveState() == eHatchMoveStateIn)
-            {
-                g_rc.m_ladderTargetHeight = eLadderHeightGround;
-                SetGrabberState(eGrabberStateNull);
-            }
-
-            break;
-        }
-    }
-    if(m_hatchMoveState != m_lastHatchMoveState)
-        printf("%s\n", HatchMoveStateToString());
-
-    if(m_grabberState != m_lastGrabberState)
-        printf("%s\n", GrabberStateToString());
-
-    m_lastGrabberState   = m_grabberState;
-    m_lastHatchMoveState = m_hatchMoveState;
-}
-
-double HatchControl::GrabberCurrent()
-{
-    //printf("Current: %.6f\n", m_grabberMotor.GetOutputCurrent());
-    return m_grabberMotor.GetOutputCurrent();
-}
-
-void HatchControl::SetAquireGrabbers()
-{
-    m_grabberMotor.Set(0.2);
-}
-
-void HatchControl::SetEjectGrabbers()
-{
-    m_grabberMotor.Set(-0.2);
-}
-
-void HatchControl::SetGrabbersOff()
-{
-    m_grabberMotor.Set(0);
-}
-
-void HatchControl::SetMoveMotorIn()
-{
-    m_movementMotor.Set(0.2);
-}
-
-void HatchControl::SetMoveMotorOut()
-{
-    m_movementMotor.Set(-0.2);
-}
-
-void HatchControl::SetMoveMotorOff()
-{
-    m_movementMotor.Set(0);
-}
-
-void HatchControl::SetHatchState(HatchMoveState newValue)
-{
-    if (newValue != m_hatchMoveState)
-       printf("%s\n", HatchMoveStateToString());
-
-    m_hatchMoveState = newValue;
-}
-
-void HatchControl::SetGrabberState(GrabberState newValue)
-{
-    m_grabberState = newValue;
-}
-
-HatchMoveState HatchControl::GetHatchMoveState()
-{
-    return m_hatchMoveState;
-}
-
-GrabberState HatchControl::GetGrabberState()
-{
-    return m_grabberState;
-}
-
-const char* HatchControl::HatchMoveStateToString()
-{
-	switch(m_hatchMoveState)
+    switch(m_hatchSliderState)
 	{
-		case eHatchMoveStateIn		  : return "Hatch Move State: In";
-		case eHatchMoveStateMovingIn  : return "Hatch Move State: Moving In";
-		case eHatchMoveStateOut       : return "Hatch Move State: Out";
-		case eHatchMoveStateMovingOut : return "Hatch Move State: Moving Out";
-	}
-	return "Unkown State";
-}
+		case eHatchSliderStateInitialize:
+			m_hatchSlide.Set(0.4);
 
-const char* HatchControl::GrabberStateToString()
-{
-	switch(m_grabberState)
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD)
+			{
+				if(++m_currentCounter == HATCH_CURRENT_ITERATIONS)
+				{
+					m_hatchSliderState = eHatchSliderStateIn;
+					m_hatchSlide.SetSelectedSensorPosition(0);
+				}
+			}
+			else
+				m_currentCounter = 0;
+
+			break;
+
+		case eHatchSliderStateMovingIn:
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_IN_CURRENT_THRESHOLD)
+				m_currentCounter++;
+			else
+				m_currentCounter = 0;
+
+			sliderError = 0 - m_hatchSlide.GetSelectedSensorPosition();
+
+			if(fabs(sliderError) <= 10 && m_currentCounter >= HATCH_CURRENT_ITERATIONS)
+			{
+				m_hatchSlide.Set(0);
+				m_hatchSliderState = eHatchSliderStateIn;
+			}
+			else
+			{
+				if(fabs(sliderError) < 100)
+					m_hatchSlide.Set(0.3/100 * sliderError + 0.2);
+				else
+					m_hatchSlide.Set(0.5);
+			}
+
+			break;
+		
+		case eHatchSliderStateIn:
+			m_hatchSlide.Set(0.0);
+			m_hatchSlide.SetSelectedSensorPosition(0);
+
+			m_currentCounter = 0;
+
+			break;
+
+		case eHatchSliderStateMovingOut:
+			//printf("%s %d %d %.6f\n", HatchSliderStateToString(m_hatchSliderState), -320 - m_hatchSlide.GetSelectedSensorPosition(), m_hatchSlide.GetSelectedSensorPosition(), m_hatchSlide.GetOutputCurrent());
+
+			sliderError = -320 - m_hatchSlide.GetSelectedSensorPosition();
+
+			if(m_hatchSlide.GetOutputCurrent() >= (fabs(sliderError) < 30 ? 0.6 : HATCH_SLIDER_OUT_CURRENT_THRESHOLD))
+				m_currentCounter++;
+			else
+				m_currentCounter = 0;
+
+			if(fabs(sliderError) <= 10 || m_currentCounter >= HATCH_CURRENT_ITERATIONS)
+			{
+				m_hatchSlide.Set(0);
+				m_hatchSliderState = eHatchSliderStateOut;
+			}
+			else
+			{
+				if(fabs(sliderError) < 30)
+					m_hatchSlide.Set(0.3/100 * sliderError - 0.2);
+				else
+					m_hatchSlide.Set(-0.5);
+			}
+
+			break;
+
+		case eHatchSliderStateOut:
+			m_hatchSlide.Set(0.0);
+
+			m_currentCounter = 0;
+
+			break;
+	}
+
+	switch(m_hatchGrabState)
 	{
-		case eGrabberStateNull	   : return "Grabber State: Null";
-		case eGrabberStateAquiring : return "Grabber State: Aquiring";
-		case eGrabberStateAquired  : return "Grabber State: Aquired";
-		case eGrabberStateEjecting : return "Grabber State: Ejecting";
-		case eGrabberStateEjected  : return "Grabber State: Ejected";
+		case eHatchGrabStateInitialize:
+			m_hatchGrab.Set(-0.4);
+
+			if(g_rc.m_cargoSwitch.Get())
+			{
+				if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
+				{
+					if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
+					{
+						m_hatchGrab.SetSelectedSensorPosition(350);
+						m_hatchGrabState = eHatchGrabStateNotHolding;
+					}
+				}
+			}
+			else
+			{
+				if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
+				{
+					if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
+					{
+						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
+						m_hatchGrabState = eHatchGrabStateAcquried;
+					}
+				}
+			}
+
+			break;
+
+		case eHatchGrabStateAcquring:
+			grabError = m_hatchGrabInitialPosition - m_hatchGrab.GetSelectedSensorPosition();
+			
+			if(m_hatchSliderState == eHatchSliderStateOut)
+				m_hatchGrab.Set(-0.3);
+
+			if(m_hatchGrab.GetSelectedSensorPosition() >= 310)
+				m_hatchGrabState = eHatchGrabStateNotHolding;
+
+			if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
+			{
+				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
+				{
+					m_hatchGrabState = eHatchGrabStateAcquried;
+					m_hatchSliderState = eHatchSliderStateMovingIn;
+				}
+			}
+			else
+				m_hatchGrabCounter = 0;
+
+			break;
+
+    	case eHatchGrabStateAcquried:
+			m_hatchGrab.Set(-0.2);
+
+			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+				m_hatchSliderState = eHatchSliderStateMovingOut;
+
+			if(m_hatchSliderState == eHatchSliderStateOut)
+				m_hatchGrabState = eHatchGrabStateEjecting;
+
+			break;
+		
+    	case eHatchGrabStateNotHolding:
+			grabError = 0 - m_hatchGrab.GetSelectedSensorPosition();
+			m_hatchGrab.Set(0.2);
+
+			if(m_hatchSliderState == eHatchSliderStateOut)
+				m_hatchSliderState = eHatchSliderStateMovingIn;
+
+			if(fabs(grabError) <= 5)
+				m_hatchGrabState = eHatchGrabStateWaiting;
+		
+			break;
+		
+		case eHatchGrabStateEjecting:
+			grabError = 0 - m_hatchGrab.GetSelectedSensorPosition();
+			m_hatchGrab.Set(0.2);
+
+			if(fabs(grabError) <= 5)
+			{
+				m_hatchSliderState = eHatchSliderStateMovingIn;
+				m_hatchGrabState = eHatchGrabStateWaiting;
+			}
+		
+			break;
+		
+		case eHatchGrabStateWaiting:
+			m_hatchGrab.Set(0);
+
+			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+				m_hatchSliderState = eHatchSliderStateMovingOut;
+
+			if(m_hatchSliderState == eHatchSliderStateOut)
+				m_hatchGrabState = eHatchGrabStateAcquring;
+	
+			break;
 	}
-	return "Unkown State";
 }
 
-void HatchControl::StartWithHatch()
+HatchSliderState HatchControl::GetHatchMoveState()
 {
-    m_grabberState     = eGrabberStateAquired;
-    m_lastGrabberState = eGrabberStateAquired;
+	return m_hatchSliderState;
+}
+
+HatchGrabState  HatchControl::GetHatchGrabState()
+{
+	return m_hatchGrabState;
+}
+
+const char *HatchControl::HatchGrabStateToString(HatchGrabState hatchGrabState)
+{
+	switch(hatchGrabState)
+	{
+		case eHatchGrabStateInitialize: return "Initialize";
+    	case eHatchGrabStateAcquring:	return "Acquiring";
+    	case eHatchGrabStateAcquried:   return "Acquired";
+    	case eHatchGrabStateNotHolding: return "Not Holding";
+		case eHatchGrabStateEjecting: 	return "Ejecting";
+    	case eHatchGrabStateWaiting:    return "Waiting";	
+	}
+
+	return "Unknown State";
+}
+
+const char *HatchControl::HatchSliderStateToString(HatchSliderState hatchSliderState)
+{
+	switch(hatchSliderState)
+	{
+		case eHatchSliderStateInitialize: return "Initialize";
+		case eHatchSliderStateMovingIn:	  return "Moving In";
+		case eHatchSliderStateIn:		  return "In";
+		case eHatchSliderStateMovingOut:  return "Moving Out";
+		case eHatchSliderStateOut:		  return "Out";
+	}
+
+	return "Unknown State";	
 }

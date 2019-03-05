@@ -7,72 +7,71 @@
 #include "..\CanSimulator.h"
 #include "..\include\Defines.h"
 
-#define DELIVERY_SYSTEM_LEFT_MOTOR    0
-#define DELIVERY_SYSTEM_RIGHT_MOTOR   1
-#define DELIVERY_SYSTEM_INTAKE_MOTOR  2
-#define DELIVERY_SYSTEM_CAPTURE_MOTOR 3
+#define EJECT_TIME 25
 
-#define EJECT_CYCLE_COUNT 50
-#define FLIP_CYLCE_COUNT  50
-#define CAPTURE_MOVE_TIME 50
+#define CARGO_CURRENT_THRESHOLD 5.0
+#define CARGO_CURRENT_ITERATIONS 10
+#define FLIP_TIME 50
 
-#define CAPTURE_LOWER_POSITION  100
-#define CAPTURE_READY_POSITION  500
-#define CAPTURE_RAISE_POSITION 1200
-#define MAXIMUM_CAPTURE_ERROR    20
-#define MAXIMUM_CAPTURE_CURRENT  10
+#define CAPTURE_TILT_CURRENT_THRESHOLD 3.0
+#define CAPTURE_TILT_CURRENT_ITERATIONS 5
 
-typedef enum 
+typedef enum
 {
-	eCargoStateNull = 0,
-	eCargoStateIntaking,
-	eCargoStateWaitingForReady,
-	eCargoStateWaitingForAcquired,
-	eCargoStateForwardFlip,
-	eCargoStateFlipped,
-	eCargoStateEjecting,
-	eCargoStateEjected,
-	eCargoStateBackFlip
+    eCargoStateStationIntake = 0,
+    eCargoStateHardPullIn,
+    eCargoStateSoftPullIn,
+    eCargoStateWaitingForFlip,
+    eCargoStateFlipping,
+    eCargoStateFlipped,
+    eCargoStateEjecting,
+    eCargoStateEjected,
+    eCargoStateEmpty
 } CargoState;
+
+typedef enum
+{
+    eCargoCaptureStateInitialize = 0,
+    eCargoCaptureStateToReady,
+    eCargoCaptureStateUp,
+    eCargoCaptureStateMovingUp,
+    eCargoCaptureStateDown,
+    eCargoCaptureStateMovingDown
+} CargoCaptureState;
 
 class CargoControl
 {
-	public    : CargoControl(int leftID, int rightID, int intakeID, int captureID);
+	public    : CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, int captureID);
 
 				void Periodic();
-				void SetCapturePIDValues();
-				void ProcessCargoState();
-				void ProcessCaptureState();
-				void EjectMotorsOff();
-				void IntakeMotorOff();
-				void CaptureMotorOff();
-				void LowerCapture();
-				void RaiseCapture();
-				void ReadyCapture();
-       			void IntakeMotorOn();
-				void GrabCargo();
-				void EjectCargo();
-				void NewCargoStateCheck();
-				void SetNewCargoState(CargoState state);
-				void StartWithCargo();
 				
 				CargoState GetCargoState();
 
-				static constexpr float kDefaultCaptureF = 0.0;
-				static constexpr float kDefaultCaptureP = 10.0;
-				static constexpr float kDefaultCaptureI = 0.002;
-				static constexpr float kDefaultCaptureD = 100;
-
 	protected :
-				const char* CargoStateToString();
+				const char* CargoStateToString(CargoState cargoState);
 
 				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
 
-				WPI_TalonSRX_     m_leftGrabberMotor, m_rightGrabberMotor, m_intakeMotor, m_cargoCaptureMotor;
-				CargoState        m_cargoState, m_lastCargoState;
-				Pneumatics        m_pneumatics;
+				WPI_TalonSRX 	  m_leftGrabberMotor, m_rightGrabberMotor;
+       		 	WPI_TalonSRX 	  m_cargoCaptureTilt, m_cargoCaptureIntake;
+				CargoState   	  m_cargoState;
+				CargoCaptureState m_cargoCaptureState;
+				Pneumatics   	  m_pneumatics;
 
 				int m_ejectCounter, m_flippingCounter;
+
+				int m_leftEncoderPosition;
+        		int m_rightEncoderPosition;
+        		int m_currentCounter;
+      	 		int m_cargoStateCounter;
+      	 		int m_hatchGrabCounter;
+      	  		int m_captureCurrentCounter;
+     	   		int m_DICounter;
+        		int m_hatchGrabInitialPosition;
+
+        		bool m_bCargoIntakeTestWaiting;
+        		bool m_bGlobeTrotterMode;
+        		bool m_bFlipped;
 };
 
 #endif

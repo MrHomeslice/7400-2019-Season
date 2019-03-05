@@ -56,7 +56,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 	#else
 		//static std::string state = "Idle";
 
-		bool bControlChanged = g_rc.PeriodicTest();
+		bool bControlChanged = g_rc.Periodic(true);
 
 		if(bControlChanged)
 		{

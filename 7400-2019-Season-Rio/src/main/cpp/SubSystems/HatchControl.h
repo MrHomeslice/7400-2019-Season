@@ -4,56 +4,54 @@
 #include <ctre/Phoenix.h>
 #include "..\CanSImulator.h"
 
-typedef enum 
+typedef enum
 {
-	eHatchMoveStateIn = 0,
-    eHatchMoveStateOut,
-    eHatchMoveStateMovingIn,
-    eHatchMoveStateMovingOut
-} HatchMoveState;
+    eHatchSliderStateInitialize = 0,
+    eHatchSliderStateMovingIn,
+    eHatchSliderStateIn,
+    eHatchSliderStateMovingOut,
+    eHatchSliderStateOut
+} HatchSliderState;
 
 typedef enum
 {
-    eGrabberStateNull = 0,
-    eGrabberStateAquiring,
-    eGrabberStateAquired,
-    eGrabberStateEjecting,
-    eGrabberStateEjected
-} GrabberState;
+    eHatchGrabStateInitialize = 0,
+    eHatchGrabStateAcquring,
+    eHatchGrabStateAcquried,
+    eHatchGrabStateNotHolding,
+    eHatchGrabStateEjecting,
+    eHatchGrabStateWaiting,
+} HatchGrabState;
 
-#define GRABBER_THRESHOLD_CURRENT 5
-#define HATCH_EJECT_TIME          100
-#define HATCH_MOVE_TIME           100
+#define HATCH_CURRENT_ITERATIONS 10
+#define HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD 1.3
+#define HATCH_SLIDER_IN_CURRENT_THRESHOLD 0.3
+#define HATCH_SLIDER_OUT_CURRENT_THRESHOLD 1.8
+
+#define HATCH_GRAB_CURRENT_THRESHOLD 1.2
+#define HATCH_GRAB_ITERATIONS 25
+#define HATCH_GRAB_HOLDING_POSITION 273
+#define HATCH_GRAB_NOT_HOLDING_POSITION 350
 
 class HatchControl
 {
 	public    : HatchControl(int movementID, int grabberID, int hatchID);
 
                 void Periodic();
-                void StartWithHatch();
 
-                HatchMoveState GetHatchMoveState();
-                GrabberState   GetGrabberState();
+                HatchSliderState GetHatchMoveState();
+                HatchGrabState   GetHatchGrabState();
 
 	protected :
-                void        SetAquireGrabbers();
-                void        SetEjectGrabbers();
-                void        SetGrabbersOff();
-                void        SetMoveMotorIn();
-                void        SetMoveMotorOut();
-                void        SetMoveMotorOff();
-                void        SetHatchState(HatchMoveState newValue);
-                void        SetGrabberState(GrabberState newValue);
-                double      GrabberCurrent();
-                const char* HatchMoveStateToString();
-                const char* GrabberStateToString();
+                const char *HatchGrabStateToString(HatchGrabState hatchGrabState);
+                const char *HatchSliderStateToString(HatchSliderState hatchSliderState);
 
-				WPI_TalonSRX_  m_movementMotor, m_grabberMotor, m_hatchMotor;     
+				WPI_TalonSRX  m_hatchGrab, m_hatchSlide;   
 
-                HatchMoveState m_hatchMoveState, m_lastHatchMoveState;
-                GrabberState   m_grabberState, m_lastGrabberState;
+                HatchSliderState  m_hatchSliderState;
+                HatchGrabState    m_hatchGrabState;
 
-                int m_ejectCounter, m_hatchMoveCounter;
+                int m_hatchGrabCounter, m_hatchGrabInitialPosition, m_currentCounter;
 };
 
 #endif
