@@ -22,7 +22,6 @@ RobotControl::RobotControl()
 	m_lastZ  = 0.0;
 
 	m_bXYZChanged = false;
-	m_bChangedHeight = false;
 }
 
 void RobotControl::Initialize()
@@ -123,9 +122,11 @@ bool RobotControl::Periodic(bool bTeleop)
 	}
 
 	m_slider = (m_driveJoystick.GetThrottle() + 1) / 2;
-	m_pov    = m_driveJoystick.GetPOV();
+	m_pov    =  m_driveJoystick.GetPOV();
 
 	m_bRobotCentric = m_driveJoystick.CentricityToggle()->Value() == 1 ? true : false;
+
+	ReadButtons();
 
 	m_cargoControl.Periodic();
 	m_hatchControl.Periodic();	
@@ -287,45 +288,38 @@ void RobotControl::ReadButtons()
 	{
 		if(m_driveJoystick.CargoShipHeight()->Changed() && m_driveJoystick.CargoShipHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
-			m_bChangedHeight = true;
 			m_ladderTargetHeight = eLadderHeightCargoShip;
 		}
 
 		if(m_driveJoystick.TopHeight()->Changed() && m_driveJoystick.TopHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightCargoTop;
 		}
 	
 		if(m_driveJoystick.MidHeight()->Changed() && m_driveJoystick.MidHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightCargoMid;
 		}
 
 		if(m_driveJoystick.BottomHeight()->Changed() && m_driveJoystick.BottomHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightCargoBottom;
 		}
 	}
 	else
 	{
 		if(m_driveJoystick.TopHeight()->Changed() && m_driveJoystick.TopHeight()->Pressed() && m_hatchControl.GetHatchGrabState() == eHatchGrabStateAcquried)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightHatchTop;
 		}
 		
 		if(m_driveJoystick.MidHeight()->Changed() && m_driveJoystick.MidHeight()->Pressed() && m_hatchControl.GetHatchGrabState() == eHatchGrabStateAcquried)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightHatchMid;
 		}
 
 		if(m_driveJoystick.BottomHeight()->Changed() && m_driveJoystick.BottomHeight()->Pressed() && m_hatchControl.GetHatchGrabState() == eHatchGrabStateAcquried)
-		{
-			m_bChangedHeight = true;
+		{			
 			m_ladderTargetHeight = eLadderHeightHatchBottom;
 		}
 	}
@@ -348,7 +342,7 @@ bool RobotControl::RobotCentric()
 
 void RobotControl::CargoEjected()
 {
-	m_bChangedHeight = true;
+	
 	m_ladderTargetHeight = eLadderHeightGround;
 }
 
@@ -356,4 +350,9 @@ bool RobotControl::IsLadderAtHeight()
 {
 	double delta = fabs(m_ladder.GetLadderPosition() - m_ladder.SetLadderPosition());
 	return delta < MAX_LADDER_POSITION_ERROR && m_ladder.GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
+}
+
+LadderHeight RobotControl::GetCargoShipCargoHeight()
+{
+	return eLadderHeightCargoShip;
 }

@@ -153,7 +153,7 @@ void HatchControl::Periodic()
     	case eHatchGrabStateAcquried:
 			m_hatchGrab.Set(-0.2);
 
-			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+			if((g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
 			if(m_hatchSliderState == eHatchSliderStateOut)
@@ -188,7 +188,7 @@ void HatchControl::Periodic()
 		case eHatchGrabStateWaiting:
 			m_hatchGrab.Set(0);
 
-			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+			if(g_rc.m_bAction)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
 			if(m_hatchSliderState == eHatchSliderStateOut)

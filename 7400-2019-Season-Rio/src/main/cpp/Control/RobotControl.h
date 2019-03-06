@@ -64,18 +64,19 @@ class RobotControl
 				void CargoEjected();
 				bool IsLadderAtHeight();
 
+				LadderHeight GetCargoShipCargoHeight();
+
 				DriveJoystick m_driveJoystick;
 
-				bool m_bCargo, m_bAllign, m_bAction, m_bFlipped, m_bAbort, m_bChangedHeight, m_bLadderAtHeight;
+				bool m_bCargo, m_bAllign, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
 				int m_flippedStateValue;
-
-				LadderHeight m_ladderTargetHeight;
 
 				frc::DigitalInput m_cargoSwitch, m_fieldSwitch;
 
 				CargoControl   m_cargoControl;
 				HatchControl   m_hatchControl;
 				Ladder         m_ladder;
+				LadderHeight   m_ladderTargetHeight;
 	protected :
 				double Deadband(double x, double d);
 

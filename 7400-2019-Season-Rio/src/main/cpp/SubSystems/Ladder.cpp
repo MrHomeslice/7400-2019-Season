@@ -59,18 +59,13 @@ void Ladder::ProcessLadderStates()
 
     switch(m_ladderState)
     {
-        case eLadderStateDisabled :
-        {
-            g_rc.m_bChangedHeight = false;
-            break;
-        }
+        case eLadderStateDisabled: break;
 
-        case eLadderStateEnabled  :
-        {
+        case eLadderStateEnabled:
             ladderPosition = SetLadderPosition();
             m_pDrives[0]->Set(motorcontrol::ControlMode::Position, ladderPosition);
+            
             break;
-        }
     }
 }
 
@@ -101,5 +96,5 @@ int Ladder::SetLadderPosition()
 
 double Ladder::GetLadderPosition()
 {
-    return g_tc.GetDouble("CANSim/LadderHeight", 1.337);
+    return SetLadderPosition();
 }

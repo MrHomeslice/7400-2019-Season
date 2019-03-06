@@ -11,6 +11,7 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, 
 {
 		m_bCargoIntakeTestWaiting = true;
 		m_bFlipped = false;
+		m_bChangeHeight = false;
 
 		m_cargoStateCounter = 0;
 		m_captureCurrentCounter = 0;
@@ -23,38 +24,46 @@ void CargoControl::Periodic()
 {
 	switch(m_cargoState)
 	{
+		case eCargoCaptureStateInitialize:
+			
+
+			break;
+
 		case eCargoStateStationIntake:
 			m_pneumatics.Flip(true);
 
-			//Goto ladder height
+			if(++m_flippingCounter == FLIP_TIME)
+			{
+				g_rc.m_ladderTargetHeight = g_rc.GetCargoShipCargoHeight();
+				m_bChangeHeight = true;
+			}
 
-			m_cargoState = eCargoStateHardPullIn;
+			if(m_bChangeHeight && g_rc.IsLadderAtHeight())
+			{
+				m_cargoState = eCargoStateHardPullIn;
+				m_bChangeHeight = false;
+			}
 
 			break;
 
 		case eCargoStateHardPullIn:
-			if(g_rc.m_cargoSwitch.Get())
-			{	
-				if(m_leftGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD || m_rightGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD)
+			if(m_leftGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD || m_rightGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD)
+			{
+				if(++m_currentCounter == CARGO_CURRENT_ITERATIONS)
 				{
-					if(++m_currentCounter == CARGO_CURRENT_ITERATIONS)
-					{
-						m_cargoState = eCargoStateSoftPullIn;
-						m_cargoStateCounter = 0;
-					}
-				}
-				else
-				{
-					m_currentCounter = 0;
-					m_leftGrabberMotor.Set(-0.98);
-					m_rightGrabberMotor.Set(1.0);
+					m_cargoState = eCargoStateSoftPullIn;
+					m_cargoStateCounter = 0;
 				}
 			}
 			else
 			{
-				m_cargoState = eCargoStateEmpty;
-				m_cargoStateCounter = 0;
+				m_currentCounter = 0;
+				m_leftGrabberMotor.Set(-0.98);
+				m_rightGrabberMotor.Set(1.0);
 			}
+		
+			m_cargoState = eCargoStateEmpty;
+			m_cargoStateCounter = 0;
 
 			break;
 
@@ -64,11 +73,6 @@ void CargoControl::Periodic()
 
 			m_cargoCaptureIntake.Set(0);
 
-			m_cargoState = eCargoStateWaitingForFlip;
-
-			break;
-
-		case eCargoStateWaitingForFlip:
 			m_cargoState = eCargoStateFlipping;
 			m_cargoStateCounter = 0;
 
@@ -85,7 +89,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateFlipped:
-			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+			if((g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
 			{
 				m_cargoState = eCargoStateEjecting;
 				m_cargoStateCounter = 0;
@@ -99,6 +103,8 @@ void CargoControl::Periodic()
 
 			if(++m_cargoStateCounter == EJECT_TIME)
 				m_cargoState = eCargoStateEjected;
+
+			
 
 			break;
 
@@ -124,7 +130,7 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureState == eCargoCaptureStateUp)
 			{
-				if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+				if(g_rc.m_bAction)
 				{
 					m_cargoCaptureState = eCargoCaptureStateMovingDown;
 				}
@@ -170,14 +176,20 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingUp:
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= -500 - 200)
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= -500)
 				m_cargoCaptureTilt.Set(-0.3);
 			else
 				m_cargoCaptureTilt.Set(-1.0);
 
-			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition() - (-200)) <= 30)
+			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 30)
 			{
-				m_cargoCaptureState = eCargoCaptureStateUp;	
+				m_cargoCaptureState = eCargoCaptureStateUp;
+			}
+
+			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
+			{
+				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
+					m_cargoCaptureState = eCargoCaptureStateUp;
 			}
 
 			break;
@@ -185,11 +197,10 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateDown:
 			m_cargoCaptureTilt.Set(0);
 
-			if(g_rc.m_driveJoystick.Action()->Pressed() && g_rc.m_driveJoystick.Action()->Changed())
+			if(g_rc.m_bAction || g_rc.m_bAbort)
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoState = eCargoStateHardPullIn;
-
 			}
 
 			break;
@@ -198,8 +209,13 @@ void CargoControl::Periodic()
 			m_cargoCaptureTilt.Set(0.5);
 			m_cargoCaptureIntake.Set(1.0);
 
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= -2000)
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= CAPTURE_TILT_DOWN_POSITION)
 				m_cargoCaptureState = eCargoCaptureStateDown;
+
+			if(g_rc.m_bAbort)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+			}
 		
 			break;
 	}
@@ -221,13 +237,18 @@ CargoState CargoControl::GetCargoState()
 	return m_cargoState;
 }
 
+CargoCaptureState CargoControl::GetCargoCaptureState()
+{
+	return m_cargoCaptureState;
+}
+
+
 const char *CargoControl::CargoStateToString(CargoState cargoState)
 {
 	switch(cargoState)
 	{
 		case eCargoStateHardPullIn:		 return "Hard Pull In";
     	case eCargoStateSoftPullIn:		 return "Soft Pull In";
-    	case eCargoStateWaitingForFlip:  return "Wating For Eject";
 		case eCargoStateFlipping:		 return "Flipping";
 		case eCargoStateFlipped:		 return "Flipped";
     	case eCargoStateEjecting: 		 return "Ejecting";

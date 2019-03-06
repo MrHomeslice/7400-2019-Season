@@ -72,7 +72,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 void Robot::AutonomousInit()
 {
 	//m_swerve.SetSteerOffsets();
-	TeleopInit();
+	//TeleopInit();
 	printf("AutonomousInit()\n");
 }
 

@@ -11,17 +11,19 @@
 
 #define CARGO_CURRENT_THRESHOLD 5.0
 #define CARGO_CURRENT_ITERATIONS 10
+
 #define FLIP_TIME 50
 
-#define CAPTURE_TILT_CURRENT_THRESHOLD 3.0
+#define CAPTURE_TILT_CURRENT_THRESHOLD  3.0
 #define CAPTURE_TILT_CURRENT_ITERATIONS 5
+#define CAPTURE_TILT_DOWN_POSITION 		-2000
 
 typedef enum
 {
-    eCargoStateStationIntake = 0,
+	eCargoCaptureStateInitialize = 0,
+    eCargoStateStationIntake,
     eCargoStateHardPullIn,
     eCargoStateSoftPullIn,
-    eCargoStateWaitingForFlip,
     eCargoStateFlipping,
     eCargoStateFlipped,
     eCargoStateEjecting,
@@ -45,8 +47,9 @@ class CargoControl
 
 				void Periodic();
 				
-				CargoState GetCargoState();
-
+				CargoState 		  GetCargoState();
+				CargoCaptureState GetCargoCaptureState();
+				
 	protected :
 				const char* CargoStateToString(CargoState cargoState);
 
@@ -72,6 +75,7 @@ class CargoControl
         		bool m_bCargoIntakeTestWaiting;
         		bool m_bGlobeTrotterMode;
         		bool m_bFlipped;
+				bool m_bChangeHeight;
 };
 
 #endif
