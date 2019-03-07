@@ -7,7 +7,8 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, 
             : m_leftGrabberMotor(leftGrabberID), m_rightGrabberMotor(rightGrabberID), 
 			//m_leftGrabberMotor(4, "Left Cargo Motor", true), m_rightGrabberMotor(5, "Right Cargo Motor", true),
 			m_cargoCaptureTilt(62), m_cargoCaptureIntake(61),
-			m_cargoState(eCargoStateHardPullIn), m_cargoCaptureState(eCargoCaptureStateInitialize)
+			m_cargoState(eCargoStateInitialize), m_lastCargoState(eCargoStateInitialize),
+			 m_cargoCaptureState(eCargoCaptureStateInitialize)
 {
 		m_bCargoIntakeTestWaiting = true;
 		m_bFlipped = false;
@@ -24,9 +25,16 @@ void CargoControl::Periodic()
 {
 	switch(m_cargoState)
 	{
-		case eCargoCaptureStateInitialize:
-			
-
+		case eCargoStateInitialize:
+			if(g_rc.m_cargoSwitch.Get())
+			{
+				m_cargoState = eCargoStateHardPullIn;
+			}
+			else
+			{
+				m_cargoState = eCargoStateEmpty;
+			}
+		
 			break;
 
 		case eCargoStateStationIntake:
@@ -61,9 +69,16 @@ void CargoControl::Periodic()
 				m_leftGrabberMotor.Set(-0.98);
 				m_rightGrabberMotor.Set(1.0);
 			}
-		
-			m_cargoState = eCargoStateEmpty;
-			m_cargoStateCounter = 0;
+
+			if(m_lastCargoState == eCargoStateStationIntake && g_rc.m_bAbort)
+			{
+				g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
+				
+				if(g_rc.GetLadderPosition() <= 10)
+				{
+					m_cargoState = eCargoStateEmpty;
+				}
+			}
 
 			break;
 
@@ -104,15 +119,16 @@ void CargoControl::Periodic()
 			if(++m_cargoStateCounter == EJECT_TIME)
 				m_cargoState = eCargoStateEjected;
 
-			
-
 			break;
 
 		case eCargoStateEjected:
 			m_leftGrabberMotor.Set(0);
 			m_rightGrabberMotor.Set(0);
 
-			m_cargoState = eCargoStateEmpty;
+			g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
+
+			if(g_rc.GetLadderPosition() <= 10)
+				m_cargoState = eCargoStateEmpty;
 
 			break;
 
@@ -144,9 +160,9 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateInitialize:
 			m_cargoCaptureIntake.Set(0.0);
 
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= -200)
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 200) //200
 			{
-				m_cargoCaptureTilt.Set(0.05);
+				m_cargoCaptureTilt.Set(-0.05);
 				m_cargoCaptureState = eCargoCaptureStateToReady;
 			}
 
@@ -154,14 +170,14 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateToReady:
-			m_cargoCaptureTilt.Set(-0.5);
+			m_cargoCaptureTilt.Set(0.2); //0.5
 
 			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
 			{
 				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
 				{
 					m_cargoCaptureTilt.SetSelectedSensorPosition(10);
-					m_cargoCaptureTilt.Set(0.5);
+					m_cargoCaptureTilt.Set(-0.2); //-0.5
 					m_cargoCaptureState = eCargoCaptureStateUp;
 				}
 			}
@@ -171,15 +187,15 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateUp:
-			m_cargoCaptureTilt.Set(-0.05);
+			m_cargoCaptureTilt.Set(0.05);
 
 			break;
 
 		case eCargoCaptureStateMovingUp:
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= -500)
-				m_cargoCaptureTilt.Set(-0.3);
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500) //500
+				m_cargoCaptureTilt.Set(0.3); //0.3
 			else
-				m_cargoCaptureTilt.Set(-1.0);
+				m_cargoCaptureTilt.Set(0.5); //1.0
 
 			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 30)
 			{
@@ -211,7 +227,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingDown:
-			m_cargoCaptureTilt.Set(0.5);
+			m_cargoCaptureTilt.Set(-0.2); //-0.5
 			m_cargoCaptureIntake.Set(1.0);
 
 			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= CAPTURE_TILT_DOWN_POSITION)
@@ -230,6 +246,9 @@ void CargoControl::Periodic()
 		
 			break;
 	}
+
+	if(m_lastCargoState != m_cargoState)
+		m_lastCargoState = m_cargoState;
 }
 
 bool CargoControl::MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent)

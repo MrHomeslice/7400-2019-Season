@@ -62,14 +62,16 @@ class RobotControl
 				void ProcessLadderState();
 				void ReadButtons();
 				void CargoEjected();
+            	int  GetLadderPosition();
 				bool IsLadderAtHeight();
 
 				LadderHeight GetCargoShipCargoHeight();
+				LadderHeight GetGroundHeight();
 
 				DriveJoystick m_driveJoystick;
 
 				bool m_bCargo, m_bAllign, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
-				int m_flippedStateValue;
+				int  m_flippedStateValue;
 
 				frc::DigitalInput m_cargoSwitch, m_fieldSwitch;
 

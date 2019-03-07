@@ -15,8 +15,8 @@ const double kDefaultLadderD = 0.0;
 
 Ladder::Ladder()
 {
-    m_pDrives[0] = new WPI_TalonSRX_(ELEVATOR_MASTER, "Ladder Drive 1");
-    m_pDrives[1] = new WPI_TalonSRX_(ELEVATOR_SLAVE, "Ladder Drive 2");
+    m_pDrives[0] = new WPI_TalonSRX(ELEVATOR_MASTER);
+    m_pDrives[1] = new WPI_TalonSRX(ELEVATOR_SLAVE);
 
     m_ladderState = eLadderStateDisabled;
 }
@@ -94,7 +94,7 @@ int Ladder::SetLadderPosition()
     return 0;
 }
 
-double Ladder::GetLadderPosition()
+int Ladder::GetLadderPosition()
 {
-    return SetLadderPosition();
+    return m_pDrives[0]->GetSelectedSensorPosition();
 }

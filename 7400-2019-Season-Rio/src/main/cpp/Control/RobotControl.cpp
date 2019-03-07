@@ -286,24 +286,27 @@ void RobotControl::ReadButtons()
 	
 	if(m_bCargo)
 	{
-		if(m_driveJoystick.CargoShipHeight()->Changed() && m_driveJoystick.CargoShipHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
+		if(m_cargoControl.GetCargoState() == eCargoStateFlipped)
 		{
-			m_ladderTargetHeight = eLadderHeightCargoShip;
-		}
+			if(m_driveJoystick.CargoShipHeight()->Changed() && m_driveJoystick.CargoShipHeight()->Pressed())
+			{
+				m_ladderTargetHeight = eLadderHeightCargoShip;
+			}
 
-		if(m_driveJoystick.TopHeight()->Changed() && m_driveJoystick.TopHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{			
-			m_ladderTargetHeight = eLadderHeightCargoTop;
-		}
-	
-		if(m_driveJoystick.MidHeight()->Changed() && m_driveJoystick.MidHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{			
-			m_ladderTargetHeight = eLadderHeightCargoMid;
-		}
+			if(m_driveJoystick.TopHeight()->Changed() && m_driveJoystick.TopHeight()->Pressed())
+			{			
+				m_ladderTargetHeight = eLadderHeightCargoTop;
+			}
+		
+			if(m_driveJoystick.MidHeight()->Changed() && m_driveJoystick.MidHeight()->Pressed())
+			{			
+				m_ladderTargetHeight = eLadderHeightCargoMid;
+			}
 
-		if(m_driveJoystick.BottomHeight()->Changed() && m_driveJoystick.BottomHeight()->Pressed() && m_cargoControl.GetCargoState() == eCargoStateFlipped)
-		{			
-			m_ladderTargetHeight = eLadderHeightCargoBottom;
+			if(m_driveJoystick.BottomHeight()->Changed() && m_driveJoystick.BottomHeight()->Pressed())
+			{			
+				m_ladderTargetHeight = eLadderHeightCargoBottom;
+			}
 		}
 	}
 	else
@@ -348,11 +351,21 @@ void RobotControl::CargoEjected()
 
 bool RobotControl::IsLadderAtHeight()
 {
-	double delta = fabs(m_ladder.GetLadderPosition() - m_ladder.SetLadderPosition());
-	return delta < MAX_LADDER_POSITION_ERROR && m_ladder.GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
+	double delta = fabs(GetLadderPosition() - m_ladder.SetLadderPosition());
+	return delta < MAX_LADDER_POSITION_ERROR && GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
 }
 
 LadderHeight RobotControl::GetCargoShipCargoHeight()
 {
 	return eLadderHeightCargoShip;
+}
+
+LadderHeight RobotControl::GetGroundHeight()
+{
+
+}
+
+int RobotControl::GetLadderPosition()
+{
+	return m_ladder.m_pDrives[0]->GetSelectedSensorPosition();
 }

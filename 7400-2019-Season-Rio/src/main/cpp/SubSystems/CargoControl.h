@@ -16,11 +16,11 @@
 
 #define CAPTURE_TILT_CURRENT_THRESHOLD  3.0
 #define CAPTURE_TILT_CURRENT_ITERATIONS 5
-#define CAPTURE_TILT_DOWN_POSITION 		-2000
+#define CAPTURE_TILT_DOWN_POSITION 		2000 //-2000
 
 typedef enum
 {
-	eCargoCaptureStateInitialize = 0,
+	eCargoStateInitialize = 0,
     eCargoStateStationIntake,
     eCargoStateHardPullIn,
     eCargoStateSoftPullIn,
@@ -57,7 +57,7 @@ class CargoControl
 
 				WPI_TalonSRX 	  m_leftGrabberMotor, m_rightGrabberMotor;
        		 	WPI_TalonSRX 	  m_cargoCaptureTilt, m_cargoCaptureIntake;
-				CargoState   	  m_cargoState;
+				CargoState   	  m_cargoState, m_lastCargoState;
 				CargoCaptureState m_cargoCaptureState;
 				Pneumatics   	  m_pneumatics;
 

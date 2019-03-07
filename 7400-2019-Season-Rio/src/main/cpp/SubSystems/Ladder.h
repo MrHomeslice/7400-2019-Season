@@ -27,19 +27,18 @@ class Ladder
     public:
             Ladder();
 
-            void   Initialize();
-            void   Periodic();
-            void   ProcessLadderStates();
-            int    SetLadderPosition();
-            double GetLadderPosition();
+            void Initialize();
+            void Periodic();
+            void ProcessLadderStates();
+            int  SetLadderPosition();
             
             static constexpr float kDefaultDrivesF = 0.0;
 			static constexpr float kDefaultDrivesP = 10.0;
 			static constexpr float kDefaultDrivesI = 0.002;
 			static constexpr float kDefaultDrivesD = 100;
-             LadderState    m_ladderState;            
+            LadderState    m_ladderState;
+            WPI_TalonSRX  *m_pDrives[2];         
     protected:
-             WPI_TalonSRX_ *m_pDrives[2];
              std::string    m_name;
 };
 

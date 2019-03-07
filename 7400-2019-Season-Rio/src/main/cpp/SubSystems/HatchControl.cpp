@@ -109,7 +109,7 @@ void HatchControl::Periodic()
 				{
 					if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 					{
-						m_hatchGrab.SetSelectedSensorPosition(350);
+						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
 						m_hatchGrabState = eHatchGrabStateNotHolding;
 					}
 				}
