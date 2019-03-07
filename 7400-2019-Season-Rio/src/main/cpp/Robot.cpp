@@ -19,7 +19,7 @@ void Robot::RobotInit()
 
 	g_tc.Initialize();
 
-	g_rc.Initialize();
+	//g_rc.Initialize();
 
 	m_gyro.Initialize();
 
@@ -31,9 +31,11 @@ void Robot::TeleopInit()
 	m_gyro.ZeroYaw();
 	printf("Gyro Zeroed\n");
 
+	g_rc.Initialize();
+
 	m_swerve.SetPIDValues();
 
-	m_swerve.Disable();
+	//m_swerve.Disable();
 
 #ifdef BIT_IS_ENABLED
 	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
@@ -62,8 +64,6 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 		{
 			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() || g_rc.m_bAllign ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
-
-		//g_rc.ReadButtons();
 
 		m_swerve.Periodic();
 	#endif

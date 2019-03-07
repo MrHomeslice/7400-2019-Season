@@ -35,18 +35,19 @@ typedef enum
 
 class HatchControl
 {
-	public    : HatchControl(int movementID, int grabberID, int hatchID);
+	public    : HatchControl(int slideID, int grabberID);
 
+                void Initialize();
                 void Periodic();
 
                 HatchSliderState GetHatchMoveState();
                 HatchGrabState   GetHatchGrabState();
 
+				WPI_TalonSRX  m_hatchGrab, m_hatchSlide; 
+
 	protected :
                 const char *HatchGrabStateToString(HatchGrabState hatchGrabState);
-                const char *HatchSliderStateToString(HatchSliderState hatchSliderState);
-
-				WPI_TalonSRX  m_hatchGrab, m_hatchSlide;   
+                const char *HatchSliderStateToString(HatchSliderState hatchSliderState);  
 
                 HatchSliderState  m_hatchSliderState;
                 HatchGrabState    m_hatchGrabState;

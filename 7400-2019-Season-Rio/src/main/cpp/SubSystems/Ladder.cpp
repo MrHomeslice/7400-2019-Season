@@ -26,7 +26,7 @@ void Ladder::Initialize()
     m_pDrives[1]->Follow(*m_pDrives[0]);
 
     m_pDrives[0]->ConfigPeakOutputReverse(-0.4);
-    m_pDrives[0]->ConfigPeakOutputForward(1.0);    
+    m_pDrives[0]->ConfigPeakOutputForward(0.7);    
     
     double f = g_tc.GetDouble("Ladder/F", kDefaultLadderF);
 	double p = g_tc.GetDouble("Ladder/P", kDefaultLadderP);
@@ -50,7 +50,7 @@ void Ladder::Periodic()
 {
     ProcessLadderStates();
     // Uncoment to following line to force ladder buttons to be enabled
-    //m_ladderState = eLadderStateEnabled; 
+    m_ladderState = eLadderStateEnabled; 
 }
 
 void Ladder::ProcessLadderStates()
@@ -62,14 +62,14 @@ void Ladder::ProcessLadderStates()
         case eLadderStateDisabled: break;
 
         case eLadderStateEnabled:
-            ladderPosition = SetLadderPosition();
+            ladderPosition = GetTargetLadderPosition();
             m_pDrives[0]->Set(motorcontrol::ControlMode::Position, ladderPosition);
             
             break;
     }
 }
 
-int Ladder::SetLadderPosition()
+int Ladder::GetTargetLadderPosition()
 {
     switch(g_rc.m_ladderTargetHeight)
     {

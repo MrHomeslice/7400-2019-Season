@@ -42,11 +42,11 @@ class SwerveModule
 				void SetDrivePercentOutput(double percentOutput);
 				void ReportStatus();
 
-				WPI_TalonSRX_ m_steer, m_drive;
-				double        m_steerEncoderPulsesPerDegree, m_steerEncoderPulsesPerRotation, m_driveNegate;
-				std::string   m_name, m_reportAngle, m_reportMagnitude, m_reportSteerError, m_reportSteerTarget,
-				              m_reportSteerAnalogRaw, m_reportSteerAnalogValue, m_reportSteerOverflowBits, m_reportSteerCurrent, m_reportDriveCurrent;
-				int           m_steerOffset;
+				WPI_TalonSRX m_steer, m_drive;
+				double       m_steerEncoderPulsesPerDegree, m_steerEncoderPulsesPerRotation, m_driveNegate;
+				std::string  m_name, m_reportAngle, m_reportMagnitude, m_reportSteerError, m_reportSteerTarget,
+				             m_reportSteerAnalogRaw, m_reportSteerAnalogValue, m_reportSteerOverflowBits, m_reportSteerCurrent, m_reportDriveCurrent;
+				int          m_steerOffset;
 
 };
 

@@ -2,7 +2,7 @@
 
 Pneumatics::Pneumatics()
 {
-	m_pFlip = NULL;//m_pFlip = new frc::DoubleSolenoid(6, 7);
+	m_pFlip = new frc::DoubleSolenoid(0, 1);
 }
 
 void Pneumatics::Initialize()

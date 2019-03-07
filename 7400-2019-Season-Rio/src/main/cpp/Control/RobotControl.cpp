@@ -8,8 +8,8 @@ extern TableController	  g_tc;
 
 RobotControl::RobotControl()
 			 : m_driveJoystick(JOYSTICK_1),
-			   m_cargoControl(0, 1, 2, 3),
-			   m_hatchControl(0, 1, 2),
+			   m_cargoControl(15, 14, 13, 12),
+			   m_hatchControl(17, 16),
 			   m_cargoSwitch(0), m_fieldSwitch(1)
 {
 	m_x 	 = -10.0;
@@ -22,11 +22,18 @@ RobotControl::RobotControl()
 	m_lastZ  = 0.0;
 
 	m_bXYZChanged = false;
+
+	m_printCounter = 0;
 }
 
 void RobotControl::Initialize()
 {
 	m_ladder.Initialize();
+	m_cargoControl.Initialize();
+	m_hatchControl.Initialize();
+
+	m_printCounter = 0;
+	m_ladder.m_pDrives[0]->SetSelectedSensorPosition(0);
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -77,6 +84,8 @@ bool RobotControl::PeriodicTest()
 bool RobotControl::Periodic(bool bTeleop)
 {
 	m_driveJoystick.Periodic();
+
+	//printf("%d %d\n", IsLadderAtHeight(), m_ladder.GetLadderPosition());
 
 	if(m_bAllign)
 	{
@@ -144,7 +153,7 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_bXYZChanged = false;
 	}
 
-	m_bCargo = m_driveJoystick.GetThrottle() > 0.0 ? true : false;	
+	m_bCargo = m_driveJoystick.GetThrottle() > 0.0 ? true : false;
 
 	return m_bXYZChanged;
 }
@@ -276,7 +285,6 @@ bool RobotControl::Cargo()
 
 void RobotControl::ReadButtons()
 {
-
 	if(m_driveJoystick.Allign()->Changed() && m_driveJoystick.Allign()->Pressed())
 		m_bAllign = true;
 
@@ -294,7 +302,7 @@ void RobotControl::ReadButtons()
 			}
 
 			if(m_driveJoystick.TopHeight()->Changed() && m_driveJoystick.TopHeight()->Pressed())
-			{			
+			{							
 				m_ladderTargetHeight = eLadderHeightCargoTop;
 			}
 		
@@ -351,7 +359,7 @@ void RobotControl::CargoEjected()
 
 bool RobotControl::IsLadderAtHeight()
 {
-	double delta = fabs(GetLadderPosition() - m_ladder.SetLadderPosition());
+	double delta = fabs(GetLadderPosition() - m_ladder.GetTargetLadderPosition());
 	return delta < MAX_LADDER_POSITION_ERROR && GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
 }
 

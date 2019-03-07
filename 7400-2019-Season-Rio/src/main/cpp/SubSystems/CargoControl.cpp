@@ -3,10 +3,10 @@
 
 extern RobotControl g_rc;
 
-CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, int captureID)
+CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID)
             : m_leftGrabberMotor(leftGrabberID), m_rightGrabberMotor(rightGrabberID), 
 			//m_leftGrabberMotor(4, "Left Cargo Motor", true), m_rightGrabberMotor(5, "Right Cargo Motor", true),
-			m_cargoCaptureTilt(62), m_cargoCaptureIntake(61),
+			m_cargoCaptureTilt(tiltID), m_cargoCaptureIntake(intakeID),
 			m_cargoState(eCargoStateInitialize), m_lastCargoState(eCargoStateInitialize),
 			 m_cargoCaptureState(eCargoCaptureStateInitialize)
 {
@@ -19,10 +19,131 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, 
 		m_leftEncoderPosition = 0;
 		m_rightEncoderPosition = 0;
 		m_DICounter = 0;
+		m_printCounter = 0;
+}
+
+void CargoControl::Initialize()
+{
+	m_leftGrabberMotor.SetSafetyEnabled(false);
+	m_rightGrabberMotor.SetSafetyEnabled(false);
+
+	m_cargoState = eCargoStateInitialize;
+	m_cargoCaptureState = eCargoCaptureStateInitialize;
+
+	m_cargoStateCounter = 0;
+	m_currentCounter = 0;
+
+	m_pneumatics.Flip(false);
+
+	m_cargoCaptureTilt.Set(-0.3);
+	m_cargoCaptureTilt.SetSelectedSensorPosition(0);
 }
 
 void CargoControl::Periodic() 
 {
+	printf("%d\n", m_cargoCaptureTilt.GetSelectedSensorPosition());
+	static int oldState = -100;
+	if(oldState != m_cargoCaptureState)
+	{
+		printf("%d\n\n", m_cargoCaptureState);
+		oldState = m_cargoCaptureState;
+	}
+	switch(m_cargoCaptureState)
+	{
+		case eCargoCaptureStateInitialize:
+			m_cargoCaptureIntake.Set(0.0);
+
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500) //200
+			{
+				m_cargoCaptureState = eCargoCaptureStateToReady;
+			}
+
+			break;
+
+		case eCargoCaptureStateToReady:
+			m_cargoCaptureTilt.Set(0.5); //0.5
+
+			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
+			{
+				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
+				{
+					m_cargoCaptureTilt.SetSelectedSensorPosition(10);
+					m_cargoCaptureTilt.Set(-0.5); //-0.5
+					m_cargoCaptureState = eCargoCaptureStateUp;
+				}
+			}
+			else
+				m_captureCurrentCounter = 0;
+
+			break;
+
+		case eCargoCaptureStateUp:
+			m_cargoCaptureTilt.Set(0.05);
+
+			break;
+
+		case eCargoCaptureStateMovingUp:
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 500) //500
+				m_cargoCaptureTilt.Set(0.3); //0.3
+			else
+				m_cargoCaptureTilt.Set(1.0); //1.0
+
+			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 200)
+			{
+				m_cargoCaptureState = eCargoCaptureStateUp;
+			}
+
+			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
+			{
+				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
+					m_cargoCaptureState = eCargoCaptureStateUp;
+			}
+
+			break;
+
+		case eCargoCaptureStateDown:
+			m_cargoCaptureTilt.Set(0);
+
+			if(g_rc.m_bCargo && g_rc.m_bAction)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoState = eCargoStateHardPullIn;
+			}
+
+			if(g_rc.m_bAbort)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+			}
+
+			break;
+
+		case eCargoCaptureStateMovingDown:
+			//printf("Moving Down\n");
+			m_cargoCaptureTilt.Set(-0.5); //-0.5
+			m_cargoCaptureIntake.Set(1.0);
+
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= CAPTURE_TILT_DOWN_POSITION)
+			{
+			//	printf("***DOWN***\n");
+				m_cargoCaptureState = eCargoCaptureStateDown;
+			}
+
+			if(g_rc.m_bCargo && g_rc.m_bAction)
+			{
+			//	printf("***ACTION***\n");
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoState = eCargoStateHardPullIn;
+			}
+
+			if(g_rc.m_bAbort)
+			{
+			//	printf("***ABORTING***\n");
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+			}
+		
+			break;
+	}
+
 	switch(m_cargoState)
 	{
 		case eCargoStateInitialize:
@@ -46,7 +167,7 @@ void CargoControl::Periodic()
 				m_bChangeHeight = true;
 			}
 
-			if(m_bChangeHeight && g_rc.IsLadderAtHeight())
+			if(m_bChangeHeight)
 			{
 				m_cargoState = eCargoStateHardPullIn;
 				m_bChangeHeight = false;
@@ -94,17 +215,22 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateFlipping:
-			m_pneumatics.Flip(true);
+			if(g_rc.m_hatchControl.GetHatchGrabState() == eHatchGrabStateWaiting)
+			{
+				m_pneumatics.Flip(true);
+				m_bFlipped = true;
+			}
 
-			if(++m_cargoStateCounter == FLIP_TIME)
+			if(++m_cargoStateCounter >= FLIP_TIME && m_bFlipped)
 			{
 				m_cargoState = eCargoStateFlipped;
+				m_bFlipped = false;
 			}
 
 			break;
 
 		case eCargoStateFlipped:
-			if((g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
+			if(g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
 			{
 				m_cargoState = eCargoStateEjecting;
 				m_cargoStateCounter = 0;
@@ -127,8 +253,7 @@ void CargoControl::Periodic()
 
 			g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
 
-			if(g_rc.GetLadderPosition() <= 10)
-				m_cargoState = eCargoStateEmpty;
+			m_cargoState = eCargoStateEmpty;
 
 			break;
 
@@ -138,7 +263,7 @@ void CargoControl::Periodic()
 
 			m_pneumatics.Flip(false);
 
-			if(g_rc.m_driveJoystick.StationIntake()->Pressed() && g_rc.m_driveJoystick.StationIntake()->Changed())
+			if(g_rc.m_bCargo && g_rc.m_driveJoystick.StationIntake()->Pressed() && g_rc.m_driveJoystick.StationIntake()->Changed())
 			{
 				m_cargoState = eCargoStateStationIntake;
 				m_currentCounter = 0;
@@ -146,7 +271,8 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureState == eCargoCaptureStateUp)
 			{
-				if(g_rc.m_bAction)
+				//printf("**%d %d**\n", g_rc.m_bCargo, g_rc.m_bAction);
+				if(g_rc.m_bCargo && g_rc.m_bAction)
 				{
 					m_cargoCaptureState = eCargoCaptureStateMovingDown;
 				}
@@ -155,97 +281,7 @@ void CargoControl::Periodic()
 			break;
 	}
 
-	switch(m_cargoCaptureState)
-	{
-		case eCargoCaptureStateInitialize:
-			m_cargoCaptureIntake.Set(0.0);
-
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 200) //200
-			{
-				m_cargoCaptureTilt.Set(-0.05);
-				m_cargoCaptureState = eCargoCaptureStateToReady;
-			}
-
-			
-			break;
-
-		case eCargoCaptureStateToReady:
-			m_cargoCaptureTilt.Set(0.2); //0.5
-
-			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
-			{
-				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
-				{
-					m_cargoCaptureTilt.SetSelectedSensorPosition(10);
-					m_cargoCaptureTilt.Set(-0.2); //-0.5
-					m_cargoCaptureState = eCargoCaptureStateUp;
-				}
-			}
-			else
-				m_captureCurrentCounter = 0;
-
-			break;
-
-		case eCargoCaptureStateUp:
-			m_cargoCaptureTilt.Set(0.05);
-
-			break;
-
-		case eCargoCaptureStateMovingUp:
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500) //500
-				m_cargoCaptureTilt.Set(0.3); //0.3
-			else
-				m_cargoCaptureTilt.Set(0.5); //1.0
-
-			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 30)
-			{
-				m_cargoCaptureState = eCargoCaptureStateUp;
-			}
-
-			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
-			{
-				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
-					m_cargoCaptureState = eCargoCaptureStateUp;
-			}
-
-			break;
-
-		case eCargoCaptureStateDown:
-			m_cargoCaptureTilt.Set(0);
-
-			if(g_rc.m_bAction)
-			{
-				m_cargoCaptureState = eCargoCaptureStateMovingUp;
-				m_cargoState = eCargoStateHardPullIn;
-			}
-
-			if(g_rc.m_bAbort)
-			{
-				m_cargoCaptureState = eCargoCaptureStateMovingUp;
-			}
-
-			break;
-
-		case eCargoCaptureStateMovingDown:
-			m_cargoCaptureTilt.Set(-0.2); //-0.5
-			m_cargoCaptureIntake.Set(1.0);
-
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= CAPTURE_TILT_DOWN_POSITION)
-				m_cargoCaptureState = eCargoCaptureStateDown;
-
-			if(g_rc.m_bAction)
-			{
-				m_cargoCaptureState = eCargoCaptureStateMovingUp;
-				m_cargoState = eCargoStateHardPullIn;
-			}
-
-			if(g_rc.m_bAbort)
-			{
-				m_cargoCaptureState = eCargoCaptureStateMovingUp;
-			}
-		
-			break;
-	}
+	
 
 	if(m_lastCargoState != m_cargoState)
 		m_lastCargoState = m_cargoState;
@@ -271,7 +307,6 @@ CargoCaptureState CargoControl::GetCargoCaptureState()
 {
 	return m_cargoCaptureState;
 }
-
 
 const char *CargoControl::CargoStateToString(CargoState cargoState)
 {

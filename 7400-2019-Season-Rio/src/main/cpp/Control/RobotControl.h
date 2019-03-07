@@ -10,7 +10,7 @@
 
 #define JOYSTICK_1	0
 
-#define MAX_LADDER_POSITION_ERROR 10
+#define MAX_LADDER_POSITION_ERROR 500
 
 #define ALLIGNMENT_X_CORRECTION .2
 #define ALLIGNMENT_Z_CORRECTION .2
@@ -82,7 +82,7 @@ class RobotControl
 	protected :
 				double Deadband(double x, double d);
 
-				int 		   m_pov;
+				int 		   m_pov, m_printCounter;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
 				bool           m_bXYZChanged, m_bRobotCentric;
 

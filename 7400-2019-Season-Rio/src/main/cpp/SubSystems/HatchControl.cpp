@@ -3,18 +3,30 @@
 
 extern RobotControl g_rc;
 
-HatchControl::HatchControl(int movementID, int grabberID, int hatchID)
-             : m_hatchGrab(23), m_hatchSlide(24),
+HatchControl::HatchControl(int slideID, int grabberID)
+             : m_hatchGrab(grabberID), m_hatchSlide(slideID),
 			m_hatchSliderState(eHatchSliderStateInitialize), m_hatchGrabState(eHatchGrabStateInitialize)
 {
 		m_hatchGrabCounter = 0;
 		m_hatchGrabInitialPosition = 0;
+		m_hatchGrabInitialPosition = 0;
+}
+
+void HatchControl::Initialize()
+{
+	m_hatchGrabCounter = 0;
+	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition();
+
+	m_hatchGrabState = eHatchGrabStateInitialize;
+	m_hatchSliderState = eHatchSliderStateInitialize;
 }
 
 void HatchControl::Periodic()
 {
 	double sliderError;
 	double grabError;
+
+	//printf("%d %.6f\n\n", m_hatchGrabState, m_hatchGrab.GetOutputCurrent());
 
     switch(m_hatchSliderState)
 	{
@@ -44,7 +56,7 @@ void HatchControl::Periodic()
 
 			if(fabs(sliderError) <= 10 && m_currentCounter >= HATCH_CURRENT_ITERATIONS)
 			{
-				m_hatchSlide.Set(0);
+				m_hatchSlide.Set(0.1);
 				m_hatchSliderState = eHatchSliderStateIn;
 			}
 			else
@@ -58,7 +70,7 @@ void HatchControl::Periodic()
 			break;
 		
 		case eHatchSliderStateIn:
-			m_hatchSlide.Set(0.0);
+			m_hatchSlide.Set(0.1);
 			m_hatchSlide.SetSelectedSensorPosition(0);
 
 			m_currentCounter = 0;
@@ -153,7 +165,7 @@ void HatchControl::Periodic()
     	case eHatchGrabStateAcquried:
 			m_hatchGrab.Set(-0.2);
 
-			if((g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
+			if(!g_rc.m_bCargo && (g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
 			if(m_hatchSliderState == eHatchSliderStateOut)
@@ -188,7 +200,7 @@ void HatchControl::Periodic()
 		case eHatchGrabStateWaiting:
 			m_hatchGrab.Set(0);
 
-			if(g_rc.m_bAction)
+			if(!g_rc.m_bCargo && g_rc.m_bAction)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
 			if(m_hatchSliderState == eHatchSliderStateOut)

@@ -16,7 +16,7 @@
 
 #define CAPTURE_TILT_CURRENT_THRESHOLD  3.0
 #define CAPTURE_TILT_CURRENT_ITERATIONS 5
-#define CAPTURE_TILT_DOWN_POSITION 		2000 //-2000
+#define CAPTURE_TILT_DOWN_POSITION 		2300 //-2000
 
 typedef enum
 {
@@ -43,8 +43,9 @@ typedef enum
 
 class CargoControl
 {
-	public    : CargoControl(int leftGrabberID, int rightGrabberID, int intakeID, int captureID);
+	public    : CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID);
 
+				void Initialize();
 				void Periodic();
 				
 				CargoState 		  GetCargoState();
@@ -71,6 +72,7 @@ class CargoControl
       	  		int m_captureCurrentCounter;
      	   		int m_DICounter;
         		int m_hatchGrabInitialPosition;
+				int m_printCounter;
 
         		bool m_bCargoIntakeTestWaiting;
         		bool m_bGlobeTrotterMode;

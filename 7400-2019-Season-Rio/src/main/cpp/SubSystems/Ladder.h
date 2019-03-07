@@ -30,7 +30,8 @@ class Ladder
             void Initialize();
             void Periodic();
             void ProcessLadderStates();
-            int  SetLadderPosition();
+            int  GetTargetLadderPosition();
+            int  GetLadderPosition();
             
             static constexpr float kDefaultDrivesF = 0.0;
 			static constexpr float kDefaultDrivesP = 10.0;
