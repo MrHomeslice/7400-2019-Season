@@ -63,7 +63,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() || g_rc.m_bAllign ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
 
-		g_rc.ReadButtons();
+		//g_rc.ReadButtons();
 
 		m_swerve.Periodic();
 	#endif
@@ -72,7 +72,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 void Robot::AutonomousInit()
 {
 	//m_swerve.SetSteerOffsets();
-	//TeleopInit();
+	TeleopInit();
 	printf("AutonomousInit()\n");
 }
 

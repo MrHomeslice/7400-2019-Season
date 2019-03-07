@@ -197,10 +197,15 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateDown:
 			m_cargoCaptureTilt.Set(0);
 
-			if(g_rc.m_bAction || g_rc.m_bAbort)
+			if(g_rc.m_bAction)
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoState = eCargoStateHardPullIn;
+			}
+
+			if(g_rc.m_bAbort)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 			}
 
 			break;
@@ -211,6 +216,12 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= CAPTURE_TILT_DOWN_POSITION)
 				m_cargoCaptureState = eCargoCaptureStateDown;
+
+			if(g_rc.m_bAction)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoState = eCargoStateHardPullIn;
+			}
 
 			if(g_rc.m_bAbort)
 			{

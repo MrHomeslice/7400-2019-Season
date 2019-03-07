@@ -15,7 +15,7 @@ RobotControl::RobotControl()
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;
 	m_z      = -10.0;
-	m_slider = 0;
+	m_slider =  0;
 
 	m_lastX  = 0.0;
 	m_lastY  = 0.0;
