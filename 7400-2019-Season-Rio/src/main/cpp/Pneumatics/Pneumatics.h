@@ -9,6 +9,9 @@ class Pneumatics
 
 							void Initialize();
 							void Flip(bool bFlip);
+							void Flop();
+
+							bool m_bFlip;
 	protected :
 							frc::DoubleSolenoid *m_pFlip;
 };

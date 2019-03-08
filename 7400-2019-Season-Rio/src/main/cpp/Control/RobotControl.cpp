@@ -95,6 +95,8 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	m_bRobotCentric = m_driveJoystick.CentricityToggle()->Value() == 1 ? true : false;
 
+	//printf("robotCentric: %d\n",m_bRobotCentric);
+
 	ReadButtons();
 
 	m_cargoControl.Periodic();

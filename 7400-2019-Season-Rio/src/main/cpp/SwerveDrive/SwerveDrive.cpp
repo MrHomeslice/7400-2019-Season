@@ -99,8 +99,11 @@ void SwerveDrive::TransformRotatedCorners(double x, double y, double yaw, Double
 
    double yawRadians = -M_PI * yaw / 180.0;
 
+
+
    double cosGyro = cos(yawRadians);
    double sinGyro = sin(yawRadians);
+
 
    DoubleXY transform;
 
@@ -149,9 +152,8 @@ int SwerveDrive::GetSteerPosition(int module)
 }
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
-{ 	
-	z /= 2;//g_mp.m_zScale;
-
+{
+	z *= 0.75;
 	RectangularToBoundedCircle(x, y);
 
 	DoubleXY rotatedCorners[4], transformedCorners[4];

@@ -48,6 +48,13 @@ void CargoControl::Periodic()
 		//printf("%d\n\n", m_cargoCaptureState);
 		oldState = m_cargoCaptureState;
 	}
+
+	if(g_rc.m_bCargo && g_rc.m_driveJoystick.Flip()->Pressed() && g_rc.m_driveJoystick.Flip()->Changed())
+	{
+		printf("FLOPPING\n");
+		m_pneumatics.Flop();
+	}
+
 	switch(m_cargoCaptureState)
 	{
 		case eCargoCaptureStateInitialize:
@@ -165,7 +172,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateStationIntake:
-			m_pneumatics.Flip(true);
+			
 
 			if(++m_flippingCounter == FLIP_TIME)
 			{
@@ -250,7 +257,10 @@ void CargoControl::Periodic()
 			m_rightGrabberMotor.Set(-1.0);
 
 			if(++m_cargoStateCounter == EJECT_TIME)
+			{
+				m_pneumatics.Flip(false);
 				m_cargoState = eCargoStateEjected;
+			}
 
 			break;
 
@@ -268,11 +278,11 @@ void CargoControl::Periodic()
 			m_leftGrabberMotor.Set(0);
 			m_rightGrabberMotor.Set(0);
 
-			m_pneumatics.Flip(false);
-
 			if(g_rc.m_bCargo && g_rc.m_driveJoystick.StationIntake()->Pressed() && g_rc.m_driveJoystick.StationIntake()->Changed())
 			{
+				m_pneumatics.Flip(true);
 				m_cargoState = eCargoStateStationIntake;
+				m_flippingCounter = 0;
 				m_currentCounter = 0;
 			}
 

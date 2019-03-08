@@ -147,6 +147,7 @@ int SwerveModule::SetSteerAngle(double targetAngle)
 
 	m_driveNegate = 1.0;
 
+
 	if (delta > 90.0) {
 		targetAngle -= 180.0;
 		m_driveNegate = -1.0;
@@ -155,6 +156,7 @@ int SwerveModule::SetSteerAngle(double targetAngle)
 		targetAngle += 180.0;
 		m_driveNegate = -1.0;
     }
+	
 
 	delta = targetAngle - currentAngle;
 
