@@ -10,7 +10,7 @@
 #define EJECT_TIME 25
 
 #define CARGO_CURRENT_THRESHOLD 5.0
-#define CARGO_CURRENT_ITERATIONS 10
+#define CARGO_CURRENT_ITERATIONS 25
 
 #define FLIP_TIME 50
 
@@ -45,12 +45,12 @@ class CargoControl
 {
 	public    : CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID);
 
-				void Initialize();
+				void Initialize(bool bFlip);
 				void Periodic();
 				
 				CargoState 		  GetCargoState();
 				CargoCaptureState GetCargoCaptureState();
-				
+				Pneumatics   	  m_pneumatics;				
 	protected :
 				const char* CargoStateToString(CargoState cargoState);
 
@@ -60,7 +60,6 @@ class CargoControl
        		 	WPI_TalonSRX 	  m_cargoCaptureTilt, m_cargoCaptureIntake;
 				CargoState   	  m_cargoState, m_lastCargoState;
 				CargoCaptureState m_cargoCaptureState;
-				Pneumatics   	  m_pneumatics;
 
 				int m_ejectCounter, m_flippingCounter;
 

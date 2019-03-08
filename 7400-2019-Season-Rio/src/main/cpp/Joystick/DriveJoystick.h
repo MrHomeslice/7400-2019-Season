@@ -14,8 +14,7 @@ class DriveJoystick : public MeeseeksJoystick
 				JSButton *MidHeight()	    { return &m_midHeight;	     }
 				JSButton *BottomHeight()    { return &m_bottomHeight;    }
 				JSButton *CargoShipHeight() { return &m_cargoShipHeight; }
-				
-				JoystickRepeatButton *Abort() { return &m_abort; }
+				JSButton *Abort() 			{ return &m_abort; }
 
 				JoystickValueButton *CentricityToggle() { return &m_centricityToggle; }
 				JoystickValueButton *CameraSelection()  { return &m_cameraSelection;  }
@@ -24,10 +23,8 @@ class DriveJoystick : public MeeseeksJoystick
 				
 				void Periodic();
 	protected :
-				JSButton m_allign, m_action, m_stationIntake;
+				JSButton m_allign, m_action, m_stationIntake, m_abort;
 				JSButton m_topHeight, m_midHeight, m_bottomHeight, m_cargoShipHeight;
-
-				JoystickRepeatButton m_abort;
 				JoystickValueButton  m_centricityToggle, m_cameraSelection;
 				
 				

@@ -22,7 +22,7 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, in
 		m_printCounter = 0;
 }
 
-void CargoControl::Initialize()
+void CargoControl::Initialize(bool bFlip)
 {
 	m_leftGrabberMotor.SetSafetyEnabled(false);
 	m_rightGrabberMotor.SetSafetyEnabled(false);
@@ -33,7 +33,8 @@ void CargoControl::Initialize()
 	m_cargoStateCounter = 0;
 	m_currentCounter = 0;
 
-	m_pneumatics.Flip(false);
+	if(bFlip)
+		m_pneumatics.Flip(false);
 
 	m_cargoCaptureTilt.Set(-0.3);
 	m_cargoCaptureTilt.SetSelectedSensorPosition(0);
@@ -41,11 +42,10 @@ void CargoControl::Initialize()
 
 void CargoControl::Periodic() 
 {
-	printf("%d\n", m_cargoCaptureTilt.GetSelectedSensorPosition());
 	static int oldState = -100;
 	if(oldState != m_cargoCaptureState)
 	{
-		printf("%d\n\n", m_cargoCaptureState);
+		//printf("%d\n\n", m_cargoCaptureState);
 		oldState = m_cargoCaptureState;
 	}
 	switch(m_cargoCaptureState)
@@ -104,8 +104,6 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateDown:
 			m_cargoCaptureTilt.Set(0);
 
-			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
-
 			if(g_rc.m_bCargo && g_rc.m_bAction)
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
@@ -115,12 +113,17 @@ void CargoControl::Periodic()
 			if(g_rc.m_bAbort)
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoCaptureIntake.Set(0.0);
 			}
 
 			break;
 
 		case eCargoCaptureStateMovingDown:
 			//printf("Moving Down\n");
+
+			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
+			printf("**MOVING DOWN**\n");
+
 			m_cargoCaptureTilt.Set(-0.5); //-0.5
 			m_cargoCaptureIntake.Set(1.0);
 
@@ -141,6 +144,7 @@ void CargoControl::Periodic()
 			{
 			//	printf("***ABORTING***\n");
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoCaptureIntake.Set(0.0);
 			}
 		
 			break;
@@ -206,8 +210,8 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateSoftPullIn:
-			m_leftGrabberMotor.Set(-0.05);
-			m_rightGrabberMotor.Set(0.05);
+			m_leftGrabberMotor.Set(-0.1);
+			m_rightGrabberMotor.Set(0.1);
 
 			m_cargoCaptureIntake.Set(0);
 
@@ -226,6 +230,7 @@ void CargoControl::Periodic()
 			if(++m_cargoStateCounter >= FLIP_TIME && m_bFlipped)
 			{
 				m_cargoState = eCargoStateFlipped;
+				g_rc.m_ladderTargetHeight = eLadderHeightGround;
 				m_bFlipped = false;
 			}
 

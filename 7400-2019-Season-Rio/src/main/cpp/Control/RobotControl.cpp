@@ -26,10 +26,10 @@ RobotControl::RobotControl()
 	m_printCounter = 0;
 }
 
-void RobotControl::Initialize()
+void RobotControl::Initialize(bool bFlip)
 {
 	m_ladder.Initialize();
-	m_cargoControl.Initialize();
+	m_cargoControl.Initialize(bFlip);
 	m_hatchControl.Initialize();
 
 	m_printCounter = 0;
@@ -60,8 +60,6 @@ bool RobotControl::PeriodicTest()
 			return true;
 		}
 		
-		m_bAllign = false;
-		
 		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 		m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
 		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
@@ -87,48 +85,10 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	//printf("%d %d\n", IsLadderAtHeight(), m_ladder.GetLadderPosition());
 
-	if(m_bAllign)
-	{
-		//AutoMoveToTarget();
-
-		/*
-		double approachAngle = g_tc.GetDouble("Target/ApproachAngle", 0);
-
-		if(approachAngle == -1000)
-			m_bAllign = false;
-		else
-		{
-			double xOffSet  = g_tc.GetDouble("Target/XOffset", 0);
-			double distance = g_tc.GetDouble("Target/Distance", 0);
-
-			m_y = distance / 10.0;
-
-			if(xOffSet > 0)
-				m_x = -ALLIGNMENT_X_CORRECTION;
-			else if(xOffSet < 0)
-				m_x = ALLIGNMENT_X_CORRECTION;
-			else
-				m_x = 0;
-
-			if(approachAngle > 90)
-				m_z = -ALLIGNMENT_Z_CORRECTION;
-			else if(approachAngle < 90)
-				m_z = ALLIGNMENT_Z_CORRECTION;
-			else
-				m_z = 0;
-
-			g_tc.PutDouble("Target/XOffset", m_x);
-			g_tc.PutDouble("Target/Distance", m_y);
-			g_tc.PutDouble("Target/ApproachAngle", m_z);
-		}
-		*/
-	}
-	else
-	{
-		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
-		m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
-		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
-	}
+	
+	m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
+	m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
+	m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
 
 	m_slider = (m_driveJoystick.GetThrottle() + 1) / 2;
 	m_pov    =  m_driveJoystick.GetPOV();
@@ -170,8 +130,6 @@ void RobotControl::AutoMoveToTarget()
 
 	if (targetLineSlope == -1000 || targetXDelta == -1000 || targetDistance == -1000) //Lost tracked target
 	{
-		m_bAllign = false;
-
 		m_x = 0.0;
 		m_y = 0.0;
 		m_z = 0.0;
@@ -245,10 +203,6 @@ void RobotControl::AutoMoveToTarget()
 
 	printf("%.6f %.6f %.6f\n", m_x, m_y, m_z);
 
-
-  m_bAllign = true;		
-
-
 	// printf("%.6f %.6f\n", targetXDelta, m_x);
 
 	//transform.Translate(lateral * Time.deltaTime, 0.0f, forward * Time.deltaTime);
@@ -286,11 +240,12 @@ bool RobotControl::Cargo()
 void RobotControl::ReadButtons()
 {
 	if(m_driveJoystick.Allign()->Changed() && m_driveJoystick.Allign()->Pressed())
-		m_bAllign = true;
+	{ 
+	}
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();
 
-	m_bAbort = m_driveJoystick.Abort()->Pressed();
+	m_bAbort = m_driveJoystick.Abort()->Pressed() && m_driveJoystick.Abort()->Changed();
 	
 	if(m_bCargo)
 	{

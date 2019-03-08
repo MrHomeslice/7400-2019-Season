@@ -28,18 +28,7 @@ void Robot::RobotInit()
 
 void Robot::TeleopInit()
 {
-	m_gyro.ZeroYaw();
-	printf("Gyro Zeroed\n");
-
-	g_rc.Initialize();
-
-	m_swerve.SetPIDValues();
-
-	//m_swerve.Disable();
-
-#ifdef BIT_IS_ENABLED
-	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
-#endif
+	g_rc.Initialize(false);
 }
 
 void ShowState(std::string &oldState, const char *pNewState)
@@ -72,7 +61,18 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 void Robot::AutonomousInit()
 {
 	//m_swerve.SetSteerOffsets();
-	TeleopInit();
+	m_gyro.ZeroYaw();
+	printf("Gyro Zeroed\n");
+
+	g_rc.Initialize(true);
+
+	m_swerve.SetPIDValues();
+
+	//m_swerve.Disable();
+
+#ifdef BIT_IS_ENABLED
+	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
+#endif
 	printf("AutonomousInit()\n");
 }
 

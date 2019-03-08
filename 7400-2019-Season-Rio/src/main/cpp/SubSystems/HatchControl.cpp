@@ -114,27 +114,22 @@ void HatchControl::Periodic()
 	{
 		case eHatchGrabStateInitialize:
 			m_hatchGrab.Set(-0.4);
-
-			if(g_rc.m_cargoSwitch.Get())
+		
+			if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
 			{
-				if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
+				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
-					if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
-					{
-						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
-						m_hatchGrabState = eHatchGrabStateNotHolding;
-					}
+					m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
+					m_hatchGrabState = eHatchGrabStateNotHolding;
 				}
 			}
-			else
+
+			if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
 			{
-				if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
+				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
-					if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
-					{
-						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
-						m_hatchGrabState = eHatchGrabStateAcquried;
-					}
+					m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
+					m_hatchGrabState = eHatchGrabStateAcquried;
 				}
 			}
 
@@ -144,7 +139,7 @@ void HatchControl::Periodic()
 			grabError = m_hatchGrabInitialPosition - m_hatchGrab.GetSelectedSensorPosition();
 			
 			if(m_hatchSliderState == eHatchSliderStateOut)
-				m_hatchGrab.Set(-0.3);
+				m_hatchGrab.Set(-0.4);
 
 			if(m_hatchGrab.GetSelectedSensorPosition() >= 310)
 				m_hatchGrabState = eHatchGrabStateNotHolding;
@@ -163,9 +158,9 @@ void HatchControl::Periodic()
 			break;
 
     	case eHatchGrabStateAcquried:
-			m_hatchGrab.Set(-0.2);
+			m_hatchGrab.Set(-0.4);
 
-			if(!g_rc.m_bCargo && (g_rc.m_bAction && g_rc.IsLadderAtHeight()) || g_rc.m_bAbort)
+			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
 			if(m_hatchSliderState == eHatchSliderStateOut)
@@ -189,7 +184,7 @@ void HatchControl::Periodic()
 			grabError = 0 - m_hatchGrab.GetSelectedSensorPosition();
 			m_hatchGrab.Set(0.2);
 
-			if(fabs(grabError) <= 5)
+			if(fabs(grabError) <= 20)
 			{
 				m_hatchSliderState = eHatchSliderStateMovingIn;
 				m_hatchGrabState = eHatchGrabStateWaiting;
@@ -199,6 +194,9 @@ void HatchControl::Periodic()
 		
 		case eHatchGrabStateWaiting:
 			m_hatchGrab.Set(0);
+
+			if(!g_rc.m_bCargo)
+				g_rc.m_ladderTargetHeight = eLadderHeightGround;
 
 			if(!g_rc.m_bCargo && g_rc.m_bAction)
 				m_hatchSliderState = eHatchSliderStateMovingOut;

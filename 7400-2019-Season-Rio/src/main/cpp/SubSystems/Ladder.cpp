@@ -50,7 +50,7 @@ void Ladder::Periodic()
 {
     ProcessLadderStates();
     // Uncoment to following line to force ladder buttons to be enabled
-    m_ladderState = eLadderStateEnabled; 
+    m_ladderState = eLadderStateEnabled;
 }
 
 void Ladder::ProcessLadderStates()

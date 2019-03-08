@@ -30,6 +30,30 @@ void NavXGyro::ZeroYaw()
 	m_yawCorrection = m_gyro.GetYaw();
 
 	printf("Yaw correction %.6f\n", m_yawCorrection);
+
+	FILE *pFile = NULL;	
+
+	char filename [120];
+
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[80];
+	tstruct = *localtime(&now);
+
+	strftime(buf, sizeof(buf), "%Y-%m-%d-%H-%M-%S", &tstruct);
+
+
+	sprintf(filename, "/home/lvuser/yaw_%s.txt", buf);
+
+	pFile = fopen(filename, "wb");
+
+	printf("Filename: %s\n", filename);
+
+	if (pFile)
+	{
+		fprintf(pFile, "%.6f", m_yawCorrection);
+		fclose(pFile);
+	}
 }
 
 float NavXGyro::Yaw()

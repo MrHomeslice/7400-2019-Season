@@ -50,7 +50,7 @@ class RobotControl
 				void AutoMoveToTarget();
 				bool PeriodicTest();
 				bool XYZChanged();
-				void Initialize();
+				void Initialize(bool bFlip);
 
 				double X();
 				double Y();
@@ -71,7 +71,7 @@ class RobotControl
 
 				DriveJoystick m_driveJoystick;
 
-				bool m_bCargo, m_bAllign, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
+				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
 				int  m_flippedStateValue;
 
 				frc::DigitalInput m_cargoSwitch, m_fieldSwitch;

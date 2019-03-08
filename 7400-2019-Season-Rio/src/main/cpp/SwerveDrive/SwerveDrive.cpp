@@ -150,7 +150,7 @@ int SwerveDrive::GetSteerPosition(int module)
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
 { 	
-	z /= g_mp.m_zScale;
+	z /= 2;//g_mp.m_zScale;
 
 	RectangularToBoundedCircle(x, y);
 
