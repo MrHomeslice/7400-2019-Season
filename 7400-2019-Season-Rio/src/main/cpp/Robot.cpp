@@ -62,7 +62,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 		if(bControlChanged)
 		{
-			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() || g_rc.m_bAllign ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
+			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
 
 		m_swerve.Periodic();

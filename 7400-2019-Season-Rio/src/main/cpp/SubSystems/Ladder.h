@@ -5,8 +5,9 @@
 #include "Defines.h"
 #include "..\CanSimulator.h"
 
-#define LADDER_GROUND_HEIGHT       0
-#define LADDER_CARGO_SHIP_HEIGHT   15000
+#define LADDER_GROUND_HEIGHT        0
+#define LADDER_CARGO_SHIP_HEIGHT    15000
+#define LADDER_RECEIVE_CARGO_HEIGHT 2500
 
 #define LADDER_HATCH_TOP_HEIGHT    30000
 #define LADDER_HATCH_MID_HEIGHT    15000

@@ -73,21 +73,23 @@ int Ladder::GetTargetLadderPosition()
 {
     switch(g_rc.m_ladderTargetHeight)
     {
-        case eLadderHeightGround      : return LADDER_GROUND_HEIGHT;
+        case eLadderHeightGround       : return LADDER_GROUND_HEIGHT;
 
-        case eLadderHeightCargoShip   : return LADDER_CARGO_SHIP_HEIGHT;
+        case eLadderHeightCargoShip    : return LADDER_CARGO_SHIP_HEIGHT;
 
-	    case eLadderHeightCargoBottom : return LADDER_CARGO_BOTTOM_HEIGHT;
+        case eLadderHeightReceiveCargo : return LADDER_RECEIVE_CARGO_HEIGHT;
 
-	    case eLadderHeightCargoMid    : return LADDER_CARGO_MID_HEIGHT;
+	    case eLadderHeightCargoBottom  : return LADDER_CARGO_BOTTOM_HEIGHT;
+
+	    case eLadderHeightCargoMid     : return LADDER_CARGO_MID_HEIGHT;
         
-        case eLadderHeightCargoTop    : return LADDER_CARGO_TOP_HEIGHT;
+        case eLadderHeightCargoTop     : return LADDER_CARGO_TOP_HEIGHT;
         
-        case eLadderHeightHatchBottom : return LADDER_HATCH_BOTTOM_HEIGHT;
+        case eLadderHeightHatchBottom  : return LADDER_HATCH_BOTTOM_HEIGHT;
         
-        case eLadderHeightHatchMid    : return LADDER_HATCH_MID_HEIGHT;
+        case eLadderHeightHatchMid     : return LADDER_HATCH_MID_HEIGHT;
         
-        case eLadderHeightHatchTop    : return LADDER_HATCH_TOP_HEIGHT;
+        case eLadderHeightHatchTop     : return LADDER_HATCH_TOP_HEIGHT;
         
     }
 

@@ -348,7 +348,7 @@ void RobotControl::ReadButtons()
 
 bool RobotControl::RobotCentric()
 {
-	return m_driveJoystick.CentricityToggle()->Value() || m_bAllign;
+	return m_driveJoystick.CentricityToggle()->Value();
 }
 
 void RobotControl::CargoEjected()

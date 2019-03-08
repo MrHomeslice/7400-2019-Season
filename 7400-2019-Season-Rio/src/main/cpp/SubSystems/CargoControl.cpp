@@ -104,6 +104,8 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateDown:
 			m_cargoCaptureTilt.Set(0);
 
+			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
+
 			if(g_rc.m_bCargo && g_rc.m_bAction)
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
