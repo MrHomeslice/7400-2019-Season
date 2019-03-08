@@ -45,7 +45,7 @@ class CargoControl
 {
 	public    : CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID);
 
-				void Initialize(bool bFlip);
+				void Initialize(bool bAuton);
 				void Periodic();
 				
 				CargoState 		  GetCargoState();
@@ -77,6 +77,7 @@ class CargoControl
         		bool m_bGlobeTrotterMode;
         		bool m_bFlipped;
 				bool m_bChangeHeight;
+				bool m_bAuton;
 };
 
 #endif

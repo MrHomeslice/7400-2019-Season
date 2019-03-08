@@ -26,10 +26,10 @@ RobotControl::RobotControl()
 	m_printCounter = 0;
 }
 
-void RobotControl::Initialize(bool bFlip)
+void RobotControl::Initialize(bool bAuton)
 {
 	m_ladder.Initialize();
-	m_cargoControl.Initialize(bFlip);
+	m_cargoControl.Initialize(bAuton);
 	m_hatchControl.Initialize();
 
 	m_printCounter = 0;
@@ -297,10 +297,10 @@ void RobotControl::ReadButtons()
 		printf("Centricity Value: %d\n", m_driveJoystick.CentricityToggle()->Value());
 	}
 
-	if(m_driveJoystick.CameraSelection()->Changed() && m_driveJoystick.CameraSelection()->Pressed())
+	/*if(m_driveJoystick.CameraSelection()->Changed() && m_driveJoystick.CameraSelection()->Pressed())
 	{
 		g_tc.PutDouble("Jetson/Camera", m_driveJoystick.CameraSelection()->Value());
-	}
+	}*/
 }
 
 bool RobotControl::RobotCentric()

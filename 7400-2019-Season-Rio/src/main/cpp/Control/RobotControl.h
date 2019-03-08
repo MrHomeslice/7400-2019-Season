@@ -50,7 +50,7 @@ class RobotControl
 				void AutoMoveToTarget();
 				bool PeriodicTest();
 				bool XYZChanged();
-				void Initialize(bool bFlip);
+				void Initialize(bool bAuton);
 
 				double X();
 				double Y();

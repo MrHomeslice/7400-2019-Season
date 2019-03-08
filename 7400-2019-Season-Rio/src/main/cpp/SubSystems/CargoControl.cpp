@@ -22,7 +22,7 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, in
 		m_printCounter = 0;
 }
 
-void CargoControl::Initialize(bool bFlip)
+void CargoControl::Initialize(bool bAuton)
 {
 	m_leftGrabberMotor.SetSafetyEnabled(false);
 	m_rightGrabberMotor.SetSafetyEnabled(false);
@@ -33,8 +33,13 @@ void CargoControl::Initialize(bool bFlip)
 	m_cargoStateCounter = 0;
 	m_currentCounter = 0;
 
-	if(bFlip)
+	m_bAuton = bAuton;
+
+	if(m_bAuton)
+	{
 		m_pneumatics.Flip(false);
+	}
+	
 
 	m_cargoCaptureTilt.Set(-0.3);
 	m_cargoCaptureTilt.SetSelectedSensorPosition(0);
@@ -119,6 +124,7 @@ void CargoControl::Periodic()
 
 			if(g_rc.m_bAbort)
 			{
+				g_rc.m_ladderTargetHeight = eLadderHeightGround;
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
 			}
@@ -150,6 +156,7 @@ void CargoControl::Periodic()
 			if(g_rc.m_bAbort)
 			{
 			//	printf("***ABORTING***\n");
+			g_rc.m_ladderTargetHeight = eLadderHeightGround;
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
 			}
@@ -160,7 +167,7 @@ void CargoControl::Periodic()
 	switch(m_cargoState)
 	{
 		case eCargoStateInitialize:
-			if(g_rc.m_cargoSwitch.Get())
+			if(g_rc.m_cargoSwitch.Get() && m_bAuton)
 			{
 				m_cargoState = eCargoStateHardPullIn;
 			}
