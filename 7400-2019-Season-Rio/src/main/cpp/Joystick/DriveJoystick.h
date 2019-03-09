@@ -16,18 +16,17 @@ class DriveJoystick : public MeeseeksJoystick
 				JSButton *CargoShipHeight() { return &m_cargoShipHeight; }
 				JSButton *Abort() 			{ return &m_abort; 			 }
 				JSButton *Flip()			{ return &m_flip;			 }
-				JSButton *ZeroGyro()		{ return &m_zeroGyro;		 }
 
 				JoystickValueButton *CentricityToggle() { return &m_centricityToggle; }
-				//JoystickValueButton *CameraSelection()  { return &m_cameraSelection;  }
+				JoystickValueButton *CameraSelection()  { return &m_cameraSelection;  }
 
 				
 				
 				void Periodic();
 	protected :
-				JSButton m_allign, m_action, m_stationIntake, m_abort, m_flip, m_zeroGyro;
+				JSButton m_allign, m_action, m_stationIntake, m_abort, m_flip;
 				JSButton m_topHeight, m_midHeight, m_bottomHeight, m_cargoShipHeight;
-				JoystickValueButton  m_centricityToggle;//, m_cameraSelection;
+				JoystickValueButton  m_centricityToggle, m_cameraSelection;
 				
 				
 };
