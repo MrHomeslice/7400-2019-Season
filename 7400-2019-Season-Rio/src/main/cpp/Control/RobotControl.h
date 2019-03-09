@@ -47,7 +47,7 @@ class RobotControl
 	public    : RobotControl();
 
 				bool Periodic(bool bTeleop);
-				void AutoMoveToTarget();
+				bool AutoMoveToTarget();
 				bool PeriodicTest();
 				bool XYZChanged();
 				void Initialize(bool bFlip);
@@ -73,6 +73,8 @@ class RobotControl
 
 				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
 				int  m_flippedStateValue;
+
+				bool m_bAlligning;
 
 				frc::DigitalInput m_cargoSwitch, m_fieldSwitch;
 

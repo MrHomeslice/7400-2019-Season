@@ -24,6 +24,8 @@ RobotControl::RobotControl()
 	m_bXYZChanged = false;
 
 	m_printCounter = 0;
+
+	m_bAlligning = false;
 }
 
 void RobotControl::Initialize(bool bFlip)
@@ -85,10 +87,20 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	//printf("%d %d\n", IsLadderAtHeight(), m_ladder.GetLadderPosition());
 
-	
-	m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 	m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
-	m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
+
+
+	if(m_bAlligning)
+	{
+		m_bAlligning = AutoMoveToTarget();
+	}
+	else
+	{
+		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
+		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
+	}
+	
+	
 
 	m_slider = (m_driveJoystick.GetThrottle() + 1) / 2;
 	m_pov    =  m_driveJoystick.GetPOV();
@@ -122,96 +134,43 @@ bool RobotControl::Periodic(bool bTeleop)
 
 // #define MIKEES_NOT_WORKING
 
-void RobotControl::AutoMoveToTarget()
+bool RobotControl::AutoMoveToTarget()
 {
 	double targetLineSlope = g_tc.GetDouble("Target/LineSlope", -1000.0);
 	double targetXDelta    = g_tc.GetDouble("Target/XOffset",    -1000.0);
 	double targetDistance  = g_tc.GetDouble("Target/Distance",  -1000.0);
 
-	// printf("%.6f %.6f %.6f\n", targetLineSlope, targetXDelta, targetDistance);
 
 	if (targetLineSlope == -1000 || targetXDelta == -1000 || targetDistance == -1000) //Lost tracked target
 	{
-		m_x = 0.0;
-		m_y = 0.0;
-		m_z = 0.0;
-		
-		return;
+			return false;
 	}
-
-#ifdef MIKEES_NOT_WORKING	
-
-	double lateral = 0.0;
-	double twist = 0.0;
-
-	bool finishedRot = false;
-	bool finishedLat = false;
 
 	if (fabs(targetLineSlope) > 0.01)
 	{
-		if (targetDistance > 30)
-		{
-			twist = targetLineSlope * 1.5 / 100.0;
-		}
-		else
-		{
-			twist = targetLineSlope * 1.5f * (targetDistance / 30.0f) / 100.0;
-		}
-	}
-	else
-	{
-		finishedRot = true;
+			if (targetDistance > 30)
+			{
+				m_z = (targetLineSlope * 1.5) * 2.0;
+			}
+			else
+			{
+				m_z = (targetLineSlope * 1.5 * (targetDistance / 30.0)) * 2.0;
+			}
 	}
 
 	if (fabs(targetXDelta) > 5)
 	{
-		if (targetDistance > 30)
-		{
-			lateral = -targetXDelta / 10.0 * 2.5;
-		}
-		else
-		{
-			lateral = -targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0f) / 100.0;
-		}
-	}
-	else
-	{
-		finishedLat = true;
+			if (targetDistance > 30)
+			{
+				m_x = (-targetXDelta / 10.0 * 2.5) / 80.0 / 2.0; //TargetXDelta max = 320
+			}
+			else
+			{
+				m_x = (-targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0)) / 40.0 / 2.0;
+			}
 	}
 
-	double forward = (finishedRot && finishedLat) ? -15.0 / 15: -7.5 / 100.0;
-#endif
-
-  // m_x = lateral;
-	// m_y = forward;
-	// m_z = twist;
-
-	// printf("%.6f %.6f %.6f\n", lateral, forward, twist);
-
-	m_x = targetXDelta / 320.0;
-	m_z = targetLineSlope / -0.5;
-
-	if (m_x > 0.6)
-	 	m_x = 0.6;
-	if (m_x < -0.6)
-		m_x = -0.6;
-
-		
-	if (m_z > 0.6)
-	 	m_z = 0.6;
-	if (m_z < -0.6)
-		m_z = -0.6;
-
-
-	printf("%.6f %.6f %.6f\n", m_x, m_y, m_z);
-
-	// printf("%.6f %.6f\n", targetXDelta, m_x);
-
-	//transform.Translate(lateral * Time.deltaTime, 0.0f, forward * Time.deltaTime);
-
-
-
-  //transform.eulerAngles = new Vector3(0.0f, -heading * 10.0f, 0.0f);
+	return true;
 }
 
 bool RobotControl::XYZChanged()
@@ -241,8 +200,9 @@ bool RobotControl::Cargo()
 
 void RobotControl::ReadButtons()
 {
-	if(m_driveJoystick.Allign()->Changed() && m_driveJoystick.Allign()->Pressed())
+	if(m_driveJoystick.Allign()->Changed())
 	{ 
+		m_bAlligning = m_driveJoystick.Allign()->Pressed();
 	}
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();
