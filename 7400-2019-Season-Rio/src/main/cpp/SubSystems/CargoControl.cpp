@@ -128,7 +128,7 @@ void CargoControl::Periodic()
 			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
 			printf("**MOVING DOWN**\n");
 
-			m_cargoCaptureTilt.Set(-0.5); //-0.5
+			m_cargoCaptureTilt.Set(-0.5);
 			m_cargoCaptureIntake.Set(1.0);
 
 			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= CAPTURE_TILT_DOWN_POSITION)

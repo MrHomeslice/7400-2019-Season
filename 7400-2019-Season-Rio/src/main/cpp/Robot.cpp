@@ -59,7 +59,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 		if(g_rc.m_driveJoystick.ZeroGyro()->Pressed() && g_rc.m_driveJoystick.ZeroGyro()->Changed())
 		{
 			m_gyro.ZeroYaw();
-			printf("Zero Yaw**********\n");
+			printf("***Zero Yaw***\n");
 		}
 	#endif
 }
