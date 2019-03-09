@@ -181,10 +181,10 @@ void HatchControl::Periodic()
 			break;
 		
 		case eHatchGrabStateEjecting:
-			grabError = 0 - m_hatchGrab.GetSelectedSensorPosition();
+			grabError = -10 - m_hatchGrab.GetSelectedSensorPosition();
 			m_hatchGrab.Set(0.2);
 
-			if(fabs(grabError) <= 20)
+			if(fabs(grabError) <= 10)
 			{
 				m_hatchSliderState = eHatchSliderStateMovingIn;
 				m_hatchGrabState = eHatchGrabStateWaiting;

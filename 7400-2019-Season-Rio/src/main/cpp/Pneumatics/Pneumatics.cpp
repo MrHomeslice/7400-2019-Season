@@ -12,7 +12,7 @@ void Pneumatics::Initialize()
 
 void Pneumatics::Flip(bool bFlip)
 {
-	if (m_pFlip)
+	if(m_pFlip)
 	{
 		printf("%d %d\n", bFlip, m_bFlip);
 		m_bFlip = bFlip;

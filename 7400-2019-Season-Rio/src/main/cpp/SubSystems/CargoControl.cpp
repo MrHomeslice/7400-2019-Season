@@ -45,11 +45,8 @@ void CargoControl::Periodic()
 	static int oldState = -100;
 	if(oldState != m_cargoCaptureState)
 	{
-		//printf("%d\n\n", m_cargoCaptureState);
 		oldState = m_cargoCaptureState;
 	}
-
-	
 
 	if(g_rc.m_bCargo && g_rc.m_driveJoystick.Flip()->Pressed() && g_rc.m_driveJoystick.Flip()->Changed())
 	{
@@ -62,7 +59,7 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateInitialize:
 			m_cargoCaptureIntake.Set(0.0);
 
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500) //200
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500)
 			{
 				m_cargoCaptureState = eCargoCaptureStateToReady;
 			}
@@ -70,14 +67,14 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateToReady:
-			m_cargoCaptureTilt.Set(0.5); //0.5
+			m_cargoCaptureTilt.Set(0.5);
 
 			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
 			{
 				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
 				{
 					m_cargoCaptureTilt.SetSelectedSensorPosition(10);
-					m_cargoCaptureTilt.Set(-0.5); //-0.5
+					m_cargoCaptureTilt.Set(-0.5);
 					m_cargoCaptureState = eCargoCaptureStateUp;
 				}
 			}
@@ -92,10 +89,10 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingUp:
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 500) //500
-				m_cargoCaptureTilt.Set(0.3); //0.3
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 500)
+				m_cargoCaptureTilt.Set(0.3);
 			else
-				m_cargoCaptureTilt.Set(1.0); //1.0
+				m_cargoCaptureTilt.Set(1.0);
 
 			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 200)
 			{
@@ -128,8 +125,6 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingDown:
-			//printf("Moving Down\n");
-
 			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
 			printf("**MOVING DOWN**\n");
 
@@ -138,20 +133,17 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= CAPTURE_TILT_DOWN_POSITION)
 			{
-			//	printf("***DOWN***\n");
 				m_cargoCaptureState = eCargoCaptureStateDown;
 			}
 
 			if(g_rc.m_bCargo && g_rc.m_bAction)
 			{
-			//	printf("***ACTION***\n");
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoState = eCargoStateHardPullIn;
 			}
 
 			if(g_rc.m_bAbort)
 			{
-			//	printf("***ABORTING***\n");
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
 			}
@@ -290,7 +282,7 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureState == eCargoCaptureStateUp)
 			{
-				//printf("**%d %d**\n", g_rc.m_bCargo, g_rc.m_bAction);
+
 				if(g_rc.m_bCargo && g_rc.m_bAction)
 				{
 					m_cargoCaptureState = eCargoCaptureStateMovingDown;
