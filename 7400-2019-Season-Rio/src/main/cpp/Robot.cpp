@@ -49,7 +49,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 		bool bControlChanged = g_rc.Periodic(true);
 
-		if(bControlChanged)
+		if (bControlChanged)
 		{
 			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0.01 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
@@ -66,6 +66,8 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 void Robot::AutonomousInit()
 {
+
+	
 	//m_swerve.SetSteerOffsets();
 	m_gyro.ZeroYaw();
 	printf("Gyro Zeroed\n");

@@ -94,12 +94,14 @@ void SwerveDrive::RotateCorners(double rotation, eRotationPoint rotationPoint, D
 
 void SwerveDrive::TransformRotatedCorners(double x, double y, double yaw, DoubleXY *pSource, DoubleXY *pDest)
 {
+
    x *= g_transformScale;
    y *= g_transformScale;
 
+	double tempX = x;
+	double tempY = y;
+	
    double yawRadians = -M_PI * yaw / 180.0;
-
-
 
    double cosGyro = cos(yawRadians);
    double sinGyro = sin(yawRadians);
@@ -109,6 +111,9 @@ void SwerveDrive::TransformRotatedCorners(double x, double y, double yaw, Double
 
    transform.x =  x * cosGyro + y * sinGyro;
    transform.y = -x * sinGyro + y * cosGyro;
+
+	printf("oldX: %0.6f newX: %0.6f oldY: %0.6f newY: %0.6f\n", tempX, transform.x, tempY, transform.y);
+
 
    for (int index = 0; index<4; index++)
 	  pDest[index] = pSource[index] + transform;
@@ -153,6 +158,8 @@ int SwerveDrive::GetSteerPosition(int module)
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
 {
+
+
 	z *= 0.75;
 	RectangularToBoundedCircle(x, y);
 
