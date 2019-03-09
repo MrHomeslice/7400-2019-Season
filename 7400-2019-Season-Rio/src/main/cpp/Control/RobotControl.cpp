@@ -297,10 +297,10 @@ void RobotControl::ReadButtons()
 		printf("Centricity Value: %d\n", m_driveJoystick.CentricityToggle()->Value());
 	}
 
-	if(m_driveJoystick.CameraSelection()->Changed() && m_driveJoystick.CameraSelection()->Pressed())
+	/*if(m_driveJoystick.CameraSelection()->Changed() && m_driveJoystick.CameraSelection()->Pressed())
 	{
 		g_tc.PutDouble("Jetson/Camera", m_driveJoystick.CameraSelection()->Value());
-	}
+	}*/
 }
 
 bool RobotControl::RobotCentric()

@@ -49,6 +49,8 @@ void CargoControl::Periodic()
 		oldState = m_cargoCaptureState;
 	}
 
+	
+
 	if(g_rc.m_bCargo && g_rc.m_driveJoystick.Flip()->Pressed() && g_rc.m_driveJoystick.Flip()->Changed())
 	{
 		printf("FLOPPING\n");
