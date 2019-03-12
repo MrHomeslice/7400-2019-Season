@@ -85,8 +85,6 @@ bool RobotControl::Periodic(bool bTeleop)
 {
 	m_driveJoystick.Periodic();
 
-	//printf("%d %d\n", IsLadderAtHeight(), m_ladder.GetLadderPosition());
-
 	m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
 
 
@@ -127,7 +125,8 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_bXYZChanged = false;
 	}
 
-	m_bCargo = m_driveJoystick.GetThrottle() > 0.0 ? true : false;
+	m_bCargo = m_driveJoystick.GetThrottle() > 0.0 && m_hatchControl.GetHatchGrabState() == eHatchGrabStateWaiting
+			   && m_hatchControl.GetHatchMoveState() == eHatchSliderStateIn ? true : false;
 
 	return m_bXYZChanged;
 }
@@ -260,7 +259,7 @@ void RobotControl::ReadButtons()
 	/*if(m_driveJoystick.CameraSelection()->Changed() && m_driveJoystick.CameraSelection()->Pressed())
 	{
 		g_tc.PutDouble("Jetson/Camera", m_driveJoystick.CameraSelection()->Value());
-	}*/
+	}*/	
 }
 
 bool RobotControl::RobotCentric()
