@@ -64,7 +64,7 @@ bool RobotControl::PeriodicTest()
 		
 		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 		m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
-		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
+		m_z =  pow(m_driveJoystick.GetZ(), 2 + (1/3.0));//Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
 	{
@@ -90,7 +90,7 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	if(m_bAlligning)
 	{
-		m_bAlligning = AutoMoveToTarget();
+		AutoMoveToTarget();
 	}
 	else
 	{
@@ -136,37 +136,37 @@ bool RobotControl::Periodic(bool bTeleop)
 bool RobotControl::AutoMoveToTarget()
 {
 	double targetLineSlope = g_tc.GetDouble("Target/LineSlope", -1000.0);
-	double targetXDelta    = g_tc.GetDouble("Target/XOffset",    -1000.0);
+	double targetXDelta    = g_tc.GetDouble("Target/XOffset",   -1000.0);
 	double targetDistance  = g_tc.GetDouble("Target/Distance",  -1000.0);
 
 
 	if (targetLineSlope == -1000 || targetXDelta == -1000 || targetDistance == -1000) //Lost tracked target
 	{
-			return false;
+		return false;
 	}
 
 	if (fabs(targetLineSlope) > 0.01)
 	{
-			if (targetDistance > 30)
-			{
-				m_z = (targetLineSlope * 1.5) * 2.0;
-			}
-			else
-			{
-				m_z = (targetLineSlope * 1.5 * (targetDistance / 30.0)) * 2.0;
-			}
+		if (targetDistance > 30)
+		{
+			m_z = (targetLineSlope * 1.5) * 2.0;
+		}
+		else
+		{
+			m_z = (targetLineSlope * 1.5 * (targetDistance / 30.0)) * 2.0;
+		}
 	}
 
 	if (fabs(targetXDelta) > 5)
 	{
-			if (targetDistance > 30)
-			{
-				m_x = (-targetXDelta / 10.0 * 2.5) / 80.0 / 2.0; //TargetXDelta max = 320
-			}
-			else
-			{
-				m_x = (-targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0)) / 40.0 / 2.0;
-			}
+		if (targetDistance > 30)
+		{
+			m_x = (-targetXDelta / 10.0 * 2.5) / 80.0 / 2.0; //TargetXDelta max = 320
+		}
+		else
+		{
+			m_x = (-targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0)) / 40.0 / 2.0;
+		}
 	}
 
 	return true;
@@ -199,10 +199,7 @@ bool RobotControl::Cargo()
 
 void RobotControl::ReadButtons()
 {
-	if(m_driveJoystick.Allign()->Changed())
-	{ 
-		m_bAlligning = m_driveJoystick.Allign()->Pressed();
-	}
+	m_bAlligning = m_driveJoystick.Allign()->Pressed();
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();
 
@@ -264,7 +261,7 @@ void RobotControl::ReadButtons()
 
 bool RobotControl::RobotCentric()
 {
-	return m_driveJoystick.CentricityToggle()->Value();
+	return m_driveJoystick.CentricityToggle()->Value() || m_bAlligning;
 }
 
 void RobotControl::CargoEjected()
