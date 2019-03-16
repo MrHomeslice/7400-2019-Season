@@ -119,17 +119,17 @@ void HatchControl::Periodic()
 			{
 				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
-					m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
-					m_hatchGrabState = eHatchGrabStateNotHolding;
-				}
-			}
-
-			if(m_hatchGrab.GetOutputCurrent() >= HATCH_GRAB_CURRENT_THRESHOLD)
-			{
-				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
-				{
-					m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
-					m_hatchGrabState = eHatchGrabStateAcquried;
+					if(!g_rc.m_cargoSwitch.Get() && g_rc.m_gamePieceSwitch.Get())
+					{
+						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
+						m_hatchGrabState = eHatchGrabStateAcquried;
+					}
+					else
+					{
+						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
+						m_hatchGrabState = eHatchGrabStateNotHolding;
+					}
+					
 				}
 			}
 
