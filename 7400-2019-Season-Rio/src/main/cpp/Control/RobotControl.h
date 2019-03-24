@@ -84,6 +84,7 @@ class RobotControl
 				LadderHeight   m_ladderTargetHeight;
 	protected :
 				double Deadband(double x, double d);
+				double Deadpool(double x, double exponent);
 
 				int 		   m_pov, m_printCounter;
 				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;

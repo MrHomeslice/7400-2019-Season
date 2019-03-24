@@ -64,7 +64,7 @@ bool RobotControl::PeriodicTest()
 		
 		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 		m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
-		m_z =  pow(m_driveJoystick.GetZ(), 2 + (1/3.0));//Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
+		m_z =  Deadpool(m_driveJoystick.GetZ(), 2.0 + (1.0/3.0)); //Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
 	{
@@ -283,10 +283,18 @@ LadderHeight RobotControl::GetCargoShipCargoHeight()
 
 LadderHeight RobotControl::GetGroundHeight()
 {
-
+	return eLadderHeightGround;
 }
 
 int RobotControl::GetLadderPosition()
 {
 	return m_ladder.m_pDrives[0]->GetSelectedSensorPosition();
+}
+
+double RobotControl::Deadpool(double z, double exponent)
+{
+	if(z > 0)
+		return pow(z, exponent);
+	else
+		return -pow(-z, exponent);
 }
