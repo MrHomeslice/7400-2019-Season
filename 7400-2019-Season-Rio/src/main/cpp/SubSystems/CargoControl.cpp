@@ -125,7 +125,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingDown:
-			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
+			g_rc.m_ladderTargetHeight = eLadderHeightReceivePiece;
 			printf("**MOVING DOWN**\n");
 
 			m_cargoCaptureTilt.Set(-0.5);

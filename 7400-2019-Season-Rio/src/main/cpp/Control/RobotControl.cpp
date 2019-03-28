@@ -87,10 +87,8 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
 
-
 	if(m_bAlligning)
 	{
-		m_driveJoystick.CentricityToggle()->Value(1);
 		AutoMoveToTarget();
 	}
 	else
@@ -203,7 +201,10 @@ void RobotControl::ReadButtons()
 	m_bAlligning = m_driveJoystick.Allign()->Pressed();
 	
 	if(m_bAlligning)
+	{
 		m_driveJoystick.CentricityToggle()->Value(1);
+		m_ladderTargetHeight = eLadderHeightReceivePiece;
+	}
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();
 

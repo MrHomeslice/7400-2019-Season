@@ -77,7 +77,7 @@ int Ladder::GetTargetLadderPosition()
 
         case eLadderHeightCargoShip    : return LADDER_CARGO_SHIP_HEIGHT;
 
-        case eLadderHeightReceiveCargo : return LADDER_RECEIVE_CARGO_HEIGHT;
+        case eLadderHeightReceivePiece : return LADDER_RECEIVE_CARGO_HEIGHT;
 
 	    case eLadderHeightCargoBottom  : return LADDER_CARGO_BOTTOM_HEIGHT;
 
