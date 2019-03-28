@@ -90,6 +90,7 @@ bool RobotControl::Periodic(bool bTeleop)
 
 	if(m_bAlligning)
 	{
+		m_driveJoystick.CentricityToggle()->Value(1);
 		AutoMoveToTarget();
 	}
 	else
@@ -200,6 +201,9 @@ bool RobotControl::Cargo()
 void RobotControl::ReadButtons()
 {
 	m_bAlligning = m_driveJoystick.Allign()->Pressed();
+	
+	if(m_bAlligning)
+		m_driveJoystick.CentricityToggle()->Value(1);
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();
 
