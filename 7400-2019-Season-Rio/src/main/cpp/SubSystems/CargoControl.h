@@ -72,6 +72,7 @@ class CargoControl
      	   		int m_DICounter;
         		int m_hatchGrabInitialPosition;
 				int m_printCounter;
+				int m_cargoHardPullCounter;
 
         		bool m_bCargoIntakeTestWaiting;
         		bool m_bGlobeTrotterMode;
