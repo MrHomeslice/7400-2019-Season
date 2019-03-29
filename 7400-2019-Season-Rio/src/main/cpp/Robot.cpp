@@ -28,7 +28,7 @@ void Robot::RobotInit()
 
 void Robot::TeleopInit()
 {
-	g_rc.Initialize(false);
+	//g_rc.Initialize(false);
 
 	//m_swerve.Disable();
 }
@@ -68,7 +68,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 void Robot::AutonomousInit()
 {
-	m_swerve.SetSteerOffsets();
+	//m_swerve.SetSteerOffsets();
 	
 	m_gyro.ZeroYaw();
 	printf("Gyro Zeroed\n");

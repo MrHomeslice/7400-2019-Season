@@ -97,8 +97,6 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
 	}
 	
-	
-
 	m_slider = (m_driveJoystick.GetThrottle() + 1) / 2;
 	m_pov    =  m_driveJoystick.GetPOV();
 
@@ -124,8 +122,7 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_bXYZChanged = false;
 	}
 
-	m_bCargo = m_driveJoystick.GetThrottle() > 0.0 && m_hatchControl.GetHatchGrabState() == eHatchGrabStateWaiting
-			   && m_hatchControl.GetHatchMoveState() == eHatchSliderStateIn ? true : false;
+	m_bCargo = m_driveJoystick.GetThrottle() > 0.0;
 
 	return m_bXYZChanged;
 }
@@ -138,35 +135,38 @@ bool RobotControl::AutoMoveToTarget()
 	double targetXDelta    = g_tc.GetDouble("Target/XOffset",   -1000.0);
 	double targetDistance  = g_tc.GetDouble("Target/Distance",  -1000.0);
 
+	double m = 40/12.0;
+
+	targetXDelta -= 200;//(m*(targetDistance-23)+80);
 
 	if (targetLineSlope == -1000 || targetXDelta == -1000 || targetDistance == -1000) //Lost tracked target
 	{
-		return false;
+		m_x = 0.0;
+		m_z = 0.0;
+		return true;
 	}
 
 	if (fabs(targetLineSlope) > 0.01)
 	{
-		if (targetDistance > 30)
-		{
-			m_z = (targetLineSlope * 1.5) * 2.0;
-		}
-		else
-		{
-			m_z = (targetLineSlope * 1.5 * (targetDistance / 30.0)) * 2.0;
-		}
+		m_x = targetLineSlope * (targetDistance / 120.0) * 2.0 * 5.0;
 	}
+	else
+	{
+		m_x = 0.0;
+	}
+	
 
 	if (fabs(targetXDelta) > 5)
 	{
-		if (targetDistance > 30)
-		{
-			m_x = (-targetXDelta / 10.0 * 2.5) / 80.0 / 2.0; //TargetXDelta max = 320
-		}
-		else
-		{
-			m_x = (-targetXDelta / 10.0 * 2.5 * (targetDistance / 60.0)) / 40.0 / 2.0;
-		}
+		m_z = targetXDelta * (targetDistance / 120.0) / 150.0;
+
 	}
+	else
+	{
+		m_z = 0.0;
+	}
+
+	//printf("m_x: %6.6f\t m_z: %6.6f\n", m_x, m_z);
 
 	return true;
 }
@@ -203,7 +203,6 @@ void RobotControl::ReadButtons()
 	if(m_bAlligning)
 	{
 		m_driveJoystick.CentricityToggle()->Value(1);
-		m_ladderTargetHeight = eLadderHeightReceivePiece;
 	}
 
 	m_bAction = m_driveJoystick.Action()->Changed() && m_driveJoystick.Action()->Pressed();

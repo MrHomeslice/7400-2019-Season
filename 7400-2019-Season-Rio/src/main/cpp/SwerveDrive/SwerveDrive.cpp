@@ -158,9 +158,7 @@ int SwerveDrive::GetSteerPosition(int module)
 
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
 {
-
-
-	z *= 0.75;
+	z *= 1.4;
 	RectangularToBoundedCircle(x, y);
 
 	DoubleXY rotatedCorners[4], transformedCorners[4];

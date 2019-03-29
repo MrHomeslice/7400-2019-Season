@@ -125,7 +125,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingDown:
-			//g_rc.m_ladderTargetHeight = eLadderHeightReceivePiece;
+			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
 			printf("**MOVING DOWN**\n");
 
 			m_cargoCaptureTilt.Set(-0.5);
@@ -196,6 +196,14 @@ void CargoControl::Periodic()
 				m_currentCounter = 0;
 				m_leftGrabberMotor.Set(-0.98);
 				m_rightGrabberMotor.Set(1.0);
+			}
+
+			if(g_rc.m_bAbort)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoCaptureIntake.Set(0.0);
+
+				m_cargoState = eCargoStateEmpty;
 			}
 
 			if(m_lastCargoState == eCargoStateStationIntake && g_rc.m_bAbort)

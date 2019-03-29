@@ -15,6 +15,7 @@ HatchControl::HatchControl(int slideID, int grabberID)
 void HatchControl::Initialize()
 {
 	m_hatchGrabCounter = 0;
+	m_hatchRaiseCounter = 0;
 	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition();
 
 	m_hatchGrabState = eHatchGrabStateInitialize;
@@ -27,6 +28,8 @@ void HatchControl::Periodic()
 	double grabError;
 
 	//printf("%d %.6f\n\n", m_hatchGrabState, m_hatchGrab.GetOutputCurrent());
+
+	printf("%d %d\n", g_rc.m_cargoSwitch.Get(), g_rc.m_gamePieceSwitch.Get());
 
     switch(m_hatchSliderState)
 	{
@@ -139,7 +142,7 @@ void HatchControl::Periodic()
 			grabError = m_hatchGrabInitialPosition - m_hatchGrab.GetSelectedSensorPosition();
 			
 			if(m_hatchSliderState == eHatchSliderStateOut)
-				m_hatchGrab.Set(-0.4);
+				m_hatchGrab.Set(-0.6);
 
 			if(m_hatchGrab.GetSelectedSensorPosition() >= 310)
 				m_hatchGrabState = eHatchGrabStateNotHolding;
@@ -148,6 +151,7 @@ void HatchControl::Periodic()
 			{
 				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
+					m_hatchRaiseCounter = 0;
 					m_hatchGrabState = eHatchGrabStateAcquried;
 					m_hatchSliderState = eHatchSliderStateMovingIn;
 				}
@@ -159,6 +163,11 @@ void HatchControl::Periodic()
 
     	case eHatchGrabStateAcquried:
 			m_hatchGrab.Set(-0.4);
+
+			if(++m_hatchRaiseCounter == 50)
+			{
+				g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch;
+			}
 
 			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
 				m_hatchSliderState = eHatchSliderStateMovingOut;
@@ -182,7 +191,7 @@ void HatchControl::Periodic()
 		
 		case eHatchGrabStateEjecting:
 			grabError = -10 - m_hatchGrab.GetSelectedSensorPosition();
-			m_hatchGrab.Set(0.2);
+			m_hatchGrab.Set(0.4);
 
 			if(fabs(grabError) <= 10)
 			{
