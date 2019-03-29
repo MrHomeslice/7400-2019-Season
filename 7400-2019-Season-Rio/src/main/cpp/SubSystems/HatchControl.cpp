@@ -132,7 +132,6 @@ void HatchControl::Periodic()
 						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
 						m_hatchGrabState = eHatchGrabStateNotHolding;
 					}
-					
 				}
 			}
 
