@@ -18,16 +18,8 @@ void HatchControl::Initialize()
 	m_hatchRaiseCounter = 0;
 	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition();
 
-	if(!g_rc.m_bRestartRobotCode)
-		m_hatchGrabState = eHatchGrabStateInitialize;
-	else
-	{
-		if(fabs(HATCH_GRAB_HOLDING_POSITION - m_hatchGrab.GetSelectedSensorPosition()) <= 10)
-			m_hatchGrabState = eHatchGrabStateAcquried;
-		else
-			m_hatchGrabState = eHatchGrabStateWaiting;
-		
-	}
+	m_hatchGrabState = eHatchGrabStateInitialize;
+	
 	m_hatchSliderState = eHatchSliderStateInitialize;
 }
 
@@ -38,7 +30,7 @@ void HatchControl::Periodic()
 
 	//printf("%d %.6f\n\n", m_hatchGrabState, m_hatchGrab.GetOutputCurrent());
 
-	printf("%d %d\n", g_rc.m_cargoSwitch.Get(), g_rc.m_gamePieceSwitch.Get());
+	//printf("%d %d\n", g_rc.m_cargoSwitch.Get(), g_rc.m_gamePieceSwitch.Get());
 
     switch(m_hatchSliderState)
 	{
@@ -174,14 +166,18 @@ void HatchControl::Periodic()
 
 			if(++m_hatchRaiseCounter == 50)
 			{
-				g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch;
+				//g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch;
 			}
 
 			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
+			{
 				m_hatchSliderState = eHatchSliderStateMovingOut;
+			}
 
 			if(m_hatchSliderState == eHatchSliderStateOut)
+			{
 				m_hatchGrabState = eHatchGrabStateEjecting;
+			}
 
 			break;
 		

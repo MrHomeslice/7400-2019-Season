@@ -26,7 +26,6 @@ RobotControl::RobotControl()
 	m_printCounter = 0;
 
 	m_bAlligning = false;
-	m_bRestartRobotCode = true;
 }
 
 void RobotControl::Initialize(bool bFlip)
@@ -271,7 +270,6 @@ bool RobotControl::RobotCentric()
 
 void RobotControl::CargoEjected()
 {
-	
 	m_ladderTargetHeight = eLadderHeightGround;
 }
 
