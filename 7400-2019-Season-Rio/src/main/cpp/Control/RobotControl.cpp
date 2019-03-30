@@ -26,6 +26,7 @@ RobotControl::RobotControl()
 	m_printCounter = 0;
 
 	m_bAlligning = false;
+	m_bRestartRobotCode = true;
 }
 
 void RobotControl::Initialize(bool bFlip)

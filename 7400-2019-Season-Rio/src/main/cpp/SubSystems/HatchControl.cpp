@@ -18,7 +18,16 @@ void HatchControl::Initialize()
 	m_hatchRaiseCounter = 0;
 	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition();
 
-	m_hatchGrabState = eHatchGrabStateInitialize;
+	if(!g_rc.m_bRestartRobotCode)
+		m_hatchGrabState = eHatchGrabStateInitialize;
+	else
+	{
+		if(fabs(HATCH_GRAB_HOLDING_POSITION - m_hatchGrab.GetSelectedSensorPosition()) <= 10)
+			m_hatchGrabState = eHatchGrabStateAcquried;
+		else
+			m_hatchGrabState = eHatchGrabStateWaiting;
+		
+	}
 	m_hatchSliderState = eHatchSliderStateInitialize;
 }
 
