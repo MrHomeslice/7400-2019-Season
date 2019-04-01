@@ -300,8 +300,6 @@ void CargoControl::Periodic()
 			break;
 	}
 
-	
-
 	if(m_lastCargoState != m_cargoState)
 		m_lastCargoState = m_cargoState;
 }
