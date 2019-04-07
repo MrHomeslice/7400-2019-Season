@@ -123,7 +123,7 @@ void HatchControl::Periodic()
 			{
 				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
-					if(!g_rc.m_cargoSwitch.Get() && g_rc.m_gamePieceSwitch.Get())
+					if(g_rc.m_gamePieceSwitch.Get() && !g_rc.m_cargoSwitch.Get())
 					{
 						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
 						m_hatchGrabState = eHatchGrabStateAcquried;

@@ -154,7 +154,7 @@ void CargoControl::Periodic()
 	switch(m_cargoState)
 	{
 		case eCargoStateInitialize:
-			if(g_rc.m_cargoSwitch.Get() && g_rc.m_gamePieceSwitch.Get())
+			if(g_rc.m_gamePieceSwitch.Get() && g_rc.m_cargoSwitch.Get())
 			{
 				m_cargoState = eCargoStateHardPullIn;
 			}
