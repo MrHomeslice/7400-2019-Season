@@ -7,12 +7,12 @@
 #include "..\CanSimulator.h"
 #include "..\include\Defines.h"
 
-#define EJECT_TIME 25
+#define EJECT_TIME 		  25
+#define FLIP_TIME 		  50
+#define HARD_PULL_IN_TIME 250
 
-#define CARGO_CURRENT_THRESHOLD 5.0
+#define CARGO_CURRENT_THRESHOLD  5.0
 #define CARGO_CURRENT_ITERATIONS 25
-
-#define FLIP_TIME 50
 
 #define CAPTURE_TILT_CURRENT_THRESHOLD  3.0
 #define CAPTURE_TILT_CURRENT_ITERATIONS 5
@@ -63,15 +63,11 @@ class CargoControl
 
 				int m_ejectCounter, m_flippingCounter;
 
-				int m_leftEncoderPosition;
-        		int m_rightEncoderPosition;
-        		int m_currentCounter;
-      	 		int m_cargoStateCounter;
-      	 		int m_hatchGrabCounter;
-      	  		int m_captureCurrentCounter;
-     	   		int m_DICounter;
+				int m_leftEncoderPosition, m_rightEncoderPosition;
+        		int m_currentCounter, m_cargoStateCounter, m_hatchGrabCounter, m_captureCurrentCounter, m_DICounter;
         		int m_hatchGrabInitialPosition;
 				int m_printCounter;
+				int m_hardPullInCounter;
 
         		bool m_bCargoIntakeTestWaiting;
         		bool m_bGlobeTrotterMode;

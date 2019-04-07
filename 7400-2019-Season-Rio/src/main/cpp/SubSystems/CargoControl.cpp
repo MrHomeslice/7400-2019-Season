@@ -20,6 +20,7 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, in
 		m_rightEncoderPosition = 0;
 		m_DICounter = 0;
 		m_printCounter = 0;
+		m_hardPullInCounter = 0;
 }
 
 void CargoControl::Initialize(bool bFlip)
@@ -204,6 +205,15 @@ void CargoControl::Periodic()
 				m_cargoCaptureIntake.Set(0.0);
 
 				m_cargoState = eCargoStateEmpty;
+			}
+
+			if(++m_hardPullInCounter == HARD_PULL_IN_TIME)
+			{
+				m_cargoCaptureState = eCargoCaptureStateMovingUp;
+				m_cargoCaptureIntake.Set(0.0);
+
+				m_cargoState = eCargoStateEmpty;
+				m_hardPullInCounter = 0;
 			}
 
 			if(m_lastCargoState == eCargoStateStationIntake && g_rc.m_bAbort)
