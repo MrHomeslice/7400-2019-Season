@@ -1,6 +1,8 @@
 #include "CargoControl.h"
 #include "..\Control\RobotControl.h"
 
+void SetEncoderPosition(WPI_TalonSRX &talon, int position);
+
 extern RobotControl g_rc;
 
 CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID)
@@ -37,8 +39,8 @@ void CargoControl::Initialize(bool bFlip)
 	if(bFlip)
 		m_pneumatics.Flip(false);
 
-	m_cargoCaptureTilt.Set(-0.3);
-	m_cargoCaptureTilt.SetSelectedSensorPosition(0);
+	m_cargoCaptureTilt.Set(-0.3); //Capture starts to go down
+	SetEncoderPosition(m_cargoCaptureTilt, 0);
 }
 
 void CargoControl::Periodic() 
@@ -49,7 +51,7 @@ void CargoControl::Periodic()
 		oldState = m_cargoCaptureState;
 	}
 
-	if(g_rc.m_bCargo && g_rc.m_driveJoystick.Flip()->Pressed() && g_rc.m_driveJoystick.Flip()->Changed())
+	if(g_rc.m_bCargo && g_rc.m_driveJoystick.Flip()->Pressed() && g_rc.m_driveJoystick.Flip()->Changed()) //manual pneumatics mode, must be in cargo
 	{
 		printf("FLOPPING\n");
 		m_pneumatics.Flop();
@@ -58,9 +60,10 @@ void CargoControl::Periodic()
 	switch(m_cargoCaptureState)
 	{
 		case eCargoCaptureStateInitialize:
-			m_cargoCaptureIntake.Set(0.0);
+			m_cargoCaptureIntake.Set(0.0); 
 
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500)
+			//m_cargoCaptureTilt is at Speed -0.3 from Initialize()
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= 500) //moves capture down
 			{
 				m_cargoCaptureState = eCargoCaptureStateToReady;
 			}
@@ -68,14 +71,13 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateToReady:
-			m_cargoCaptureTilt.Set(0.5);
+			m_cargoCaptureTilt.Set(0.5); //moves capture up
 
-			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
+			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD) //Tests if capture has hit the block and reaches a current
 			{
 				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
 				{
-					m_cargoCaptureTilt.SetSelectedSensorPosition(10);
-					m_cargoCaptureTilt.Set(-0.5);
+					SetEncoderPosition(m_cargoCaptureTilt, 10); //Set Encoder Position of Capture to 10 (really 0 because of momentum) at the block
 					m_cargoCaptureState = eCargoCaptureStateUp;
 				}
 			}
@@ -85,22 +87,22 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateUp:
-			m_cargoCaptureTilt.Set(0.05);
+			m_cargoCaptureTilt.Set(0.05); //Set speed of tilt to hold it up so it does not fall
 
 			break;
 
 		case eCargoCaptureStateMovingUp:
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 500)
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() <= 500) //lowers speed as capture reaches closer to the top
 				m_cargoCaptureTilt.Set(0.3);
 			else
-				m_cargoCaptureTilt.Set(1.0);
+				m_cargoCaptureTilt.Set(1.0); //move capture up
 
-			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 200)
+			if(fabs(m_cargoCaptureTilt.GetSelectedSensorPosition()) <= 150) //Sets state to up when it gets close to up.
 			{
 				m_cargoCaptureState = eCargoCaptureStateUp;
 			}
 
-			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD)
+			if(m_cargoCaptureTilt.GetOutputCurrent() >= CAPTURE_TILT_CURRENT_THRESHOLD) //sets state to up if a current limit is hit
 			{
 				if(++m_captureCurrentCounter == CAPTURE_TILT_CURRENT_ITERATIONS)
 					m_cargoCaptureState = eCargoCaptureStateUp;
@@ -111,7 +113,7 @@ void CargoControl::Periodic()
 		case eCargoCaptureStateDown:
 			m_cargoCaptureTilt.Set(0);
 
-			if(g_rc.m_bCargo && g_rc.m_bAction)
+			if(g_rc.m_bCargo && g_rc.m_bAction) //must be in cargo mode, capture starts to move up and compliant wheels start pulling in when action button is pressed
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoState = eCargoStateHardPullIn;
@@ -126,24 +128,24 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoCaptureStateMovingDown:
-			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo;
+			g_rc.m_ladderTargetHeight = eLadderHeightReceiveCargo; //Raises ladder to height to recieve cargo
 			printf("**MOVING DOWN**\n");
 
-			m_cargoCaptureTilt.Set(-0.5);
-			m_cargoCaptureIntake.Set(1.0);
+			m_cargoCaptureTilt.Set(-0.5); //Moves capture down
+			m_cargoCaptureIntake.Set(1.0); //Turn on intake wheels
 
-			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= CAPTURE_TILT_DOWN_POSITION)
+			if(m_cargoCaptureTilt.GetSelectedSensorPosition() >= CAPTURE_TILT_DOWN_POSITION) //Check to see if the Capure is past the Down Encoder Position 
 			{
 				m_cargoCaptureState = eCargoCaptureStateDown;
 			}
 
-			if(g_rc.m_bCargo && g_rc.m_bAction)
+			if(g_rc.m_bCargo && g_rc.m_bAction) //must be in cargo mode, capture starts to move up and compliant wheels start pulling in when action button is pressed
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoState = eCargoStateHardPullIn;
 			}
 
-			if(g_rc.m_bAbort)
+			if(g_rc.m_bAbort) //Capture moves up intake wheels stop
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
@@ -155,7 +157,7 @@ void CargoControl::Periodic()
 	switch(m_cargoState)
 	{
 		case eCargoStateInitialize:
-			if(g_rc.m_gamePieceSwitch.Get() && g_rc.m_cargoSwitch.Get())
+			if(g_rc.m_gamePieceSwitch.Get() && g_rc.m_cargoSwitch.Get()) //Pull in the ball at the start if the game piece switch is true and the cargo switch is true
 			{
 				m_cargoState = eCargoStateHardPullIn;
 			}
@@ -167,15 +169,13 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateStationIntake:
-			
-
-			if(++m_flippingCounter == FLIP_TIME)
+			if(++m_flippingCounter == FLIP_TIME) //waits for pneumatics to flip
 			{
-				g_rc.m_ladderTargetHeight = g_rc.GetCargoShipCargoHeight();
+				g_rc.m_ladderTargetHeight = g_rc.GetCargoShipCargoHeight(); //Cargo Ship height and loading station height are the same (still test on practive field anyway)
 				m_bChangeHeight = true;
 			}
 
-			if(m_bChangeHeight)
+			if(m_bChangeHeight) //Compliant wheels start spinning when the ladder starts moving up
 			{
 				m_cargoState = eCargoStateHardPullIn;
 				m_bChangeHeight = false;
@@ -184,6 +184,7 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateHardPullIn:
+			//Goes to soft pull in if either the left or right pair of wheels hit the current limit
 			if(m_leftGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD || m_rightGrabberMotor.GetOutputCurrent() >= CARGO_CURRENT_THRESHOLD)
 			{
 				if(++m_currentCounter == CARGO_CURRENT_ITERATIONS)
@@ -195,11 +196,19 @@ void CargoControl::Periodic()
 			else
 			{
 				m_currentCounter = 0;
-				m_leftGrabberMotor.Set(-0.98);
-				m_rightGrabberMotor.Set(1.0);
+				m_leftGrabberMotor.Set(-0.98); //Wheels spin in
+				m_rightGrabberMotor.Set(1.0); //Wheels spin in
 			}
 
-			if(g_rc.m_bAbort)
+			if(m_lastCargoState == eCargoStateStationIntake && g_rc.m_bAbort) //Special abort if intaking from station
+			{
+				g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
+				
+				if(g_rc.GetLadderPosition() <= 10)
+					m_cargoState = eCargoStateEmpty;
+			}
+
+			if(g_rc.m_bAbort) //Abort hard pull in
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
@@ -207,7 +216,7 @@ void CargoControl::Periodic()
 				m_cargoState = eCargoStateEmpty;
 			}
 
-			if(++m_hardPullInCounter == HARD_PULL_IN_TIME)
+			if(++m_hardPullInCounter == HARD_PULL_IN_TIME) //Aborts the hard pull in after set time
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
 				m_cargoCaptureIntake.Set(0.0);
@@ -216,21 +225,11 @@ void CargoControl::Periodic()
 				m_hardPullInCounter = 0;
 			}
 
-			if(m_lastCargoState == eCargoStateStationIntake && g_rc.m_bAbort)
-			{
-				g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
-				
-				if(g_rc.GetLadderPosition() <= 10)
-				{
-					m_cargoState = eCargoStateEmpty;
-				}
-			}
-
 			break;
 
 		case eCargoStateSoftPullIn:
-			m_leftGrabberMotor.Set(-0.1);
-			m_rightGrabberMotor.Set(0.1);
+			m_leftGrabberMotor.Set(-0.1); //wheels spin to hold cargo in
+			m_rightGrabberMotor.Set(0.1); //wheels spin to hold cargo in
 
 			m_cargoCaptureIntake.Set(0);
 
@@ -240,23 +239,26 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateFlipping:
-			if(g_rc.m_hatchControl.GetHatchGrabState() == eHatchGrabStateWaiting)
+			if(g_rc.m_hatchControl.GetHatchGrabState() == eHatchGrabStateWaiting) //Pneumatics may only flip if there is NO hatch acquried
 			{
 				m_pneumatics.Flip(true);
 				m_bFlipped = true;
 			}
 
-			if(++m_cargoStateCounter >= FLIP_TIME && m_bFlipped)
+			if(m_bFlipped)
 			{
-				m_cargoState = eCargoStateFlipped;
-				g_rc.m_ladderTargetHeight = eLadderHeightGround;
-				m_bFlipped = false;
+				if(++m_cargoStateCounter >= FLIP_TIME) //waits until the pneumatics has completed the flip
+				{	
+					m_cargoState = eCargoStateFlipped;
+					g_rc.m_ladderTargetHeight = eLadderHeightGround; //moves ladder to ground height
+					m_bFlipped = false;
+				}
 			}
 
 			break;
 
 		case eCargoStateFlipped:
-			if(g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
+			if(g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort) //Must be in cargo mode to eject cargo. Abort will also eject cargo
 			{
 				m_cargoState = eCargoStateEjecting;
 				m_cargoStateCounter = 0;
@@ -265,19 +267,19 @@ void CargoControl::Periodic()
 			break;
 
     	case eCargoStateEjecting:
-			m_leftGrabberMotor.Set(0.98);
-			m_rightGrabberMotor.Set(-1.0);
+			m_leftGrabberMotor.Set(0.98); //Compliant wheels spin out
+			m_rightGrabberMotor.Set(-1.0); //Compliant wheels spin out
 
 			if(++m_cargoStateCounter == EJECT_TIME)
 			{
-				m_pneumatics.Flip(false);
+				m_pneumatics.Flip(false); //Flips pneumatics back
 				m_cargoState = eCargoStateEjected;
 			}
 
 			break;
 
 		case eCargoStateEjected:
-			m_leftGrabberMotor.Set(0);
+			m_leftGrabberMotor.Set(0); //Stop compliant wheels
 			m_rightGrabberMotor.Set(0);
 
 			g_rc.m_ladderTargetHeight = g_rc.GetGroundHeight();
@@ -287,12 +289,13 @@ void CargoControl::Periodic()
 			break;
 
 		case eCargoStateEmpty:
-			m_leftGrabberMotor.Set(0);
+			m_leftGrabberMotor.Set(0); //Stop compliant whee;s
 			m_rightGrabberMotor.Set(0);
 
+			//Checking if the Station Intake is pressed in Cargo mode
 			if(g_rc.m_bCargo && g_rc.m_driveJoystick.StationIntake()->Pressed() && g_rc.m_driveJoystick.StationIntake()->Changed())
 			{
-				m_pneumatics.Flip(true);
+				m_pneumatics.Flip(true); //Flip pneumatics out
 				m_cargoState = eCargoStateStationIntake;
 				m_flippingCounter = 0;
 				m_currentCounter = 0;
@@ -300,8 +303,7 @@ void CargoControl::Periodic()
 
 			if(m_cargoCaptureState == eCargoCaptureStateUp)
 			{
-
-				if(g_rc.m_bCargo && g_rc.m_bAction)
+				if(g_rc.m_bCargo && g_rc.m_bAction) //Checks if action button is clicked, capture must be up
 				{
 					m_cargoCaptureState = eCargoCaptureStateMovingDown;
 				}
@@ -325,27 +327,37 @@ bool CargoControl::MonitorCaptureMotor(int targetPosition, int maxError, double 
 	return false;
 }
 
+/*
+* @return Current cargo state
+*/
 CargoState CargoControl::GetCargoState()
 {
 	return m_cargoState;
 }
 
+/*
+* @return Current cargo capture state
+*/
 CargoCaptureState CargoControl::GetCargoCaptureState()
 {
 	return m_cargoCaptureState;
 }
 
+/*
+* @return Cargo State as a string
+* @return "Unknown State" if not found
+*/
 const char *CargoControl::CargoStateToString(CargoState cargoState)
 {
 	switch(cargoState)
 	{
-		case eCargoStateHardPullIn:		 return "Hard Pull In";
-    	case eCargoStateSoftPullIn:		 return "Soft Pull In";
-		case eCargoStateFlipping:		 return "Flipping";
-		case eCargoStateFlipped:		 return "Flipped";
-    	case eCargoStateEjecting: 		 return "Ejecting";
-		case eCargoStateEjected:		 return "Ejected";
-    	case eCargoStateEmpty: 			 return "Empty";	
+		case eCargoStateHardPullIn:	return "Hard Pull In";
+    	case eCargoStateSoftPullIn:	return "Soft Pull In";
+		case eCargoStateFlipping:	return "Flipping";
+		case eCargoStateFlipped:	return "Flipped";
+    	case eCargoStateEjecting: 	return "Ejecting";
+		case eCargoStateEjected:	return "Ejected";
+    	case eCargoStateEmpty: 		return "Empty";	
 	}
 
 	return "Unknown State";

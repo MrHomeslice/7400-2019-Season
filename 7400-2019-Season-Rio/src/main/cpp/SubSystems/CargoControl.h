@@ -65,9 +65,8 @@ class CargoControl
 
 				int m_leftEncoderPosition, m_rightEncoderPosition;
         		int m_currentCounter, m_cargoStateCounter, m_hatchGrabCounter, m_captureCurrentCounter, m_DICounter;
-        		int m_hatchGrabInitialPosition;
-				int m_printCounter;
-				int m_hardPullInCounter;
+        		int m_hatchGrabInitialPosition, m_cargoCaptureInitialPosition;
+				int m_printCounter, m_hardPullInCounter;
 
         		bool m_bCargoIntakeTestWaiting;
         		bool m_bGlobeTrotterMode;

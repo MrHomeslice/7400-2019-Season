@@ -3,6 +3,8 @@
 #include "..\MeeseeksProperties.h"
 #include "..\DataTable\TableController.h"
 
+void SetEncoderPosition(WPI_TalonSRX &talon, int position);
+
 extern MeeseeksProperties g_mp;
 extern TableController	  g_tc;
 
@@ -15,7 +17,6 @@ RobotControl::RobotControl()
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;
 	m_z      = -10.0;
-	m_slider =  0;
 
 	m_lastX  = 0.0;
 	m_lastY  = 0.0;
@@ -23,19 +24,21 @@ RobotControl::RobotControl()
 
 	m_bXYZChanged = false;
 
-	m_printCounter = 0;
-
 	m_bAlligning = false;
 }
 
+/*
+* Initialize values to be used by subsystems.
+*
+* @param boolean value to flip the pneumatics in CargoControl Initialize()
+*/
 void RobotControl::Initialize(bool bFlip)
 {
 	m_ladder.Initialize();
 	m_cargoControl.Initialize(bFlip);
 	m_hatchControl.Initialize();
 
-	m_printCounter = 0;
-	m_ladder.m_pDrives[0]->SetSelectedSensorPosition(0);
+	SetEncoderPosition(*m_ladder.m_pDrives[0], 0);
 }
 
 double RobotControl::Deadband(double input, double deadbandHalfWidth)
@@ -54,6 +57,10 @@ double RobotControl::Deadband(double input, double deadbandHalfWidth)
 	return input * slope + yInercept;
 }
 
+/*
+* Tests for AutoAlign to set X, Y, and Z values.
+* Currently not called.
+*/
 bool RobotControl::PeriodicTest()
 {
 		if (m_driveJoystick.GetRawButton(1)) 
@@ -64,7 +71,7 @@ bool RobotControl::PeriodicTest()
 		
 		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 		m_y	= -Deadband(m_driveJoystick.GetY(), g_mp.m_deadbandY);
-		m_z =  Deadpool(m_driveJoystick.GetZ(), 2.0 + (1.0/3.0)); //Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
+		m_z =  Deadpool(m_driveJoystick.GetZ(), 2.0 + (1.0/3.0)); //Raises Z to the 2.333 power
 
 	if ((m_lastX != m_x) || (m_lastY != m_y) || (m_lastZ != m_z)) 
 	{
@@ -81,6 +88,11 @@ bool RobotControl::PeriodicTest()
 	return m_bXYZChanged;
 }
 
+/*
+* Periodic function to run every 20ms.
+*
+* @param boolean value from Robot.cpp whether the robot is in auton or teleop
+*/
 bool RobotControl::Periodic(bool bTeleop)
 {
 	m_driveJoystick.Periodic();
@@ -96,8 +108,7 @@ bool RobotControl::Periodic(bool bTeleop)
 		m_x =  Deadband(m_driveJoystick.GetX(), g_mp.m_deadbandX);
 		m_z =  Deadband(m_driveJoystick.GetZ(), g_mp.m_deadbandZ);
 	}
-	
-	m_slider = (m_driveJoystick.GetThrottle() + 1) / 2;
+
 	m_pov    =  m_driveJoystick.GetPOV();
 
 	m_bRobotCentric = m_driveJoystick.CentricityToggle()->Value() == 1 ? true : false;
@@ -129,6 +140,10 @@ bool RobotControl::Periodic(bool bTeleop)
 
 // #define MIKEES_NOT_WORKING
 
+/*
+* Moves the robot to align with targets
+* Under development
+*/
 bool RobotControl::AutoMoveToTarget()
 {
 	double targetLineSlope = g_tc.GetDouble("Target/LineSlope", -1000.0);
@@ -176,26 +191,41 @@ bool RobotControl::XYZChanged()
 	return m_bXYZChanged;
 }
 
+/*
+* @return Joystick X value
+*/
 double RobotControl::X()
 {
 	return m_x;
 }
 
+/*
+* @return Joystick Y value
+*/
 double RobotControl::Y()
 {
 	return m_y;
 }
 
+/*
+* @return Joystick Z value
+*/
 double RobotControl::Z()
 {
 	return m_z / 2;
 }
 
+/*
+* @return Value that reflects the state of the joystick slider.
+*/
 bool RobotControl::Cargo()
 {
 	return m_bCargo;
 }
 
+/*
+* Reads the buttons from the joystick
+*/
 void RobotControl::ReadButtons()
 {
 	m_bAlligning = m_driveJoystick.Allign()->Pressed();
@@ -263,41 +293,64 @@ void RobotControl::ReadButtons()
 	}*/	
 }
 
+/*
+* @return true if the robot is in robot centric, false if in field centric.
+*/
 bool RobotControl::RobotCentric()
 {
 	return m_driveJoystick.CentricityToggle()->Value() || m_bAlligning;
 }
 
-void RobotControl::CargoEjected()
-{
-	m_ladderTargetHeight = eLadderHeightGround;
-}
-
+/*
+* Currently not used.
+*
+* @return if the ladder is at the desired target height
+*/
 bool RobotControl::IsLadderAtHeight()
 {
 	double delta = fabs(GetLadderPosition() - m_ladder.GetTargetLadderPosition());
 	return delta < MAX_LADDER_POSITION_ERROR && GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
 }
 
+/*
+* @return Cargo ship encoder height constant.
+*/
 LadderHeight RobotControl::GetCargoShipCargoHeight()
 {
 	return eLadderHeightCargoShip;
 }
 
+/*
+* @return Ground encoder height constant.
+*/
 LadderHeight RobotControl::GetGroundHeight()
 {
 	return eLadderHeightGround;
 }
 
+/*
+* @return Current ladder encoder position.
+*/
 int RobotControl::GetLadderPosition()
 {
 	return m_ladder.m_pDrives[0]->GetSelectedSensorPosition();
 }
 
+/*
+* @return Z value raised to the exponent
+*/
 double RobotControl::Deadpool(double z, double exponent)
 {
 	if(z > 0)
 		return pow(z, exponent);
 	else
 		return -pow(-z, exponent);
+}
+
+void SetEncoderPosition(WPI_TalonSRX &talon, int position)
+{
+	ctre::phoenix::ErrorCode error = talon.SetSelectedSensorPosition(position, 0, 1000);
+
+	if(error != ctre::phoenix::ErrorCode::OK)
+		printf("*************  %s was not able to go to %d  *************\n", talon.GetName().c_str(), position);
 }

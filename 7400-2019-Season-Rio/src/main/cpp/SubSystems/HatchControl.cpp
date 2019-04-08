@@ -1,6 +1,8 @@
 #include "HatchControl.h"
 #include "..\Control\RobotControl.h"
 
+void SetEncoderPosition(WPI_TalonSRX &talon, int position);
+
 extern RobotControl g_rc;
 
 HatchControl::HatchControl(int slideID, int grabberID)
@@ -35,14 +37,14 @@ void HatchControl::Periodic()
     switch(m_hatchSliderState)
 	{
 		case eHatchSliderStateInitialize:
-			m_hatchSlide.Set(0.4);
+			m_hatchSlide.Set(0.4); //Moves slider in
 
-			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD)
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD) //Checks to see if slider is hitting a current against the robot
 			{
 				if(++m_currentCounter == HATCH_CURRENT_ITERATIONS)
 				{
 					m_hatchSliderState = eHatchSliderStateIn;
-					m_hatchSlide.SetSelectedSensorPosition(0);
+					SetEncoderPosition(m_hatchSlide, 0); //Sets encoder position to zero when slider is in
 				}
 			}
 			else
@@ -51,7 +53,7 @@ void HatchControl::Periodic()
 			break;
 
 		case eHatchSliderStateMovingIn:
-			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_IN_CURRENT_THRESHOLD)
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_IN_CURRENT_THRESHOLD) //Checks to see if slider is hitting a current against the robot
 				m_currentCounter++;
 			else
 				m_currentCounter = 0;
@@ -75,7 +77,7 @@ void HatchControl::Periodic()
 		
 		case eHatchSliderStateIn:
 			m_hatchSlide.Set(0.1);
-			m_hatchSlide.SetSelectedSensorPosition(0);
+			SetEncoderPosition(m_hatchSlide, 0);
 
 			m_currentCounter = 0;
 
@@ -125,12 +127,12 @@ void HatchControl::Periodic()
 				{
 					if(g_rc.m_gamePieceSwitch.Get() && !g_rc.m_cargoSwitch.Get())
 					{
-						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_HOLDING_POSITION);
+						SetEncoderPosition(m_hatchGrab, HATCH_GRAB_HOLDING_POSITION);
 						m_hatchGrabState = eHatchGrabStateAcquried;
 					}
 					else
 					{
-						m_hatchGrab.SetSelectedSensorPosition(HATCH_GRAB_NOT_HOLDING_POSITION);
+						SetEncoderPosition(m_hatchGrab, HATCH_GRAB_NOT_HOLDING_POSITION);
 						m_hatchGrabState = eHatchGrabStateNotHolding;
 					}
 				}
