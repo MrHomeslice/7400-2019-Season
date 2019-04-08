@@ -16,7 +16,7 @@ void HatchControl::Initialize()
 {
 	m_hatchGrabCounter = 0;
 	m_hatchRaiseCounter = 0;
-	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition();
+	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition(); //Set hatch grabber position on initialize
 
 	m_hatchGrabState = eHatchGrabStateInitialize;
 	
@@ -37,12 +37,12 @@ void HatchControl::Periodic()
 		case eHatchSliderStateInitialize:
 			m_hatchSlide.Set(0.4);
 
-			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD)
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_INITIALIZE_CURRENT_THRESHOLD) //Checks if hatch slide is against the robot
 			{
 				if(++m_currentCounter == HATCH_CURRENT_ITERATIONS)
 				{
 					m_hatchSliderState = eHatchSliderStateIn;
-					m_hatchSlide.SetSelectedSensorPosition(0);
+					m_hatchSlide.SetSelectedSensorPosition(0); 
 				}
 			}
 			else
@@ -51,31 +51,31 @@ void HatchControl::Periodic()
 			break;
 
 		case eHatchSliderStateMovingIn:
-			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_IN_CURRENT_THRESHOLD)
+			if(m_hatchSlide.GetOutputCurrent() >= HATCH_SLIDER_IN_CURRENT_THRESHOLD) //Checks if hatch slide is against the robot
 				m_currentCounter++;
 			else
 				m_currentCounter = 0;
 
-			sliderError = 0 - m_hatchSlide.GetSelectedSensorPosition();
+			sliderError = 0 - m_hatchSlide.GetSelectedSensorPosition(); //finds the error between 0 and the current position
 
-			if(fabs(sliderError) <= 10 && m_currentCounter >= HATCH_CURRENT_ITERATIONS)
+			if(fabs(sliderError) <= 10 && m_currentCounter >= HATCH_CURRENT_ITERATIONS) //checks if slider is close to 0
 			{
-				m_hatchSlide.Set(0.1);
+				m_hatchSlide.Set(0.1); //set slider to low speed to keep it from falling during pneumatics flip
 				m_hatchSliderState = eHatchSliderStateIn;
 			}
 			else
 			{
-				if(fabs(sliderError) < 100)
-					m_hatchSlide.Set(0.3/100 * sliderError + 0.2);
-				else
-					m_hatchSlide.Set(0.5);
+				if(fabs(sliderError) < 100) //Checks if slider is within 100 encoder ticks of 0 (getting closer to in)
+					m_hatchSlide.Set(0.3/100 * sliderError + 0.2); //Set speed to slow down as slider gets closer to zero
+				else //If slider is far from in
+					m_hatchSlide.Set(0.5); //sets speed to a constant
 			}
 
 			break;
 		
 		case eHatchSliderStateIn:
-			m_hatchSlide.Set(0.1);
-			m_hatchSlide.SetSelectedSensorPosition(0);
+			m_hatchSlide.Set(0.1); //set slider to low speed to keep it from falling during pneumatics flip
+			m_hatchSlide.SetSelectedSensorPosition(0); //<---------------------------------------------------------------- ????
 
 			m_currentCounter = 0;
 
@@ -84,8 +84,10 @@ void HatchControl::Periodic()
 		case eHatchSliderStateMovingOut:
 			//printf("%s %d %d %.6f\n", HatchSliderStateToString(m_hatchSliderState), -320 - m_hatchSlide.GetSelectedSensorPosition(), m_hatchSlide.GetSelectedSensorPosition(), m_hatchSlide.GetOutputCurrent());
 
-			sliderError = -320 - m_hatchSlide.GetSelectedSensorPosition();
+			sliderError = -320 - m_hatchSlide.GetSelectedSensorPosition(); //finds error between out position and current position
 
+			//if the error  is less than 30 (close to out) current limit is 0.6 amps
+			//if error is greater than 30, current limit is constant
 			if(m_hatchSlide.GetOutputCurrent() >= (fabs(sliderError) < 30 ? 0.6 : HATCH_SLIDER_OUT_CURRENT_THRESHOLD))
 				m_currentCounter++;
 			else
