@@ -347,6 +347,13 @@ double RobotControl::Deadpool(double z, double exponent)
 		return -pow(-z, exponent);
 }
 
+/*
+* Sets the encoder position of the desired talon.
+* If the encoder position was not set after one second, a message is printed to the log to be looked at after the match
+* 
+* @param &talon Change the encoder position of &talon
+* @param position Assigns &talon the int value position
+*/
 void SetEncoderPosition(WPI_TalonSRX &talon, int position)
 {
 	ctre::phoenix::ErrorCode error = talon.SetSelectedSensorPosition(position, 0, 1000);
