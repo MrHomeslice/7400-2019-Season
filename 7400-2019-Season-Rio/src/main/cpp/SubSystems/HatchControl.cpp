@@ -24,6 +24,9 @@ void HatchControl::Initialize()
 	m_hatchSliderState = eHatchSliderStateInitialize;
 }
 
+/*
+* Controls states for Hatch slider and grabbers
+*/
 void HatchControl::Periodic()
 {
 	double sliderError;
@@ -210,29 +213,40 @@ void HatchControl::Periodic()
 		case eHatchGrabStateWaiting: //this is the empty state, the state it is when driving around without a hatch, waiting to acquire a hatch
 			m_hatchGrab.Set(0);
 
-			if(!g_rc.m_bCargo)
-				g_rc.m_ladderTargetHeight = eLadderHeightGround;
+			if(!g_rc.m_bCargo) //checks if in hatch mode
+				g_rc.m_ladderTargetHeight = eLadderHeightGround; //moves to ground height
 
-			if(!g_rc.m_bCargo && g_rc.m_bAction)
+			if(!g_rc.m_bCargo && g_rc.m_bAction) //if in hatch mode, checks for action button
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 
-			if(m_hatchSliderState == eHatchSliderStateOut)
+			if(m_hatchSliderState == eHatchSliderStateOut) //waits for slider to be out
 				m_hatchGrabState = eHatchGrabStateAcquring;
 	
 			break;
 	}
 }
 
+/*
+* @return hatch slider state
+*/
 HatchSliderState HatchControl::GetHatchMoveState()
 {
 	return m_hatchSliderState;
 }
 
+/*
+* @return hatch grab state
+*/
 HatchGrabState  HatchControl::GetHatchGrabState()
 {
 	return m_hatchGrabState;
 }
 
+/*
+* @param hatchGrabState state of grabbers
+* @return Grabbers state as a string
+* @return "Unknown Grabber State" if state is not found
+*/
 const char *HatchControl::HatchGrabStateToString(HatchGrabState hatchGrabState)
 {
 	switch(hatchGrabState)
@@ -245,9 +259,14 @@ const char *HatchControl::HatchGrabStateToString(HatchGrabState hatchGrabState)
     	case eHatchGrabStateWaiting:    return "Waiting";	
 	}
 
-	return "Unknown State";
+	return "Unknown Grabber State";
 }
 
+/*
+* @param hatchSliderState state of Slider
+* @return Slider state as a string
+* @return "Unknown Slider State" if state is not found
+*/
 const char *HatchControl::HatchSliderStateToString(HatchSliderState hatchSliderState)
 {
 	switch(hatchSliderState)
@@ -259,5 +278,5 @@ const char *HatchControl::HatchSliderStateToString(HatchSliderState hatchSliderS
 		case eHatchSliderStateOut:		  return "Out";
 	}
 
-	return "Unknown State";	
+	return "Unknown Slider State";	
 }
