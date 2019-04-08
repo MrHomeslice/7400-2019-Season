@@ -77,7 +77,6 @@ void HatchControl::Periodic()
 		
 		case eHatchSliderStateIn:
 			m_hatchSlide.Set(0.1);
-			SetEncoderPosition(m_hatchSlide, 0);
 
 			m_currentCounter = 0;
 
