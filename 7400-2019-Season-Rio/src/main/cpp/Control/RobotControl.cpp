@@ -27,7 +27,7 @@ RobotControl::RobotControl()
 	m_bAlligning = false;
 }
 
-/*
+/**
 * Initialize values to be used by subsystems.
 *
 * @param boolean value to flip the pneumatics in CargoControl Initialize()
@@ -57,7 +57,7 @@ double RobotControl::Deadband(double input, double deadbandHalfWidth)
 	return input * slope + yInercept;
 }
 
-/*
+/**
 * Tests for AutoAlign to set X, Y, and Z values.
 * Currently not called.
 */
@@ -88,7 +88,7 @@ bool RobotControl::PeriodicTest()
 	return m_bXYZChanged;
 }
 
-/*
+/**
 * Periodic function to run every 20ms.
 *
 * @param boolean value from Robot.cpp whether the robot is in auton or teleop
@@ -140,7 +140,7 @@ bool RobotControl::Periodic(bool bTeleop)
 
 // #define MIKEES_NOT_WORKING
 
-/*
+/**
 * Moves the robot to align with targets
 * Under development
 */
@@ -191,7 +191,7 @@ bool RobotControl::XYZChanged()
 	return m_bXYZChanged;
 }
 
-/*
+/**
 * @return Joystick X value
 */
 double RobotControl::X()
@@ -199,7 +199,7 @@ double RobotControl::X()
 	return m_x;
 }
 
-/*
+/**
 * @return Joystick Y value
 */
 double RobotControl::Y()
@@ -207,7 +207,7 @@ double RobotControl::Y()
 	return m_y;
 }
 
-/*
+/**
 * @return Joystick Z value
 */
 double RobotControl::Z()
@@ -215,7 +215,7 @@ double RobotControl::Z()
 	return m_z / 2;
 }
 
-/*
+/**
 * @return Value that reflects the state of the joystick slider.
 */
 bool RobotControl::Cargo()
@@ -223,9 +223,9 @@ bool RobotControl::Cargo()
 	return m_bCargo;
 }
 
-/*
-* Reads the buttons from the joystick
-*/
+/**
+ * Reads the buttons from the joystick
+ */
 void RobotControl::ReadButtons()
 {
 	m_bAlligning = m_driveJoystick.Allign()->Pressed();
@@ -293,7 +293,7 @@ void RobotControl::ReadButtons()
 	}*/	
 }
 
-/*
+/**
 * @return true if the robot is in robot centric, false if in field centric.
 */
 bool RobotControl::RobotCentric()
@@ -301,7 +301,7 @@ bool RobotControl::RobotCentric()
 	return m_driveJoystick.CentricityToggle()->Value() || m_bAlligning;
 }
 
-/*
+/**
 * Currently not used.
 *
 * @return if the ladder is at the desired target height
@@ -312,7 +312,7 @@ bool RobotControl::IsLadderAtHeight()
 	return delta < MAX_LADDER_POSITION_ERROR && GetLadderPosition() > (LADDER_HATCH_BOTTOM_HEIGHT - MAX_LADDER_POSITION_ERROR);
 }
 
-/*
+/**
 * @return Cargo ship encoder height constant.
 */
 LadderHeight RobotControl::GetCargoShipCargoHeight()
@@ -320,7 +320,7 @@ LadderHeight RobotControl::GetCargoShipCargoHeight()
 	return eLadderHeightCargoShip;
 }
 
-/*
+/**
 * @return Ground encoder height constant.
 */
 LadderHeight RobotControl::GetGroundHeight()
@@ -328,7 +328,7 @@ LadderHeight RobotControl::GetGroundHeight()
 	return eLadderHeightGround;
 }
 
-/*
+/**
 * @return Current ladder encoder position.
 */
 int RobotControl::GetLadderPosition()
@@ -336,7 +336,7 @@ int RobotControl::GetLadderPosition()
 	return m_ladder.m_pDrives[0]->GetSelectedSensorPosition();
 }
 
-/*
+/**
 * @return Z value raised to the exponent
 */
 double RobotControl::Deadpool(double z, double exponent)
@@ -347,7 +347,7 @@ double RobotControl::Deadpool(double z, double exponent)
 		return -pow(-z, exponent);
 }
 
-/*
+/**
 * Sets the encoder position of the desired talon.
 * If the encoder position was not set after one second, a message is printed to the log to be looked at after the match
 * 

@@ -89,8 +89,8 @@ void HatchControl::Periodic()
 
 			sliderError = -320 - m_hatchSlide.GetSelectedSensorPosition(); //finds error between out position and current position
 
-			//if the error  is less than 30 (close to out) current limit is 0.6 amps
-			//if error is greater than 30, current limit is the constant, 1.8 amps
+			/*if the error  is less than 30 (close to out) current limit is 0.6 amps
+			if error is greater than 30, current limit is the constant, 1.8 amps*/
 			if(m_hatchSlide.GetOutputCurrent() >= (fabs(sliderError) < 30 ? 0.6 : HATCH_SLIDER_OUT_CURRENT_THRESHOLD))
 				m_currentCounter++;
 			else
