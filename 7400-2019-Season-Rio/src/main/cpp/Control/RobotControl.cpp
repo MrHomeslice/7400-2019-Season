@@ -302,20 +302,11 @@ bool RobotControl::RobotCentric()
 	return m_driveJoystick.CentricityToggle()->Value() || m_bAlligning;
 }
 
-<<<<<<< HEAD
 /**
 * Currently not used.
 *
 * @return if the ladder is at the desired target height
 */
-=======
-void RobotControl::CargoEjected()
-{
-	
-	m_ladderTargetHeight = eLadderHeightGround;
-}
-
->>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 bool RobotControl::IsLadderAtHeight()
 {
 	double delta = fabs(GetLadderPosition() - m_ladder.GetTargetLadderPosition());
