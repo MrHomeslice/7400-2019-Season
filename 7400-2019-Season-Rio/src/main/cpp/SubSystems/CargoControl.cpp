@@ -216,6 +216,7 @@ void CargoControl::Periodic()
 				m_cargoState = eCargoStateEmpty;
 			}
 
+			//Put in after Hofstra, test thoroughly
 			if(++m_hardPullInCounter == HARD_PULL_IN_TIME) //Aborts the hard pull in after set time
 			{
 				m_cargoCaptureState = eCargoCaptureStateMovingUp;
