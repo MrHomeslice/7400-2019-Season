@@ -228,7 +228,7 @@ void CargoControl::Periodic()
 
 			break;
 
-		case eCargoStateSoftPullIn:
+		case eCargoStateSoftPullIn: //Soft pull in only runs one iteration, then goes to flipping
 			m_leftGrabberMotor.Set(-0.1); //wheels spin to hold cargo in
 			m_rightGrabberMotor.Set(0.1); //wheels spin to hold cargo in
 
