@@ -128,7 +128,7 @@ void HatchControl::Periodic()
 			{
 				if(++m_hatchGrabCounter == HATCH_GRAB_ITERATIONS)
 				{
-					if(g_rc.m_gamePieceSwitch.Get() && !g_rc.m_cargoSwitch.Get()) ////Pull in the hatch at the start if the game piece switch is true and the cargo switch is false
+					if(g_rc.m_gamePieceSwitch.Get() && !g_rc.m_cargoSwitch.Get()) //Pull in the hatch at the start if the game piece switch is true and the cargo switch is false
 					{
 						SetEncoderPosition(m_hatchGrab, HATCH_GRAB_HOLDING_POSITION); //if there is a hatch at the start, when a current limit is hit, set the encoder position to holding
 						m_hatchGrabState = eHatchGrabStateAcquried;
