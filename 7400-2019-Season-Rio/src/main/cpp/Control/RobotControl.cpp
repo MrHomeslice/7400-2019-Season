@@ -25,7 +25,6 @@ RobotControl::RobotControl()
 	m_bXYZChanged = false;
 
 	m_bAlligning = false;
-	m_bRestartRobotCode = true;
 }
 
 /**
