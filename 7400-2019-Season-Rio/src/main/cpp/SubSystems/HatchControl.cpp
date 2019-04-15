@@ -24,7 +24,7 @@ void HatchControl::Initialize()
 	m_hatchSliderState = eHatchSliderStateInitialize;
 }
 
-/*
+/**
 * Controls states for Hatch slider and grabbers
 */
 void HatchControl::Periodic()
@@ -226,7 +226,7 @@ void HatchControl::Periodic()
 	}
 }
 
-/*
+/**
 * @return hatch slider state
 */
 HatchSliderState HatchControl::GetHatchMoveState()
@@ -234,7 +234,7 @@ HatchSliderState HatchControl::GetHatchMoveState()
 	return m_hatchSliderState;
 }
 
-/*
+/**
 * @return hatch grab state
 */
 HatchGrabState  HatchControl::GetHatchGrabState()
@@ -242,7 +242,7 @@ HatchGrabState  HatchControl::GetHatchGrabState()
 	return m_hatchGrabState;
 }
 
-/*
+/**
 * @param hatchGrabState state of grabbers
 * @return Grabbers state as a string
 * @return "Unknown Grabber State" if state is not found
@@ -262,7 +262,7 @@ const char *HatchControl::HatchGrabStateToString(HatchGrabState hatchGrabState)
 	return "Unknown Grabber State";
 }
 
-/*
+/**
 * @param hatchSliderState state of Slider
 * @return Slider state as a string
 * @return "Unknown Slider State" if state is not found

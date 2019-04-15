@@ -327,7 +327,7 @@ bool CargoControl::MonitorCaptureMotor(int targetPosition, int maxError, double 
 	return false;
 }
 
-/*
+/**
 * @return Current cargo state
 */
 CargoState CargoControl::GetCargoState()
@@ -335,7 +335,7 @@ CargoState CargoControl::GetCargoState()
 	return m_cargoState;
 }
 
-/*
+/**
 * @return Current cargo capture state
 */
 CargoCaptureState CargoControl::GetCargoCaptureState()
@@ -343,7 +343,7 @@ CargoCaptureState CargoControl::GetCargoCaptureState()
 	return m_cargoCaptureState;
 }
 
-/*
+/**
 * @return Cargo State as a string
 * @return "Unknown State" if not found
 */
