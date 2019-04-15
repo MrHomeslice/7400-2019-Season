@@ -33,14 +33,6 @@ void Robot::TeleopInit()
 	//m_swerve.Disable();
 }
 
-void ShowState(std::string &oldState, const char *pNewState)
-{
-	if (oldState != pNewState) {
-		printf("%s\n", pNewState);
-		oldState = pNewState;
-	}
-}
-
 void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
 	#ifdef BIT_IS_ENABLED
@@ -114,12 +106,19 @@ void Robot::AutonomousPeriodic()
 
 void Robot::DisabledInit()
 {
-
 }
 
 void Robot::DisabledPeriodic()
 {
-	//g_rc.Periodic(false);
+}
+
+void ShowState(std::string &oldState, const char *pNewState)
+{
+	if (oldState != pNewState) 
+	{
+		printf("%s\n", pNewState);
+		oldState = pNewState;
+	}
 }
 
 int main() 
