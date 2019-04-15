@@ -171,27 +171,16 @@ void HatchControl::Periodic()
 
 			if(++m_hatchRaiseCounter == 50) 
 			{
-<<<<<<< HEAD
-				g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch;
-			}
-
-			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
-=======
 				//g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch; //raise hatch height in order to see through camera, not used.
 			}
 
 			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort) //in hatch mode and either the action or abort button is pressed, eject the hatch
 			{
->>>>>>> parent of ebab823... Changes
 				m_hatchSliderState = eHatchSliderStateMovingOut;
 			}
 
-<<<<<<< HEAD
-			if(m_hatchSliderState == eHatchSliderStateOut)
-=======
 			if(m_hatchSliderState == eHatchSliderStateOut) //wait until slider is out from above, then start ejecting
 			{
->>>>>>> parent of ebab823... Changes
 				m_hatchGrabState = eHatchGrabStateEjecting;
 			}
 
