@@ -12,7 +12,7 @@ RobotControl::RobotControl()
 			 : m_driveJoystick(JOYSTICK_1),
 			   m_cargoControl(15, 14, 13, 12),
 			   m_hatchControl(17, 16),
-			   m_cargoSwitch(0), m_gamePieceSwitch(1)
+			   m_cargoSwitch(0), m_gamePieceSwitch(1), m_calibrationSwitch(3)
 {
 	m_x 	 = -10.0;
 	m_y 	 = -10.0;

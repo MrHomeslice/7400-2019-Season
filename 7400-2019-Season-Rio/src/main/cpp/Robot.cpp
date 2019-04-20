@@ -29,8 +29,9 @@ void Robot::RobotInit()
 void Robot::TeleopInit()
 {
 	//g_rc.Initialize(false);
-
-	//m_swerve.Disable();
+	
+	if(g_rc.m_calibrationSwitch.Get())
+		m_swerve.Disable();
 }
 
 void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
@@ -43,7 +44,7 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 		bool bControlChanged = g_rc.Periodic(true);
 
-		if (bControlChanged)
+		if (bControlChanged && !g_rc.m_calibrationSwitch.Get())
 		{
 			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0.01 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
@@ -60,7 +61,12 @@ void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 
 void Robot::AutonomousInit()
 {
-	//m_swerve.SetSteerOffsets();
+
+	if(g_rc.m_calibrationSwitch.Get())
+	{
+		m_swerve.SetSteerOffsets();
+		return;
+	}
 	
 	m_gyro.ZeroYaw();
 	printf("Gyro Zeroed\n");
@@ -79,6 +85,12 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
+
+	if(g_rc.m_calibrationSwitch.Get())
+	{
+		return;
+	}
+	
 	TeleopPeriodic();
 
 	//double x = g_tc.GetDouble("Swerve/ResetPID", -1000.0);

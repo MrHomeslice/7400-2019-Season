@@ -77,7 +77,7 @@ class RobotControl
 
 				bool m_bAlligning;
 
-				frc::DigitalInput m_cargoSwitch, m_gamePieceSwitch;
+				frc::DigitalInput m_cargoSwitch, m_gamePieceSwitch, m_calibrationSwitch;
 
 				CargoControl   m_cargoControl;
 				HatchControl   m_hatchControl;
