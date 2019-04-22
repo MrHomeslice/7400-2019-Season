@@ -66,9 +66,6 @@ void SwerveDrive::RectangularToBoundedCircle(double &x, double &y) //AKA Mikee i
 
 	x = circleX;
 	y = circleY;
-
-	g_tc.PutDouble("Control/Corrected/X", x);
-	g_tc.PutDouble("Control/Corrected/Y", y);
 }
 
 void SwerveDrive::RotateCorners(double rotation, eRotationPoint rotationPoint, DoubleXY *pDestRect)
@@ -95,27 +92,23 @@ void SwerveDrive::RotateCorners(double rotation, eRotationPoint rotationPoint, D
 void SwerveDrive::TransformRotatedCorners(double x, double y, double yaw, DoubleXY *pSource, DoubleXY *pDest)
 {
 
-   x *= g_transformScale;
-   y *= g_transformScale;
+	x *= g_transformScale;
+  y *= g_transformScale;
 
 	double tempX = x;
 	double tempY = y;
 	
-   double yawRadians = -M_PI * yaw / 180.0;
+	double yawRadians = -M_PI * yaw / 180.0;
 
-   double cosGyro = cos(yawRadians);
-   double sinGyro = sin(yawRadians);
+	double cosGyro = cos(yawRadians);
+	double sinGyro = sin(yawRadians);
 
+	DoubleXY transform;
 
-   DoubleXY transform;
+  transform.x =  x * cosGyro + y * sinGyro;
+  transform.y = -x * sinGyro + y * cosGyro;
 
-   transform.x =  x * cosGyro + y * sinGyro;
-   transform.y = -x * sinGyro + y * cosGyro;
-
-	printf("oldX: %0.6f newX: %0.6f oldY: %0.6f newY: %0.6f\n", tempX, transform.x, tempY, transform.y);
-
-
-   for (int index = 0; index<4; index++)
+	for (int index = 0; index<4; index++)
 	  pDest[index] = pSource[index] + transform;
 }
 
@@ -148,7 +141,7 @@ void SwerveDrive::CalculateDriveVectors(DoubleXY *pDestCorners)
 
 void SwerveDrive::SetSteerPosition(int module, int position)
 {
-	m_module[module]->SetSteerPosition(position);//1024
+	m_module[module]->SetSteerPosition(position);
 }
 
 int SwerveDrive::GetSteerPosition(int module)
@@ -159,6 +152,7 @@ int SwerveDrive::GetSteerPosition(int module)
 int SwerveDrive::Drive(double x, double y, double z, double yaw, eRotationPoint rotationPoint)
 {
 	z *= 1.4;
+
 	RectangularToBoundedCircle(x, y);
 
 	DoubleXY rotatedCorners[4], transformedCorners[4];
@@ -183,8 +177,6 @@ void SwerveDrive::Periodic()
 
 void SwerveDrive::SetSteerOffsets()
 {
-	printf("SetSteerOffsets()\n");
-
 	for (int index=0; index<4; index++) {
 		int steerOffset = m_module[index]->GetSteerPosition();
 		g_mp.m_steerOffsets[index] = steerOffset;
@@ -193,74 +185,3 @@ void SwerveDrive::SetSteerOffsets()
 
 	g_mp.Save();
 }
-
-void SwerveDrive::ShowOffsets()
-{
-	static std::string lastOffsets = "";
-
-	std::string offsets;
-
-	char offset[32];
-
-	for (int index=0; index<4; index++) {
-		int steerOffset = m_module[index]->GetSteerPosition();
-		int zero        = g_mp.m_steerOffsets[index];
-		sprintf(offset, "%d (%d)", steerOffset, zero);
-		offsets += offset;
-		if (index != 3) {
-			offsets += ", ";
-		}
-	}
-
-	if (offsets != lastOffsets) {
-		printf("%s\n", offsets.c_str());
-		lastOffsets = offsets;
-	}
-}
-
-bool SwerveDrive::BITTest(double &angle, int &modNum, int &testTime)
-{
-	if(testTime == 0)
-		m_module[modNum]->Set(angle, 0);
-
-	if(testTime <= 25)
-	{
-		m_module[modNum]->Set(angle, .5);
-		printf("Test Time : %d\n", testTime);
-		printf("Angle :%.6f\n", angle);
-		printf("Module Number :%d\n", modNum);
-	}
-	else if(testTime <= 50)
-	{
-		m_module[modNum]->Set(angle, -.5);
-		printf("Test Time : %d\n", testTime);
-		printf("Angle :%.6f\n", angle);
-		printf("Module Number :%d\n", modNum);
-	}
-	else
-	{
-		m_module[modNum]->Set(angle, 0);
-		angle += 40.96;
-		printf("Test Time : %d\n", testTime);
-		printf("Angle :%.6f\n", angle);
-		printf("Module Number :%d\n", modNum);
-	}
-
-	testTime++;	
-	
-	if(testTime == 76)
-	{
-		angle = 0;
-
-		if(modNum != 3)
-		{
-			modNum++;
-			testTime = 0;
-		}
-		else
-			return true;
-	}
-	else
-		return false;
-}
-

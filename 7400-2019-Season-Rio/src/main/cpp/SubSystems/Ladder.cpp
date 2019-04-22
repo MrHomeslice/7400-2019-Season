@@ -23,6 +23,9 @@ Ladder::Ladder()
 
 void Ladder::Initialize()
 {
+    m_pDrives[0]->SetSafetyEnabled(false);
+    m_pDrives[1]->SetSafetyEnabled(false);
+    
     m_pDrives[1]->Follow(*m_pDrives[0]);
 
     m_pDrives[0]->ConfigPeakOutputReverse(-0.4);
@@ -57,7 +60,7 @@ void Ladder::ProcessLadderStates()
 {
     int ladderPosition;
 
-    switch(m_ladderState)
+    switch (m_ladderState)
     {
         case eLadderStateDisabled: break;
 
@@ -71,7 +74,7 @@ void Ladder::ProcessLadderStates()
 
 int Ladder::GetTargetLadderPosition()
 {
-    switch(g_rc.m_ladderTargetHeight)
+    switch (g_rc.m_ladderTargetHeight)
     {
         case eLadderHeightGround       : return LADDER_GROUND_HEIGHT;
 

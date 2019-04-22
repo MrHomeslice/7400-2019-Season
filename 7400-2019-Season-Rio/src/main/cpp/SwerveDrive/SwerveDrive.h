@@ -14,10 +14,6 @@
 #define FRONT_RIGHT_DRIVE 7
 #define BACK_RIGHT_STEER  8
 #define BACK_RIGHT_DRIVE  9
-//#define ELEVATOR_MASTER  10
-//#define ELEVATOR_SLAVE   11
-//#define BALL_INTAKE      12
-//#define INTAKE_TILT      13
 
 class SwerveDrive
 {
@@ -30,11 +26,9 @@ class SwerveDrive
 							void SetSteerPosition(int module, int position);
 							void SetPIDValues();
 							void Disable();
-							void ShowOffsets();
 							void ToZero();
 							int  GetSteerPosition(int module);
 							void Set(double angle, double speed);
-							bool BITTest(double &angle, int &modNum, int &testTime);						
 	protected :
 							void RectangularToBoundedCircle(double &x, double &y);
 							void RotateCorners(double rotation, eRotationPoint rotationPoint, DoubleXY *pDestRect);

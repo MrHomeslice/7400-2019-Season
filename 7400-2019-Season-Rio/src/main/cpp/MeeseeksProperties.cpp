@@ -90,14 +90,14 @@ void MeeseeksProperties::Load()
 	m_corners[BACK_LEFT].x   = GetDouble(BACK_LEFT_X,   BACK_LEFT_X_DEFAULT);
 	m_corners[BACK_LEFT].y   = GetDouble(BACK_LEFT_Y,   BACK_LEFT_Y_DEFAULT);
 
-    m_center.x = GetDouble(CENTER_X, CENTER_X_DEFAULT);
-    m_center.y = GetDouble(CENTER_Y, CENTER_Y_DEFAULT);
+  m_center.x = GetDouble(CENTER_X, CENTER_X_DEFAULT);
+  m_center.y = GetDouble(CENTER_Y, CENTER_Y_DEFAULT);
 
-    m_zScale = GetDouble(Z_SCALE, Z_SCALE_DEFAULT);
+  m_zScale = GetDouble(Z_SCALE, Z_SCALE_DEFAULT);
 
-    m_openLoopRamp = GetDouble(OPEN_LOOP_RAMP, OPEN_LOOP_RAMP_DEFAULT);
+  m_openLoopRamp = GetDouble(OPEN_LOOP_RAMP, OPEN_LOOP_RAMP_DEFAULT);
 
-    m_deadbandX = GetDouble(DEADBAND_X, DEADBAND_X_DEFAULT);
+  m_deadbandX = GetDouble(DEADBAND_X, DEADBAND_X_DEFAULT);
 	m_deadbandY = GetDouble(DEADBAND_Y, DEADBAND_Y_DEFAULT);
 	m_deadbandZ = GetDouble(DEADBAND_Z, DEADBAND_Z_DEFAULT);
 }

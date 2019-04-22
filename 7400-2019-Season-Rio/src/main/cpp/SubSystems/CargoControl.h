@@ -45,33 +45,30 @@ class CargoControl
 {
 	public    : CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID);
 
-				void Initialize(bool bFlip);
-				void Periodic();
+				      void Initialize(bool bFlip);
+				      void Periodic();
 				
-				CargoState 		  GetCargoState();
-				CargoCaptureState GetCargoCaptureState();
-				Pneumatics   	  m_pneumatics;				
+				      CargoState 		  GetCargoState();
+				      CargoCaptureState GetCargoCaptureState();
+				      Pneumatics   	  m_pneumatics;				
 	protected :
-				const char* CargoStateToString(CargoState cargoState);
+				      const char* CargoStateToString(CargoState cargoState);
 
-				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
+				      WPI_TalonSRX 	    m_leftGrabberMotor, m_rightGrabberMotor;
+       	      WPI_TalonSRX 	    m_cargoCaptureTilt, m_cargoCaptureIntake;
+				      CargoState   	    m_cargoState, m_lastCargoState;
+				      CargoCaptureState m_cargoCaptureState;
 
-				WPI_TalonSRX 	  m_leftGrabberMotor, m_rightGrabberMotor;
-       		 	WPI_TalonSRX 	  m_cargoCaptureTilt, m_cargoCaptureIntake;
-				CargoState   	  m_cargoState, m_lastCargoState;
-				CargoCaptureState m_cargoCaptureState;
+				      int m_ejectCounter, m_flippingCounter;
 
-				int m_ejectCounter, m_flippingCounter;
+              int m_currentCounter, m_cargoStateCounter, m_hatchGrabCounter, m_captureCurrentCounter;
+				      int m_hatchGrabInitialPosition, m_cargoCaptureInitialPosition;
+				      int m_hardPullInCounter;
 
-				int m_leftEncoderPosition, m_rightEncoderPosition;
-        		int m_currentCounter, m_cargoStateCounter, m_hatchGrabCounter, m_captureCurrentCounter, m_DICounter;
-        		int m_hatchGrabInitialPosition, m_cargoCaptureInitialPosition;
-				int m_printCounter, m_hardPullInCounter;
-
-        		bool m_bCargoIntakeTestWaiting;
-        		bool m_bGlobeTrotterMode;
-        		bool m_bFlipped;
-				bool m_bChangeHeight;
+              bool m_bCargoIntakeTestWaiting;
+              bool m_bGlobeTrotterMode;
+              bool m_bFlipped;
+				      bool m_bChangeHeight;
 };
 
 #endif

@@ -75,8 +75,6 @@ class RobotControl
 				bool m_bCargo, m_bAction, m_bFlipped, m_bAbort, m_bLadderAtHeight;
 				int  m_flippedStateValue;
 
-				bool m_bAlligning;
-
 				frc::DigitalInput m_cargoSwitch, m_gamePieceSwitch, m_calibrationSwitch;
 
 				CargoControl   m_cargoControl;
@@ -87,9 +85,12 @@ class RobotControl
 				double Deadband(double x, double d);
 				double Deadpool(double x, double exponent);
 
-				int 		   m_pov, m_printCounter;
-				double         m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
-				bool           m_bXYZChanged, m_bRobotCentric;
+#ifdef USING_POV				
+				int 	 m_pov;
+#endif				
+				int    m_printCounter;
+				double m_x, m_y, m_z, m_slider, m_lastX, m_lastY, m_lastZ;
+				bool   m_bXYZChanged, m_bRobotCentric;
 
 				
 				

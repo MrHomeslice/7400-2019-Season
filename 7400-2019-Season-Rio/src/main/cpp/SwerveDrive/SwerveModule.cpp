@@ -173,11 +173,12 @@ int SwerveModule::SetSteerAngle(double targetAngle)
 void SwerveModule::Set(double angle, double speed)// Set values and control modes for the motors.
 {
 	int steerTargetPosition = SetSteerAngle(angle);
+	
 	SetDrivePercentOutput(speed);
 
-	g_tc.PutDouble(m_reportAngle.c_str(),     angle);
-	g_tc.PutDouble(m_reportMagnitude.c_str(), speed);
-	g_tc.PutInt(m_reportSteerTarget.c_str(),  steerTargetPosition);
+	//g_tc.PutDouble(m_reportAngle.c_str(),     angle);
+	//g_tc.PutDouble(m_reportMagnitude.c_str(), speed);
+	//g_tc.PutInt(m_reportSteerTarget.c_str(),  steerTargetPosition);
 }
 
 void SwerveModule::SetSteerPosition(int setPosition)
@@ -202,7 +203,7 @@ int SwerveModule::GetSteerPosition()
 
 void SwerveModule::ReportStatus()
 {
-	g_tc.PutInt(m_reportSteerError.c_str(),     m_steer.GetClosedLoopError(kPIDLoopIdx));
+	//g_tc.PutInt(m_reportSteerError.c_str(),     m_steer.GetClosedLoopError(kPIDLoopIdx));
 	g_tc.PutInt(m_reportSteerTarget.c_str(),    m_steer.GetSelectedSensorPosition(kPIDLoopIdx));
 	//g_tc.PutInt(m_reportSteerAnalogRaw.c_str(), m_steer.GetSensorCollection().GetAnalogInRaw());
 
@@ -215,8 +216,8 @@ void SwerveModule::ReportStatus()
 
 	//g_tc.PutInt(m_reportSteerAnalogValue.c_str(),  analogValue);
 	//g_tc.PutInt(m_reportSteerOverflowBits.c_str(), overflowBits);
-	g_tc.PutDouble(m_reportSteerCurrent.c_str(), m_steer.GetOutputCurrent());
-	g_tc.PutDouble(m_reportDriveCurrent.c_str(), m_drive.GetOutputCurrent());
+	//g_tc.PutDouble(m_reportSteerCurrent.c_str(), m_steer.GetOutputCurrent());
+	//g_tc.PutDouble(m_reportDriveCurrent.c_str(), m_drive.GetOutputCurrent());
 }
 
 void SwerveModule::Periodic()
