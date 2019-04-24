@@ -69,9 +69,9 @@ void Robot::AutonomousInit()
 	
 	g_rc.Initialize(true);
 
-	m_swerve.SetPIDValues();
+	//m_swerve.SetPIDValues();
 
-	m_swerve.Disable();
+	//m_swerve.Disable();
 
 #ifdef BIT_IS_ENABLED
 	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
