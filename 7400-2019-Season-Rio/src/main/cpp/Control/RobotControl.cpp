@@ -22,6 +22,14 @@ RobotControl::RobotControl()
 	m_lastZ = 0.0;
 
 	m_bXYZChanged = false;
+<<<<<<< HEAD
+=======
+
+	m_printCounter = 0;
+
+	m_bAlligning = false;
+	m_bRestartRobotCode = true;
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 }
 
 /**
@@ -196,7 +204,17 @@ void RobotControl::ReadButtons()
 */
 bool RobotControl::RobotCentric()
 {
+<<<<<<< HEAD
 	return m_driveJoystick.CentricityToggle()->Value();
+=======
+	return m_driveJoystick.CentricityToggle()->Value() || m_bAlligning;
+}
+
+void RobotControl::CargoEjected()
+{
+	
+	m_ladderTargetHeight = eLadderHeightGround;
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 }
 
 /**

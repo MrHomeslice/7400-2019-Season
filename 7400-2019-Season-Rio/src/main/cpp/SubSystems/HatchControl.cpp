@@ -22,8 +22,16 @@ void HatchControl::Initialize()
 	m_hatchRaiseCounter = 0;
 	m_hatchGrabInitialPosition = m_hatchGrab.GetSelectedSensorPosition(); //Set hatch grabber position on initialize
 
-	m_hatchGrabState = eHatchGrabStateInitialize;
-	
+	if(!g_rc.m_bRestartRobotCode)
+		m_hatchGrabState = eHatchGrabStateInitialize;
+	else
+	{
+		if(fabs(HATCH_GRAB_HOLDING_POSITION - m_hatchGrab.GetSelectedSensorPosition()) <= 10)
+			m_hatchGrabState = eHatchGrabStateAcquried;
+		else
+			m_hatchGrabState = eHatchGrabStateWaiting;
+		
+	}
 	m_hatchSliderState = eHatchSliderStateInitialize;
 	m_hatchSlideCurrentCounter   = 0;
 }
@@ -38,7 +46,7 @@ void HatchControl::Periodic()
 
 	//printf("%d %.6f\n\n", m_hatchGrabState, m_hatchGrab.GetOutputCurrent());
 
-	//printf("%d %d\n", g_rc.m_cargoSwitch.Get(), g_rc.m_gamePieceSwitch.Get());
+	printf("%d %d\n", g_rc.m_cargoSwitch.Get(), g_rc.m_gamePieceSwitch.Get());
 
 	switch(m_hatchSliderState) //to get out of the In or Out states, that is controlled by the switch(m_hatchGrabState) {}
 	{
@@ -174,19 +182,28 @@ void HatchControl::Periodic()
 
 			if(++m_hatchRaiseCounter == 50) 
 			{
+<<<<<<< HEAD
 				//g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch; //raise hatch height in order to see through camera, not used.
 			}
 
 			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort) //in hatch mode and either the action or abort button is pressed, eject the hatch
 			{
 				m_hatchSlideCurrentCounter = 0;
-				m_hatchSliderState = eHatchSliderStateMovingOut;
+=======
+				g_rc.m_ladderTargetHeight = eLadderHeightReceiveHatch;
 			}
 
+			if(!g_rc.m_bCargo && g_rc.m_bAction || g_rc.m_bAbort)
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
+				m_hatchSliderState = eHatchSliderStateMovingOut;
+
+<<<<<<< HEAD
 			if(m_hatchSliderState == eHatchSliderStateOut) //wait until slider is out from above, then start ejecting
 			{
+=======
+			if(m_hatchSliderState == eHatchSliderStateOut)
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 				m_hatchGrabState = eHatchGrabStateEjecting;
-			}
 
 			break;
 		
