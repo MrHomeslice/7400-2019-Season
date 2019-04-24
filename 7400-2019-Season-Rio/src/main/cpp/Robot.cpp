@@ -71,7 +71,7 @@ void Robot::AutonomousInit()
 
 	m_swerve.SetPIDValues();
 
-	m_swerve.Disable();
+	//m_swerve.Disable();
 
 	g_rc.m_bRestartRobotCode = false;
 
