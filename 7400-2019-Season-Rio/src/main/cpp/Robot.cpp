@@ -69,7 +69,7 @@ void Robot::AutonomousInit()
 	
 	g_rc.Initialize(true);
 
-	//m_swerve.SetPIDValues();
+	m_swerve.SetPIDValues();
 
 	//m_swerve.Disable();
 
