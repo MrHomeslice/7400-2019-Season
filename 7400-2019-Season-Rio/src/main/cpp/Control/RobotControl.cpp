@@ -29,6 +29,9 @@ RobotControl::RobotControl()
 
 	m_bAlligning = false;
 	m_bRestartRobotCode = true;
+<<<<<<< HEAD
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
+=======
 >>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 }
 

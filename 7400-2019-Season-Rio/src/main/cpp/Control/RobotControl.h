@@ -76,8 +76,11 @@ class RobotControl
 				int  m_flippedStateValue;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 				frc::DigitalInput m_cargoSwitch, m_gamePieceSwitch, m_calibrationSwitch;
 =======
+=======
+>>>>>>> parent of e7bbbf0... Final Hofstra 1:20pm 3-30-19
 				bool m_bAlligning, m_bRestartRobotCode;
 
 				frc::DigitalInput m_cargoSwitch, m_gamePieceSwitch;
