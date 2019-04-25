@@ -77,6 +77,8 @@ void Robot::AutonomousInit()
 
 	g_rc.m_bRestartRobotCode = false;
 
+	g_rc.m_bRestartRobotCode = false;
+
 #ifdef BIT_IS_ENABLED
 	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
 #endif
