@@ -52,7 +52,7 @@ class HatchControl
                 HatchSliderState  m_hatchSliderState;
                 HatchGrabState    m_hatchGrabState;
 
-                int m_hatchGrabCurrentCounter, m_hatchGrabInitialPosition, m_hatchSlideCurrentCounter, m_hatchRaiseCounter;
+                int m_hatchGrabCounter, m_hatchGrabInitialPosition, m_currentCounter, m_hatchRaiseCounter;
 };
 
 #endif

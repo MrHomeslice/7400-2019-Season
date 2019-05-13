@@ -3,18 +3,14 @@
 #include "DataTable\TableController.h"
 #include "Control\RobotControl.h"
 
+//#define BIT_IS_ENABLED
+
 TableController    g_tc;
 MeeseeksProperties g_mp;
-RobotControl	     g_rc;
+RobotControl	   g_rc;
 
 Robot::Robot()
 {
-}
-
-bool Robot::AligningSwerve()
-{
-	return false;
-	//return g_rc.m_calibrationSwitch.Get()
 }
 
 void Robot::RobotInit()
@@ -33,51 +29,57 @@ void Robot::RobotInit()
 void Robot::TeleopInit()
 {
 	//g_rc.Initialize(false);
-	
-	if (AligningSwerve())
-		m_swerve.Disable();
+
+	//m_swerve.Disable();
+}
+
+void ShowState(std::string &oldState, const char *pNewState)
+{
+	if (oldState != pNewState) {
+		printf("%s\n", pNewState);
+		oldState = pNewState;
+	}
 }
 
 void Robot::TeleopPeriodic() //Every 20 miliseconds, 1/50 of a second
 {
+	#ifdef BIT_IS_ENABLED
+		m_BIT.Periodic();
+
+	#else
+		//static std::string state = "Idle";
+
 		bool bControlChanged = g_rc.Periodic(true);
 
-		if (bControlChanged && !AligningSwerve())
+		if (bControlChanged)
 		{
 			m_swerve.Drive(g_rc.X(), g_rc.Y(), g_rc.Z(), g_rc.RobotCentric() ? 0.01 : m_gyro.Yaw(), eRotationPoint::eRotateCenter);
 		}
 
-		if (AligningSwerve())
-			m_swerve.Periodic();
+		m_swerve.Periodic();
 
-		if (g_rc.m_driveJoystick.ZeroGyro()->Pressed() && g_rc.m_driveJoystick.ZeroGyro()->Changed())
+		if(g_rc.m_driveJoystick.ZeroGyro()->Pressed() && g_rc.m_driveJoystick.ZeroGyro()->Changed())
 		{
 			m_gyro.ZeroYaw();
 			printf("***Zero Yaw***\n");
 		}
+	#endif
 }
 
 void Robot::AutonomousInit()
 {
-	if (AligningSwerve())
-	{
-		m_swerve.SetSteerOffsets();
-		return;
-	}
+	//m_swerve.SetSteerOffsets();
+
+	//return;
 	
 	m_gyro.ZeroYaw();
-	
+	printf("Gyro Zeroed\n");
+
 	g_rc.Initialize(true);
 
 	m_swerve.SetPIDValues();
 
 	//m_swerve.Disable();
-
-	g_rc.m_bRestartRobotCode = false;
-
-	g_rc.m_bRestartRobotCode = false;
-
-	g_rc.m_bRestartRobotCode = false;
 
 #ifdef BIT_IS_ENABLED
 	m_BIT.Initialize(&m_swerve, &g_rc.m_cargoControl);
@@ -87,21 +89,39 @@ void Robot::AutonomousInit()
 
 void Robot::AutonomousPeriodic()
 {
-
-	if(g_rc.m_calibrationSwitch.Get())
-	{
-		return;
-	}
-	
 	TeleopPeriodic();
+
+	//double x = g_tc.GetDouble("Swerve/ResetPID", -1000.0);
+	double x = g_tc.GetDouble("CANSim/GrabberCurrent", -1000.0);
+	double y = g_tc.GetDouble("Target/Y", -1000.0);
+
+	
+	//printf("x: %.6f\n", x);
+
+	//m_swerve.Disable();
+	//m_swerve.Periodic();
+	return;
+
+	double rotation = (x - 320) / 320.0;
+
+	rotation /= 2.0;
+
+	if (rotation >  .5) rotation =  .5;
+	if (rotation < -.5) rotation = -.5;
+
+	printf("%.6f, %.6f %.6f\n", x, y, rotation);
+
+	m_swerve.Periodic();
 }
 
 void Robot::DisabledInit()
 {
+
 }
 
 void Robot::DisabledPeriodic()
 {
+	//g_rc.Periodic(false);
 }
 
 int main() 

@@ -11,11 +11,7 @@ public :
 	virtual void Initialize();
 
 	void Changed(bool bChanged) { m_bChanged = bChanged; }
-
-	/*@return true if the value of the button has changed*/
 	bool Changed() { return m_bChanged; }
-
-	/*@return true while the button is pressed and held*/
 	bool Pressed() { return m_bPressed; }
 	int Index() { return m_index; }
 

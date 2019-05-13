@@ -31,7 +31,6 @@ void NavXGyro::ZeroYaw()
 
 	printf("Yaw correction %.6f\n", m_yawCorrection);
 
-#ifdef SAVE_YAW_TO_FILE
 	FILE *pFile = NULL;	
 
 	char filename [120];
@@ -42,6 +41,7 @@ void NavXGyro::ZeroYaw()
 	tstruct = *localtime(&now);
 
 	strftime(buf, sizeof(buf), "%Y-%m-%d-%H-%M-%S", &tstruct);
+
 
 	sprintf(filename, "/home/lvuser/yaw_%s.txt", buf);
 
@@ -54,7 +54,6 @@ void NavXGyro::ZeroYaw()
 		fprintf(pFile, "%.6f", m_yawCorrection);
 		fclose(pFile);
 	}
-#endif	
 }
 
 float NavXGyro::Yaw()

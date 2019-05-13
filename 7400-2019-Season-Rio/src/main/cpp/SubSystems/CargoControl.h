@@ -7,12 +7,12 @@
 #include "..\CanSimulator.h"
 #include "..\include\Defines.h"
 
-#define EJECT_TIME 		  25
-#define FLIP_TIME 		  50
-#define HARD_PULL_IN_TIME 250
+#define EJECT_TIME 25
 
-#define CARGO_CURRENT_THRESHOLD  5.0
+#define CARGO_CURRENT_THRESHOLD 5.0
 #define CARGO_CURRENT_ITERATIONS 25
+
+#define FLIP_TIME 50
 
 #define CAPTURE_TILT_CURRENT_THRESHOLD  3.0
 #define CAPTURE_TILT_CURRENT_ITERATIONS 5
@@ -45,30 +45,38 @@ class CargoControl
 {
 	public    : CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, int intakeID);
 
-				      void Initialize(bool bFlip);
-				      void Periodic();
+				void Initialize(bool bFlip);
+				void Periodic();
 				
-				      CargoState 		  GetCargoState();
-				      CargoCaptureState GetCargoCaptureState();
-				      Pneumatics   	  m_pneumatics;				
+				CargoState 		  GetCargoState();
+				CargoCaptureState GetCargoCaptureState();
+				Pneumatics   	  m_pneumatics;				
 	protected :
-				      const char* CargoStateToString(CargoState cargoState);
+				const char* CargoStateToString(CargoState cargoState);
 
-				      WPI_TalonSRX 	    m_leftGrabberMotor, m_rightGrabberMotor;
-       	      WPI_TalonSRX 	    m_cargoCaptureTilt, m_cargoCaptureIntake;
-				      CargoState   	    m_cargoState, m_lastCargoState;
-				      CargoCaptureState m_cargoCaptureState;
+				bool MonitorCaptureMotor(int targetPosition, int maxError, double maxCurrent);
 
-				      int m_ejectCounter, m_flippingCounter;
+				WPI_TalonSRX 	  m_leftGrabberMotor, m_rightGrabberMotor;
+       		 	WPI_TalonSRX 	  m_cargoCaptureTilt, m_cargoCaptureIntake;
+				CargoState   	  m_cargoState, m_lastCargoState;
+				CargoCaptureState m_cargoCaptureState;
 
-              int m_currentCounter, m_cargoStateCounter, m_hatchGrabCounter, m_captureCurrentCounter;
-				      int m_hatchGrabInitialPosition, m_cargoCaptureInitialPosition;
-				      int m_hardPullInCounter;
+				int m_ejectCounter, m_flippingCounter;
 
-              bool m_bCargoIntakeTestWaiting;
-              bool m_bGlobeTrotterMode;
-              bool m_bFlipped;
-				      bool m_bChangeHeight;
+				int m_leftEncoderPosition;
+        		int m_rightEncoderPosition;
+        		int m_currentCounter;
+      	 		int m_cargoStateCounter;
+      	 		int m_hatchGrabCounter;
+      	  		int m_captureCurrentCounter;
+     	   		int m_DICounter;
+        		int m_hatchGrabInitialPosition;
+				int m_printCounter;
+
+        		bool m_bCargoIntakeTestWaiting;
+        		bool m_bGlobeTrotterMode;
+        		bool m_bFlipped;
+				bool m_bChangeHeight;
 };
 
 #endif

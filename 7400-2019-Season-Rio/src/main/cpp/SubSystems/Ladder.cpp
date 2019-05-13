@@ -23,14 +23,14 @@ Ladder::Ladder()
 
 void Ladder::Initialize()
 {
-    m_pDrives[0]->SetSafetyEnabled(false);
-    m_pDrives[1]->SetSafetyEnabled(false);
-    
     m_pDrives[1]->Follow(*m_pDrives[0]);
 
     m_pDrives[0]->ConfigPeakOutputReverse(-0.4);
     m_pDrives[0]->ConfigPeakOutputForward(0.7);    
-    
+
+    m_pDrives[0]->SetSafetyEnabled(false);
+    m_pDrives[1]->SetSafetyEnabled(false);
+   
     double f = g_tc.GetDouble("Ladder/F", kDefaultLadderF);
 	double p = g_tc.GetDouble("Ladder/P", kDefaultLadderP);
 	double i = g_tc.GetDouble("Ladder/I", kDefaultLadderI);
@@ -60,7 +60,7 @@ void Ladder::ProcessLadderStates()
 {
     int ladderPosition;
 
-    switch (m_ladderState)
+    switch(m_ladderState)
     {
         case eLadderStateDisabled: break;
 
@@ -74,7 +74,7 @@ void Ladder::ProcessLadderStates()
 
 int Ladder::GetTargetLadderPosition()
 {
-    switch (g_rc.m_ladderTargetHeight)
+    switch(g_rc.m_ladderTargetHeight)
     {
         case eLadderHeightGround       : return LADDER_GROUND_HEIGHT;
 

@@ -15,15 +15,13 @@ class MeeseeksJoystick : public frc::Joystick
 
 							virtual void Initialize();
 							virtual void Periodic();
-#ifdef USING_POV
+
 							int GetPOVState();
-#endif							
 	protected :
 							std::vector<JSButton *> m_buttons;
-#ifdef USING_POV
+
 							int m_oldPOV, m_newPOV, m_POVState;
 							bool m_bPOVChanged;
-#endif							
 };
 
 #endif

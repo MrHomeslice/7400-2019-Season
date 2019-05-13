@@ -5,12 +5,12 @@
 #include "Gyro/NavXGyro.h"
 #include "SwerveDrive/SwerveDrive.h"
 #include "SubSystems/CargoControl.h"
+#include "BIT.h"
 
 class Robot : public frc::TimedRobot
 {
 	public    : Robot();
 	protected :
-							bool AligningSwerve();
 							void RobotInit();
 							void AutonomousInit();
 							void AutonomousPeriodic();
@@ -21,6 +21,7 @@ class Robot : public frc::TimedRobot
 
 							NavXGyro     m_gyro;
 							SwerveDrive  m_swerve;
+							BIT          m_BIT;
 };
 
 #endif
