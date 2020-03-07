@@ -8,7 +8,7 @@ CargoControl::CargoControl(int leftGrabberID, int rightGrabberID, int tiltID, in
 			//m_leftGrabberMotor(4, "Left Cargo Motor", true), m_rightGrabberMotor(5, "Right Cargo Motor", true),
 			m_cargoCaptureTilt(tiltID), m_cargoCaptureIntake(intakeID),
 			m_cargoState(eCargoStateInitialize), m_lastCargoState(eCargoStateInitialize),
-			 m_cargoCaptureState(eCargoCaptureStateInitialize)
+			m_cargoCaptureState(eCargoCaptureStateInitialize)
 {
 		m_bCargoIntakeTestWaiting = true;
 		m_bFlipped = false;

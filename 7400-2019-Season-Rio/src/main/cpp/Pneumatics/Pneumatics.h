@@ -5,15 +5,15 @@
 
 class Pneumatics
 {
-	public    : Pneumatics();
+	public : 
+		Pneumatics();
 
-							void Initialize();
-							void Flip(bool bFlip);
-							void Flop();
-
-							bool m_bFlip;
+		void Initialize();
+		void Flip(bool bFlip);
+		void Flop();
+		bool m_bFlip;
 	protected :
-							frc::DoubleSolenoid *m_pFlip;
+		frc::DoubleSolenoid *m_pFlip;
 };
 
 #endif

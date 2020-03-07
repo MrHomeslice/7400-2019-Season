@@ -35,7 +35,8 @@ void Robot::TeleopInit()
 
 void ShowState(std::string &oldState, const char *pNewState)
 {
-	if (oldState != pNewState) {
+	if (oldState != pNewState)
+	{
 		printf("%s\n", pNewState);
 		oldState = pNewState;
 	}
